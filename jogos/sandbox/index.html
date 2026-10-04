@@ -1224,6 +1224,13 @@ function seededRandom(x,y=0,extra=0){
 }
 
 
+function smoothstep(t){
+
+    return t*t*(3-2*t);
+
+}
+
+
 function noise1D(x){
 
     const x0=Math.floor(x);
@@ -1247,9 +1254,40 @@ function noise1D(x){
         );
 
     const smooth=
-        t*t*(3-2*t);
+        smoothstep(t);
 
     return a+(b-a)*smooth;
+
+}
+
+
+/* ============================================================
+   NOVO RUÍDO 2D
+============================================================ */
+
+function noise2D(x,y,extra=0){
+
+    const x0=Math.floor(x);
+    const y0=Math.floor(y);
+
+    const x1=x0+1;
+    const y1=y0+1;
+
+    const tx=smoothstep(x-x0);
+    const ty=smoothstep(y-y0);
+
+    const a=seededRandom(x0,y0,extra);
+    const b=seededRandom(x1,y0,extra);
+    const c=seededRandom(x0,y1,extra);
+    const d=seededRandom(x1,y1,extra);
+
+    const top=
+        a+(b-a)*tx;
+
+    const bottom=
+        c+(d-c)*tx;
+
+    return top+(bottom-top)*ty;
 
 }
 
@@ -1260,7 +1298,7 @@ function noise1D(x){
 
 function resizeCanvas(){
 
-    const width =
+    const width=
         Math.max(
             1,
             Math.floor(
@@ -1268,7 +1306,7 @@ function resizeCanvas(){
             )
         );
 
-    const height =
+    const height=
         Math.max(
             1,
             Math.floor(
@@ -1276,37 +1314,31 @@ function resizeCanvas(){
             )
         );
 
-
-    const devicePixelRatio =
+    const devicePixelRatio=
         Math.min(
             window.devicePixelRatio || 1,
             2
         );
 
-
-    canvas.width =
+    canvas.width=
         Math.floor(
             width*
             devicePixelRatio
         );
 
-
-    canvas.height =
+    canvas.height=
         Math.floor(
             height*
             devicePixelRatio
         );
 
-
-    canvas.style.width =
+    canvas.style.width=
         width+
         "px";
 
-
-    canvas.style.height =
+    canvas.style.height=
         height+
         "px";
-
 
     ctx.setTransform(
         devicePixelRatio,
@@ -1324,35 +1356,107 @@ function resizeCanvas(){
    RUÍOS E MARES
 ============================================================ */
 
+function getRiverStrength(blockX){
+
+    const large=
+        noise1D(
+            blockX/120+
+            500
+        );
+
+    const medium=
+        noise1D(
+            blockX/45+
+            1500
+        );
+
+    const center=
+        Math.abs(
+            large-.5
+        );
+
+    const channel=
+        Math.max(
+            0,
+            1-
+            center/.18
+        );
+
+    return channel*
+        (
+            .65+
+            medium*.35
+        );
+
+}
+
+
 function isRiverAt(blockX){
 
-    const riverNoise=
-        noise1D(
-            blockX/75+500
-        );
-
-    const secondary=
-        noise1D(
-            blockX/180+900
-        );
-
     return (
-        riverNoise>.445 &&
-        riverNoise<.555 &&
-        secondary>.25
+        getRiverStrength(blockX)>
+        .55
     );
+
+}
+
+
+function getRiverWidth(blockX){
+
+    const strength=
+        getRiverStrength(
+            blockX
+        );
+
+    return 1+
+        Math.floor(
+            strength*2.5
+        );
+
+}
+
+
+function getSeaStrength(blockX){
+
+    const broad=
+        noise1D(
+            blockX/850+
+            1400
+        );
+
+    const coast=
+        noise1D(
+            blockX/180+
+            2100
+        );
+
+    let strength=
+        clamp(
+            (0.25-broad)/
+            .16,
+            0,
+            1
+        );
+
+    strength=
+        strength*.75+
+        clamp(
+            (.55-coast)/
+            .55,
+            0,
+            1
+        )*.25;
+
+    return strength;
 
 }
 
 
 function isSeaAt(blockX){
 
-    const seaNoise=
-        noise1D(
-            blockX/700+1400
-        );
-
-    return seaNoise<.18;
+    return getSeaStrength(
+        blockX
+    )>.58;
 
 }
 
@@ -1363,41 +1467,50 @@ function isSeaAt(blockX){
 
 function getBiome(blockX){
 
-    const n=
+    const broad=
         noise1D(
-            blockX/350
+            blockX/700
         );
 
-    const n2=
+    const medium=
         noise1D(
-            blockX/900+100
+            blockX/230+
+            100
+        );
+
+    const small=
+        noise1D(
+            blockX/80+
+            300
         );
 
     const value=
-        n*.7+n2*.3;
+        broad*.45+
+        medium*.35+
+        small*.20;
 
     if(value<.10)
         return BIOMES[2];
 
-    if(value<.20)
+    if(value<.19)
         return BIOMES[5];
 
-    if(value<.30)
+    if(value<.28)
         return BIOMES[8];
 
-    if(value<.40)
+    if(value<.38)
         return BIOMES[6];
 
-    if(value<.50)
+    if(value<.49)
         return BIOMES[1];
 
-    if(value<.60)
+    if(value<.59)
         return BIOMES[7];
 
-    if(value<.70)
+    if(value<.69)
         return BIOMES[9];
 
-    if(value<.80)
+    if(value<.79)
         return BIOMES[0];
 
     if(value<.90)
@@ -1415,107 +1528,294 @@ function getBiome(blockX){
 function getSurfaceBlockY(blockX){
 
     const biome=
-        getBiome(blockX);
+        getBiome(
+            blockX
+        );
 
-    const wave1=
-        Math.sin(blockX/80)*4;
+    const continental=
+        noise1D(
+            blockX/260+
+            20
+        );
 
-    const wave2=
-        Math.sin(blockX/25)*2;
+    const largeWave=
+        Math.sin(
+            blockX/105
+        )*3.5;
 
-    const wave3=
-        Math.sin(blockX/180)*5;
+    const mediumWave=
+        Math.sin(
+            blockX/43+
+            1.7
+        )*2.2;
 
-    const noise=
-        (noise1D(blockX/12)-.5)*6;
+    const smallWave=
+        Math.sin(
+            blockX/17
+        )*1.1;
+
+    const terrainNoise=
+        (
+            noise1D(
+                blockX/18+
+                400
+            )-.5
+        )*5;
 
     let height=
         12+
-        wave1+
-        wave2+
-        wave3+
-        noise;
+        largeWave+
+        mediumWave+
+        smallWave+
+        terrainNoise;
 
 
-    if(biome.name==="Montanhas"){
+    if(
+        biome.name==="Montanhas"
+    ){
 
-        height+=
-            8+
+        const mountainLarge=
             noise1D(
-                blockX/30
-            )*15;
+                blockX/90+
+                700
+            );
+
+        const mountainSmall=
+            noise1D(
+                blockX/22+
+                800
+            );
+
+        const ridge=
+            Math.abs(
+                mountainLarge-.5
+            )*2;
 
         height+=
-            Math.sin(
-                blockX/16
+            10+
+            mountainLarge*13+
+            ridge*9+
+            mountainSmall*5;
+
+        if(
+            noise1D(
+                blockX/12+
+                900
+            )>.72
+        ){
+
+            height+=7;
+
+        }
+
+    }
+
+
+    if(
+        biome.name==="Deserto"
+    ){
+
+        height+=
+            noise1D(
+                blockX/32+
+                1000
             )*4;
 
+        height+=
+            Math.sin(
+                blockX/52
+            )*2.5;
+
     }
 
 
-    if(biome.name==="Deserto"){
+    if(
+        biome.name==="Tundra"
+    ){
 
         height+=
             noise1D(
-                blockX/40
-            )*3;
+                blockX/45+
+                1100
+            )*5;
 
         height+=
             Math.sin(
-                blockX/55
-            )*2;
+                blockX/70
+            )*3;
 
     }
 
 
-    if(biome.name==="Pântano"){
+    if(
+        biome.name==="Floresta"
+    ){
 
-        height=
-            14+
+        height+=
             noise1D(
-                blockX/35
-            )*2;
+                blockX/55+
+                1200
+            )*3;
 
     }
 
 
-    if(biome.name==="Praia"){
+    if(
+        biome.name==="Floresta Sombria"
+    ){
 
-        height=
-            12+
+        height+=
             noise1D(
-                blockX/45
+                blockX/48+
+                1300
+            )*5;
+
+        height+=
+            Math.sin(
+                blockX/34
             )*2;
 
     }
 
 
     if(
-        isSeaAt(blockX) &&
-        biome.name!=="Montanhas"
+        biome.name==="Taiga"
     ){
 
         height+=
-            3+
             noise1D(
-                blockX/35+50
+                blockX/60+
+                1400
             )*4;
 
     }
 
 
-    if(isRiverAt(blockX)){
+    if(
+        biome.name==="Savana"
+    ){
+
+        height+=
+            noise1D(
+                blockX/75+
+                1500
+            )*2.5;
+
+    }
+
+
+    if(
+        biome.name==="Pântano"
+    ){
 
         height=
-            Math.min(
+            14+
+            (
+                noise1D(
+                    blockX/28+
+                    1600
+                )-.5
+            )*3;
+
+    }
+
+
+    if(
+        biome.name==="Praia"
+    ){
+
+        height=
+            12+
+            (
+                noise1D(
+                    blockX/42+
+                    1700
+                )-.5
+            )*3;
+
+    }
+
+
+    /*
+       CONTINENTES
+
+       Em regiões muito próximas do mar,
+       o terreno vai descendo gradualmente.
+    */
+
+    const seaStrength=
+        getSeaStrength(
+            blockX
+        );
+
+    if(
+        seaStrength>.35 &&
+        biome.name!=="Montanhas"
+    ){
+
+        const coastDrop=
+            seaStrength*
+            7;
+
+        height-=
+            coastDrop;
+
+    }
+
+
+    /*
+       RIO
+
+       O rio corta o terreno e cria margens
+       mais suaves.
+    */
+
+    const riverStrength=
+        getRiverStrength(
+            blockX
+        );
+
+    if(
+        riverStrength>.30
+    ){
+
+        height-=
+            riverStrength*
+            5;
+
+    }
+
+
+    /*
+       LIMITES PARA EVITAR PONTOS EXTREMOS
+    */
+
+    if(
+        biome.name!=="Montanhas"
+    ){
+
+        height=
+            clamp(
                 height,
-                SEA_LEVEL+1
+                7,
+                23
+            );
+
+    }else{
+
+        height=
+            clamp(
+                height,
+                12,
+                48
             );
 
     }
 
 
-    return Math.floor(height);
+    return Math.floor(
+        height
+    );
 
 }
 
@@ -1529,65 +1829,166 @@ function getSurfacePixelY(worldX){
 
     return getSurfaceBlockY(
         blockX
-    )*TILE_SIZE;
+    )*
+    TILE_SIZE;
 
 }
 
 
 /* ============================================================
-   CAVERNAS
+   CAVERNAS MAIS NATURAIS
 ============================================================ */
 
 function caveNoise(blockX,blockY){
 
-    const a=
-        seededRandom(
-            Math.floor(blockX/3),
-            Math.floor(blockY/3),
+    const large=
+        noise2D(
+            blockX/8,
+            blockY/8,
             812
         );
 
-    const b=
-        seededRandom(
-            Math.floor(blockX/7),
-            Math.floor(blockY/7),
+    const medium=
+        noise2D(
+            blockX/4,
+            blockY/4,
             813
         );
 
-    const c=
-        seededRandom(
-            blockX,
-            blockY,
+    const small=
+        noise2D(
+            blockX/2,
+            blockY/2,
             814
         );
 
     return (
-        a*.45+
-        b*.35+
-        c*.20
+        large*.50+
+        medium*.32+
+        small*.18
     );
 
 }
 
 
-function isCaveAt(blockX,blockY,surface){
+function caveTunnelNoise(
+    blockX,
+    blockY
+){
+
+    const horizontal=
+        noise2D(
+            blockX/11,
+            blockY/3.5,
+            820
+        );
+
+    const vertical=
+        noise2D(
+            blockX/3.5,
+            blockY/11,
+            821
+        );
+
+    return (
+        horizontal*.62+
+        vertical*.38
+    );
+
+}
+
+
+function isCaveAt(
+    blockX,
+    blockY,
+    surface
+){
 
     const depth=
-        blockY-surface;
+        blockY-
+        surface;
 
     if(depth<6)
         return false;
 
-    if(depth>35)
+    if(depth>42)
         return false;
 
-    const cave=
+
+    /*
+       Mantém uma camada de segurança
+       abaixo da superfície.
+    */
+
+    const base=
         caveNoise(
             blockX,
             blockY
         );
 
-    return cave>.82;
+    const tunnels=
+        caveTunnelNoise(
+            blockX,
+            blockY
+        );
+
+
+    let threshold=
+        .80;
+
+
+    /*
+       Cavernas maiores no meio da terra.
+    */
+
+    if(
+        depth>=10 &&
+        depth<=28
+    ){
+
+        threshold=.73;
+
+    }
+
+
+    /*
+       Túneis estreitos em outras regiões.
+    */
+
+    if(
+        tunnels>.84 &&
+        depth>=7
+    ){
+
+        return true;
+
+    }
+
+
+    if(
+        base>threshold
+    ){
+
+        /*
+           Pequenas câmaras extras.
+        */
+
+        if(
+            seededRandom(
+                blockX,
+                blockY,
+                830
+            )>.18
+        ){
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
 
 }
 
@@ -1631,11 +2032,18 @@ function getChunkKey(chunkX,chunkY){
 }
 
 
-function getBlockChunk(blockX,blockY){
+function getBlockChunk(
+    blockX,
+    blockY
+){
 
     return getChunkKey(
-        Math.floor(blockX/CHUNK_SIZE),
-        Math.floor(blockY/CHUNK_SIZE)
+        Math.floor(
+            blockX/CHUNK_SIZE
+        ),
+        Math.floor(
+            blockY/CHUNK_SIZE
+        )
     );
 
 }
@@ -1648,10 +2056,13 @@ function getBlockChunk(blockX,blockY){
 function hasTreeAt(blockX){
 
     const biome=
-        getBiome(blockX);
+        getBiome(
+            blockX
+        );
 
     if(!biome.tree)
         return false;
+
 
     if(
         isRiverAt(blockX) ||
@@ -1662,11 +2073,93 @@ function hasTreeAt(blockX){
 
     }
 
+
+    const surface=
+        getSurfaceBlockY(
+            blockX
+        );
+
+
+    /*
+       Evita árvores em terrenos
+       muito inclinados.
+    */
+
+    const left=
+        getSurfaceBlockY(
+            blockX-1
+        );
+
+    const right=
+        getSurfaceBlockY(
+            blockX+1
+        );
+
+
+    if(
+        Math.abs(
+            left-right
+        )>2
+    ){
+
+        return false;
+
+    }
+
+
+    let chance=.86;
+
+
+    if(
+        biome.name==="Floresta"
+    ){
+
+        chance=.72;
+
+    }
+
+
+    if(
+        biome.name==="Floresta Sombria"
+    ){
+
+        chance=.66;
+
+    }
+
+
+    if(
+        biome.name==="Taiga"
+    ){
+
+        chance=.75;
+
+    }
+
+
+    if(
+        biome.name==="Pântano"
+    ){
+
+        chance=.80;
+
+    }
+
+
+    if(
+        biome.name==="Savana"
+    ){
+
+        chance=.88;
+
+    }
+
+
     return seededRandom(
         blockX,
-        getSurfaceBlockY(blockX),
+        surface,
         333
-    )>.86;
+    )>chance;
 
 }
 
@@ -1674,39 +2167,64 @@ function hasTreeAt(blockX){
 function getTreeHeight(blockX){
 
     const biome=
-        getBiome(blockX);
+        getBiome(
+            blockX
+        );
 
     let minimum=3;
 
     let extra=3;
 
-    if(biome.name==="Taiga"){
+
+    if(
+        biome.name==="Floresta"
+    ){
 
         minimum=4;
         extra=4;
 
     }
 
-    if(biome.name==="Floresta Sombria"){
 
-        minimum=4;
+    if(
+        biome.name==="Taiga"
+    ){
+
+        minimum=5;
         extra=5;
 
     }
 
-    if(biome.name==="Pântano"){
+
+    if(
+        biome.name==="Floresta Sombria"
+    ){
+
+        minimum=5;
+        extra=6;
+
+    }
+
+
+    if(
+        biome.name==="Pântano"
+    ){
 
         minimum=3;
-        extra=2;
+        extra=3;
 
     }
 
-    if(biome.name==="Savana"){
+
+    if(
+        biome.name==="Savana"
+    ){
 
         minimum=4;
-        extra=2;
+        extra=3;
 
     }
+
 
     return minimum+
         Math.floor(
@@ -1714,7 +2232,8 @@ function getTreeHeight(blockX){
                 blockX,
                 0,
                 444
-            )*extra
+            )*
+            extra
         );
 
 }
@@ -1723,7 +2242,9 @@ function getTreeHeight(blockX){
 function hasCactusAt(blockX){
 
     const biome=
-        getBiome(blockX);
+        getBiome(
+            blockX
+        );
 
     if(
         biome.name!=="Deserto"
@@ -1733,11 +2254,14 @@ function hasCactusAt(blockX){
 
     }
 
+
     return seededRandom(
         blockX,
-        getSurfaceBlockY(blockX),
+        getSurfaceBlockY(
+            blockX
+        ),
         555
-    )>.90;
+    )>.86;
 
 }
 
@@ -1750,17 +2274,134 @@ function getCactusHeight(blockX){
                 blockX,
                 0,
                 556
-            )*3
+            )*4
         );
 
 }
 
 
 /* ============================================================
-   GERAÇÃO
+   VEGETAÇÃO ESPECIAL
 ============================================================ */
 
-function generateBlock(blockX,blockY){
+function hasGrassDetailAt(
+    blockX
+){
+
+    const biome=
+        getBiome(
+            blockX
+        );
+
+    if(
+        biome.name!=="Planície" &&
+        biome.name!=="Savana" &&
+        biome.name!=="Floresta"
+    ){
+
+        return false;
+
+    }
+
+
+    if(
+        hasTreeAt(blockX)
+    ){
+
+        return false;
+
+    }
+
+
+    if(
+        isRiverAt(blockX) ||
+        isSeaAt(blockX)
+    ){
+
+        return false;
+
+    }
+
+
+    return seededRandom(
+        blockX,
+        getSurfaceBlockY(blockX),
+        600
+    )>.68;
+
+}
+
+
+function hasFlowerAt(blockX){
+
+    const biome=
+        getBiome(
+            blockX
+        );
+
+    if(
+        biome.name!=="Planície" &&
+        biome.name!=="Floresta"
+    ){
+
+        return false;
+
+    }
+
+
+    if(
+        isRiverAt(blockX) ||
+        isSeaAt(blockX)
+    ){
+
+        return false;
+
+    }
+
+
+    return seededRandom(
+        blockX,
+        getSurfaceBlockY(blockX),
+        601
+    )>.90;
+
+}
+
+
+function hasMushroomAt(blockX){
+
+    const biome=
+        getBiome(
+            blockX
+        );
+
+    if(
+        biome.name!=="Floresta Sombria" &&
+        biome.name!=="Pântano"
+    ){
+
+        return false;
+
+    }
+
+
+    return seededRandom(
+        blockX,
+        getSurfaceBlockY(blockX),
+        602
+    )>.82;
+
+}
+
+
+/* ============================================================
+   GERAÇÃO DE BLOCOS
+============================================================ */
+
+function generateBlock(
+    blockX,
+    blockY
+){
 
     if(
         blockX<-WORLD_LIMIT ||
@@ -1773,8 +2414,12 @@ function generateBlock(blockX,blockY){
 
     }
 
+
     const biome=
-        getBiome(blockX);
+        getBiome(
+            blockX
+        );
+
 
     const surface=
         getSurfaceBlockY(
@@ -1782,15 +2427,34 @@ function generateBlock(blockX,blockY){
         );
 
 
-    const waterRegion=
-        isSeaAt(blockX) ||
-        isRiverAt(blockX) ||
-        biome.name==="Pântano";
+    const sea=
+        isSeaAt(
+            blockX
+        );
 
+
+    const river=
+        isRiverAt(
+            blockX
+        );
+
+
+    const riverStrength=
+        getRiverStrength(
+            blockX
+        );
+
+
+    /*
+       ÁGUA DO MAR
+
+       O nível da água é fixo e o terreno
+       fica abaixo dele nas áreas profundas.
+    */
 
     if(
-        waterRegion &&
-        surface>SEA_LEVEL &&
+        sea &&
+        biome.name!=="Montanhas" &&
         blockY>=SEA_LEVEL &&
         blockY<surface
     ){
@@ -1800,9 +2464,55 @@ function generateBlock(blockX,blockY){
     }
 
 
-    if(blockY<surface)
+    /*
+       ÁGUA DOS RIOS
+    */
+
+    if(
+        river &&
+        riverStrength>.55 &&
+        blockY>=SEA_LEVEL &&
+        blockY<surface
+    ){
+
+        return "water";
+
+    }
+
+
+    /*
+       PÂNTANO
+
+       Algumas áreas baixas ficam alagadas.
+    */
+
+    if(
+        biome.name==="Pântano" &&
+        blockY>=SEA_LEVEL &&
+        blockY<surface &&
+        noise1D(
+            blockX/18+
+            3000
+        )>.42
+    ){
+
+        return "water";
+
+    }
+
+
+    if(
+        blockY<surface
+    ){
+
         return "air";
 
+    }
+
+
+    /*
+       CAVERNAS
+    */
 
     if(
         isCaveAt(
@@ -1818,18 +2528,100 @@ function generateBlock(blockX,blockY){
 
 
     const depth=
-        blockY-surface;
+        blockY-
+        surface;
 
 
-    if(depth===0)
+    /*
+       CAMADA SUPERFICIAL
+    */
+
+    if(depth===0){
+
+        /*
+           Margem de rio com areia.
+        */
+
+        if(
+            river &&
+            riverStrength>.35 &&
+            biome.name!=="Montanhas"
+        ){
+
+            return "sand";
+
+        }
+
+
+        /*
+           Costa de praia.
+        */
+
+        if(
+            sea &&
+            biome.name!=="Montanhas"
+        ){
+
+            return "sand";
+
+        }
+
+
         return biome.surface;
 
+    }
 
-    if(depth<=3)
+
+    /*
+       CAMADA DE SUBSOLO
+    */
+
+    if(
+        depth<=3
+    ){
+
+        /*
+           Montanhas ficam rochosas.
+        */
+
+        if(
+            biome.name==="Montanhas"
+        ){
+
+            return "stone";
+
+        }
+
+
+        /*
+           Praia/deserto continuam com areia.
+        */
+
+        if(
+            biome.name==="Deserto" ||
+            biome.name==="Praia"
+        ){
+
+            return "sand";
+
+        }
+
+
         return biome.underground;
 
+    }
 
-    const oreChance=
+
+    /*
+       PEDRA
+    */
+
+    /*
+       Minérios agora dependem também
+       da profundidade real.
+    */
+
+    const ore=
         seededRandom(
             blockX,
             blockY,
@@ -1837,9 +2629,14 @@ function generateBlock(blockX,blockY){
         );
 
 
+    /*
+       OURO:
+       muito raro e mais profundo.
+    */
+
     if(
-        oreChance>.9975 &&
-        depth>10
+        depth>=24 &&
+        ore>.9972
     ){
 
         return "gold";
@@ -1847,9 +2644,14 @@ function generateBlock(blockX,blockY){
     }
 
 
+    /*
+       FERRO:
+       comum em profundidade média.
+    */
+
     if(
-        oreChance>.987 &&
-        depth>6
+        depth>=10 &&
+        ore>.989
     ){
 
         return "iron";
@@ -1857,12 +2659,37 @@ function generateBlock(blockX,blockY){
     }
 
 
+    /*
+       CARVÃO:
+       aparece mais próximo da superfície,
+       mas também em cavernas.
+    */
+
     if(
-        oreChance>.95 &&
-        depth>4
+        depth>=5 &&
+        ore>.955
     ){
 
         return "coal";
+
+    }
+
+
+    /*
+       Pequena chance extra de ferro
+       em regiões muito profundas.
+    */
+
+    if(
+        depth>=32 &&
+        seededRandom(
+            blockX,
+            blockY,
+            701
+        )>.996
+    ){
+
+        return "iron";
 
     }
 
@@ -1876,20 +2703,27 @@ function generateBlock(blockX,blockY){
    BLOCOS MODIFICADOS
 ============================================================ */
 
-function blockKey(blockX,blockY){
+function blockKey(
+    blockX,
+    blockY
+){
 
     return `${blockX},${blockY}`;
 
 }
 
 
-function getBlock(blockX,blockY){
+function getBlock(
+    blockX,
+    blockY
+){
 
     const chunk=
         getBlockChunk(
             blockX,
             blockY
         );
+
 
     if(
         modifiedBlocks[chunk] &&
@@ -1911,6 +2745,7 @@ function getBlock(blockX,blockY){
 
     }
 
+
     return generateBlock(
         blockX,
         blockY
@@ -1919,7 +2754,11 @@ function getBlock(blockX,blockY){
 }
 
 
-function setBlock(blockX,blockY,type){
+function setBlock(
+    blockX,
+    blockY,
+    type
+){
 
     const chunk=
         getBlockChunk(
@@ -1927,11 +2766,15 @@ function setBlock(blockX,blockY,type){
             blockY
         );
 
-    if(!modifiedBlocks[chunk]){
+
+    if(
+        !modifiedBlocks[chunk]
+    ){
 
         modifiedBlocks[chunk]={};
 
     }
+
 
     modifiedBlocks[chunk][
         blockKey(
@@ -1939,6 +2782,7 @@ function setBlock(blockX,blockY,type){
             blockY
         )
     ]=type;
+
 
     exploredChunks[chunk]=true;
 
@@ -1949,7 +2793,10 @@ function setBlock(blockX,blockY,type){
    COLISÃO
 ============================================================ */
 
-function isSolidAt(blockX,blockY){
+function isSolidAt(
+    blockX,
+    blockY
+){
 
     const block=
         getBlock(
@@ -1962,7 +2809,10 @@ function isSolidAt(blockX,blockY){
 }
 
 
-function collidesAt(x,y){
+function collidesAt(
+    x,
+    y
+){
 
     const left=
         Math.floor(
@@ -1971,7 +2821,8 @@ function collidesAt(x,y){
 
     const right=
         Math.floor(
-            (x+player.width-1)/
+            (x+
+            player.width-1)/
             TILE_SIZE
         );
 
@@ -1982,9 +2833,11 @@ function collidesAt(x,y){
 
     const bottom=
         Math.floor(
-            (y+player.height-1)/
+            (y+
+            player.height-1)/
             TILE_SIZE
         );
+
 
     for(
         let bx=left;
@@ -2013,6 +2866,7 @@ function collidesAt(x,y){
 
     }
 
+
     return false;
 
 }
@@ -2028,18 +2882,23 @@ function getGroundY(){
         player.x+
         player.width/2;
 
+
     const blockX=
         Math.floor(
-            centerX/TILE_SIZE
+            centerX/
+            TILE_SIZE
         );
+
 
     const surface=
         getSurfaceBlockY(
             blockX
         );
 
+
     return (
-        surface*TILE_SIZE-
+        surface*
+        TILE_SIZE-
         player.height
     );
 
@@ -2049,12 +2908,16 @@ function getGroundY(){
 function placePlayerAtSpawn(){
 
     const surface=
-        getSurfaceBlockY(0);
+        getSurfaceBlockY(
+            0
+        );
+
 
     player.x=0;
 
     player.y=
-        surface*TILE_SIZE-
+        surface*
+        TILE_SIZE-
         player.height;
 
     player.vx=0;
@@ -2075,13 +2938,15 @@ function snapPlayerToGround(){
     const groundY=
         getGroundY();
 
+
     if(
         player.y>=groundY-2 &&
         player.y<=groundY+6 &&
         player.vy>=0
     ){
 
-        player.y=groundY;
+        player.y=
+            groundY;
 
         player.vy=0;
 
@@ -2090,6 +2955,7 @@ function snapPlayerToGround(){
         return true;
 
     }
+
 
     return false;
 
@@ -2164,7 +3030,8 @@ function updatePlayer(){
         )
     ){
 
-        player.x=nextX;
+        player.x=
+            nextX;
 
     }else{
 
@@ -2176,8 +3043,10 @@ function updatePlayer(){
     player.x=
         clamp(
             player.x,
-            -WORLD_LIMIT*TILE_SIZE,
-            WORLD_LIMIT*TILE_SIZE
+            -WORLD_LIMIT*
+            TILE_SIZE,
+            WORLD_LIMIT*
+            TILE_SIZE
         );
 
 
@@ -2202,8 +3071,14 @@ function updatePlayer(){
 
     player.vy+=.55;
 
-    if(player.vy>15)
+
+    if(
+        player.vy>15
+    ){
+
         player.vy=15;
+
+    }
 
 
     const nextY=
@@ -2211,7 +3086,9 @@ function updatePlayer(){
         player.vy;
 
 
-    if(player.vy<0){
+    if(
+        player.vy<0
+    ){
 
         if(
             !collidesAt(
@@ -2220,7 +3097,8 @@ function updatePlayer(){
             )
         ){
 
-            player.y=nextY;
+            player.y=
+                nextY;
 
             player.onGround=false;
 
@@ -2240,7 +3118,8 @@ function updatePlayer(){
             nextY>=groundY
         ){
 
-            player.y=groundY;
+            player.y=
+                groundY;
 
             player.vy=0;
 
@@ -2253,7 +3132,8 @@ function updatePlayer(){
             )
         ){
 
-            player.y=nextY;
+            player.y=
+                nextY;
 
             player.onGround=false;
 
@@ -2331,6 +3211,7 @@ function markCurrentChunkExplored(){
             player.y
         );
 
+
     exploredChunks[
         getChunkKey(
             cx,
@@ -2345,7 +3226,10 @@ function markCurrentChunkExplored(){
    ALCANCE
 ============================================================ */
 
-function canReachBlock(blockX,blockY){
+function canReachBlock(
+    blockX,
+    blockY
+){
 
     const px=
         player.x/
@@ -2361,11 +3245,13 @@ function canReachBlock(blockX,blockY){
     const by=
         blockY+.5;
 
+
     const dx=
         bx-px;
 
     const dy=
         by-py;
+
 
     return Math.sqrt(
         dx*dx+
@@ -2392,16 +3278,19 @@ function hasLineOfSight(
     const dy=
         endY-startY;
 
+
     const distance=
         Math.sqrt(
             dx*dx+
             dy*dy
         );
 
+
     const steps=
         Math.ceil(
             distance*4
         );
+
 
     for(
         let i=1;
@@ -2412,6 +3301,7 @@ function hasLineOfSight(
         const t=
             i/steps;
 
+
         const x=
             startX+
             dx*t;
@@ -2420,11 +3310,13 @@ function hasLineOfSight(
             startY+
             dy*t;
 
+
         const bx=
             Math.floor(x);
 
         const by=
             Math.floor(y);
+
 
         if(
             isSolidAt(
@@ -2438,6 +3330,7 @@ function hasLineOfSight(
         }
 
     }
+
 
     return true;
 
@@ -2480,7 +3373,9 @@ function screenToBlock(
    QUEBRAR / COLOCAR
 ============================================================ */
 
-function handleCanvasClick(event){
+function handleCanvasClick(
+    event
+){
 
     if(gamePaused)
         return;
@@ -2538,6 +3433,7 @@ function handleCanvasClick(event){
         )/
         TILE_SIZE;
 
+
     const playerCenterY=
         (
             player.y+
@@ -2577,6 +3473,7 @@ function handleCanvasClick(event){
             target.y,
             "air"
         );
+
 
         addItem(
             current,
@@ -2664,7 +3561,10 @@ function handleCanvasClick(event){
    INVENTÁRIO
 ============================================================ */
 
-function addItem(id,count){
+function addItem(
+    id,
+    count
+){
 
     let slot=
         hotbar.find(
@@ -2686,7 +3586,8 @@ function addItem(id,count){
 
     if(slot){
 
-        slot.count+=count;
+        slot.count+=
+            count;
 
     }
 
@@ -2775,6 +3676,7 @@ function initializeWeather(){
     const now=
         performance.now();
 
+
     weather.raining=false;
 
     weather.cloudCover=0;
@@ -2788,7 +3690,8 @@ function initializeWeather(){
     weather.nextChange=
         now+
         25000+
-        Math.random()*30000;
+        Math.random()*
+        30000;
 
     weather.rainEnd=0;
 
@@ -2817,13 +3720,16 @@ function updateWeather(){
 
             weather.targetCloudCover=1;
 
-            weather.targetRainIntensity=.75+
-                Math.random()*.25;
+            weather.targetRainIntensity=
+                .75+
+                Math.random()*
+                .25;
 
             weather.rainEnd=
                 now+
                 35000+
-                Math.random()*50000;
+                Math.random()*
+                50000;
 
         }else{
 
@@ -2836,9 +3742,11 @@ function updateWeather(){
             weather.clearEnd=
                 now+
                 18000+
-                Math.random()*22000;
+                Math.random()*
+                22000;
 
         }
+
 
         weather.nextChange=
             weather.raining
@@ -2864,7 +3772,8 @@ function updateWeather(){
         weather.nextChange=
             now+
             18000+
-            Math.random()*22000;
+            Math.random()*
+            22000;
 
     }
 
@@ -2936,12 +3845,10 @@ function drawSky(){
         brightness*
         90;
 
-
     let g=
         30+
         brightness*
         130;
-
 
     let b=
         50+
@@ -2992,14 +3899,18 @@ function drawSky(){
     );
 
 
-    if(weather.cloudCover>.35){
+    if(
+        weather.cloudCover>.35
+    ){
 
         const alpha=
             weather.cloudCover*
             .20;
 
+
         ctx.fillStyle=
             `rgba(20,28,38,${alpha})`;
+
 
         ctx.fillRect(
             0,
@@ -3033,6 +3944,7 @@ function drawCloudShape(
 
     ctx.beginPath();
 
+
     ctx.arc(
         x,
         y,
@@ -3041,29 +3953,38 @@ function drawCloudShape(
         Math.PI*2
     );
 
+
     ctx.arc(
-        x+35*scale,
-        y-12*scale,
+        x+
+        35*scale,
+        y-
+        12*scale,
         36*scale,
         0,
         Math.PI*2
     );
 
+
     ctx.arc(
-        x+75*scale,
+        x+
+        75*scale,
         y,
         27*scale,
         0,
         Math.PI*2
     );
 
+
     ctx.arc(
-        x+48*scale,
-        y+12*scale,
+        x+
+        48*scale,
+        y+
+        12*scale,
         32*scale,
         0,
         Math.PI*2
     );
+
 
     ctx.fill();
 
@@ -3130,7 +4051,9 @@ function drawClouds(){
     }
 
 
-    if(weather.cloudCover>.01){
+    if(
+        weather.cloudCover>.01
+    ){
 
         const darkTime=
             now/7000;
@@ -3156,7 +4079,8 @@ function drawClouds(){
                     drift
                 )%
                 (
-                    canvas.width+650
+                    canvas.width+
+                    650
                 );
 
 
@@ -3266,17 +4190,21 @@ function drawRain(){
 
         ctx.beginPath();
 
+
         ctx.moveTo(
             x,
             y
         );
 
+
         ctx.lineTo(
             x-4,
-            y+14+
+            y+
+            14+
             weather.rainIntensity*
             7
         );
+
 
         ctx.stroke();
 
@@ -3296,7 +4224,8 @@ function drawWorld(){
 
     const startX=
         Math.floor(
-            cameraX/TILE_SIZE
+            cameraX/
+            TILE_SIZE
         )-2;
 
 
@@ -3312,7 +4241,8 @@ function drawWorld(){
 
     const startY=
         Math.floor(
-            cameraY/TILE_SIZE
+            cameraY/
+            TILE_SIZE
         )-2;
 
 
@@ -3325,6 +4255,10 @@ function drawWorld(){
             TILE_SIZE
         )+2;
 
+
+    /*
+       BLOCOS
+    */
 
     for(
         let y=startY;
@@ -3345,8 +4279,13 @@ function drawWorld(){
                 );
 
 
-            if(block==="air")
+            if(
+                block==="air"
+            ){
+
                 continue;
+
+            }
 
 
             const px=
@@ -3361,7 +4300,9 @@ function drawWorld(){
                 cameraY;
 
 
-            if(block==="water"){
+            if(
+                block==="water"
+            ){
 
                 ctx.fillStyle=
                     "rgba(45,140,205,.72)";
@@ -3375,36 +4316,47 @@ function drawWorld(){
                 );
 
 
+                /*
+                   Brilho superficial
+                */
+
                 if(
-                    y===SEA_LEVEL
+                    y===SEA_LEVEL ||
+                    y===SEA_LEVEL+1
                 ){
 
                     ctx.strokeStyle=
-                        "rgba(170,225,255,.42)";
+                        "rgba(190,235,255,.45)";
 
                     ctx.lineWidth=1;
 
+
                     ctx.beginPath();
+
 
                     ctx.moveTo(
                         px+3,
                         py+8
                     );
 
+
                     ctx.lineTo(
                         px+13,
                         py+8
                     );
+
 
                     ctx.moveTo(
                         px+19,
                         py+15
                     );
 
+
                     ctx.lineTo(
                         px+29,
                         py+15
                     );
+
 
                     ctx.stroke();
 
@@ -3420,6 +4372,10 @@ function drawWorld(){
                 BLOCKS[block];
 
 
+            if(!info)
+                continue;
+
+
             ctx.fillStyle=
                 info.color;
 
@@ -3432,7 +4388,13 @@ function drawWorld(){
             );
 
 
-            if(block==="grass"){
+            /*
+               GRAMA
+            */
+
+            if(
+                block==="grass"
+            ){
 
                 ctx.fillStyle=
                     "#6ec553";
@@ -3445,13 +4407,43 @@ function drawWorld(){
                     6
                 );
 
+
+                /*
+                   Pequena variação de textura.
+                */
+
+                ctx.fillStyle=
+                    "rgba(35,90,30,.20)";
+
+
+                ctx.fillRect(
+                    px+5,
+                    py+15,
+                    3,
+                    4
+                );
+
+
+                ctx.fillRect(
+                    px+22,
+                    py+22,
+                    3,
+                    3
+                );
+
             }
 
 
-            if(block==="snow"){
+            /*
+               NEVE
+            */
+
+            if(
+                block==="snow"
+            ){
 
                 ctx.fillStyle=
-                    "rgba(255,255,255,.45)";
+                    "rgba(255,255,255,.55)";
 
 
                 ctx.fillRect(
@@ -3461,10 +4453,66 @@ function drawWorld(){
                     7
                 );
 
+
+                ctx.fillStyle=
+                    "rgba(180,210,225,.18)";
+
+
+                ctx.fillRect(
+                    px+6,
+                    py+18,
+                    7,
+                    3
+                );
+
+
+                ctx.fillRect(
+                    px+21,
+                    py+25,
+                    5,
+                    3
+                );
+
             }
 
 
-            if(block==="stone"){
+            /*
+               AREIA
+            */
+
+            if(
+                block==="sand"
+            ){
+
+                ctx.fillStyle=
+                    "rgba(150,120,55,.18)";
+
+
+                ctx.fillRect(
+                    px+5,
+                    py+8,
+                    3,
+                    3
+                );
+
+
+                ctx.fillRect(
+                    px+20,
+                    py+20,
+                    4,
+                    3
+                );
+
+            }
+
+
+            /*
+               PEDRA
+            */
+
+            if(
+                block==="stone"
+            ){
 
                 ctx.fillStyle=
                     "rgba(255,255,255,.08)";
@@ -3496,7 +4544,13 @@ function drawWorld(){
             }
 
 
-            if(block==="coal"){
+            /*
+               CARVÃO
+            */
+
+            if(
+                block==="coal"
+            ){
 
                 ctx.fillStyle=
                     "#16191c";
@@ -3517,10 +4571,24 @@ function drawWorld(){
                     7
                 );
 
+
+                ctx.fillRect(
+                    px+11,
+                    py+23,
+                    4,
+                    4
+                );
+
             }
 
 
-            if(block==="iron"){
+            /*
+               FERRO
+            */
+
+            if(
+                block==="iron"
+            ){
 
                 ctx.fillStyle=
                     "#d1c6b2";
@@ -3541,10 +4609,24 @@ function drawWorld(){
                     6
                 );
 
+
+                ctx.fillRect(
+                    px+12,
+                    py+22,
+                    4,
+                    4
+                );
+
             }
 
 
-            if(block==="gold"){
+            /*
+               OURO
+            */
+
+            if(
+                block==="gold"
+            ){
 
                 ctx.fillStyle=
                     "#ffe76a";
@@ -3565,45 +4647,104 @@ function drawWorld(){
                     7
                 );
 
+
+                ctx.fillRect(
+                    px+12,
+                    py+14,
+                    5,
+                    5
+                );
+
             }
 
 
-            if(block==="wood"){
+            /*
+               MADEIRA
+            */
+
+            if(
+                block==="wood"
+            ){
 
                 ctx.strokeStyle=
                     "rgba(50,25,10,.4)";
 
+
                 ctx.beginPath();
 
+
                 ctx.moveTo(
                     px+8,
                     py
                 );
 
+
                 ctx.lineTo(
                     px+8,
-                    py+TILE_SIZE
+                    py+
+                    TILE_SIZE
                 );
+
 
                 ctx.moveTo(
                     px+21,
                     py
                 );
 
+
                 ctx.lineTo(
                     px+21,
-                    py+TILE_SIZE
+                    py+
+                    TILE_SIZE
                 );
+
 
                 ctx.stroke();
 
             }
 
 
-            if(block==="mud"){
+            /*
+               FOLHAS
+            */
+
+            if(
+                block==="leaves"
+            ){
+
+                ctx.fillStyle=
+                    "rgba(150,220,100,.18)";
+
+
+                ctx.fillRect(
+                    px+5,
+                    py+6,
+                    7,
+                    7
+                );
+
+
+                ctx.fillRect(
+                    px+20,
+                    py+18,
+                    6,
+                    6
+                );
+
+            }
+
+
+            /*
+               LAMA
+            */
+
+            if(
+                block==="mud"
+            ){
 
                 ctx.fillStyle=
                     "rgba(30,20,15,.18)";
+
 
                 ctx.fillRect(
                     px+4,
@@ -3611,6 +4752,7 @@ function drawWorld(){
                     7,
                     5
                 );
+
 
                 ctx.fillRect(
                     px+20,
@@ -3626,14 +4768,23 @@ function drawWorld(){
     }
 
 
+    /*
+       ÁRVORES
+    */
+
     for(
         let x=startX;
         x<=endX;
         x++
     ){
 
-        if(!hasTreeAt(x))
+        if(
+            !hasTreeAt(x)
+        ){
+
             continue;
+
+        }
 
 
         const biome=
@@ -3660,12 +4811,46 @@ function drawWorld(){
             cameraY;
 
 
-        ctx.fillStyle=
-            biome.name==="Taiga"
-            ?
-            "#68452d"
-            :
+        /*
+           TRONCO
+        */
+
+        let trunkColor=
             "#704625";
+
+
+        if(
+            biome.name==="Taiga"
+        ){
+
+            trunkColor=
+                "#68452d";
+
+        }
+
+
+        if(
+            biome.name==="Savana"
+        ){
+
+            trunkColor=
+                "#765035";
+
+        }
+
+
+        if(
+            biome.name==="Pântano"
+        ){
+
+            trunkColor=
+                "#55402d";
+
+        }
+
+
+        ctx.fillStyle=
+            trunkColor;
 
 
         ctx.fillRect(
@@ -3679,8 +4864,41 @@ function drawWorld(){
         );
 
 
+        /*
+           TRONCO COM TEXTURA
+        */
+
+        ctx.fillStyle=
+            "rgba(35,20,10,.25)";
+
+
+        ctx.fillRect(
+            baseX+13,
+            baseY-
+            height*
+            TILE_SIZE,
+            3,
+            height*
+            TILE_SIZE
+        );
+
+
+        /*
+           COR DA FOLHAGEM
+        */
+
         let leafColor=
             "#2e7938";
+
+
+        if(
+            biome.name==="Floresta"
+        ){
+
+            leafColor=
+                "#28753a";
+
+        }
 
 
         if(
@@ -3727,19 +4945,24 @@ function drawWorld(){
             leafColor;
 
 
+        /*
+           TAIGA
+        */
+
         if(
             biome.name==="Taiga"
         ){
 
             for(
                 let i=0;
-                i<3;
+                i<4;
                 i++
             ){
 
                 const width=
-                    42-
-                    i*7;
+                    48-
+                    i*8;
+
 
                 ctx.fillRect(
                     baseX+
@@ -3748,38 +4971,143 @@ function drawWorld(){
                     baseY-
                     height*
                     TILE_SIZE+
-                    i*17,
+                    i*15,
                     width,
-                    24
+                    23
                 );
 
             }
 
-        }else if(
+        }
+
+
+        /*
+           SAVANA
+        */
+
+        else if(
             biome.name==="Savana"
         ){
 
             ctx.fillRect(
-                baseX-18,
+                baseX-20,
                 baseY-
                 height*
                 TILE_SIZE-
                 18,
-                58,
+                62,
                 25
             );
 
+
             ctx.fillRect(
-                baseX+15,
+                baseX+14,
                 baseY-
                 height*
                 TILE_SIZE-
                 8,
-                40,
+                43,
                 22
             );
 
-        }else{
+        }
+
+
+        /*
+           PÂNTANO
+        */
+
+        else if(
+            biome.name==="Pântano"
+        ){
+
+            ctx.fillRect(
+                baseX-15,
+                baseY-
+                height*
+                TILE_SIZE-
+                20,
+                50,
+                30
+            );
+
+
+            ctx.fillRect(
+                baseX-3,
+                baseY-
+                height*
+                TILE_SIZE-
+                30,
+                42,
+                24
+            );
+
+
+            /*
+               Galho lateral
+            */
+
+            ctx.fillRect(
+                baseX+17,
+                baseY-
+                height*
+                TILE_SIZE+
+                28,
+                28,
+                6
+            );
+
+        }
+
+
+        /*
+           FLORESTA SOMBRIA
+        */
+
+        else if(
+            biome.name==="Floresta Sombria"
+        ){
+
+            ctx.fillRect(
+                baseX-22,
+                baseY-
+                height*
+                TILE_SIZE-
+                20,
+                72,
+                35
+            );
+
+
+            ctx.fillRect(
+                baseX-10,
+                baseY-
+                height*
+                TILE_SIZE-
+                37,
+                62,
+                30
+            );
+
+
+            ctx.fillRect(
+                baseX+4,
+                baseY-
+                height*
+                TILE_SIZE-
+                51,
+                42,
+                28
+            );
+
+        }
+
+
+        /*
+           FLORESTAS NORMAIS / PLANÍCIE
+        */
+
+        else{
 
             for(
                 let i=-1;
@@ -3804,6 +5132,10 @@ function drawWorld(){
 
     }
 
+
+    /*
+       CACTOS
+    */
 
     for(
         let x=startX;
@@ -3855,7 +5187,28 @@ function drawWorld(){
         );
 
 
-        if(height>=2){
+        ctx.fillStyle=
+            "#1d6731";
+
+
+        ctx.fillRect(
+            baseX+13,
+            baseY-
+            height*
+            TILE_SIZE,
+            3,
+            height*
+            TILE_SIZE
+        );
+
+
+        if(
+            height>=2
+        ){
+
+            ctx.fillStyle=
+                "#27873d";
+
 
             ctx.fillRect(
                 baseX+3,
@@ -3868,6 +5221,241 @@ function drawWorld(){
             );
 
         }
+
+
+        if(
+            height>=3 &&
+            seededRandom(
+                x,
+                height,
+                557
+            )>.5
+        ){
+
+            ctx.fillRect(
+                baseX+21,
+                baseY-
+                height*
+                TILE_SIZE+
+                40,
+                8,
+                18
+            );
+
+        }
+
+    }
+
+
+    /*
+       GRAMA / VEGETAÇÃO
+    */
+
+    for(
+        let x=startX;
+        x<=endX;
+        x++
+    ){
+
+        if(
+            !hasGrassDetailAt(x)
+        ){
+
+            continue;
+
+        }
+
+
+        const surface=
+            getSurfaceBlockY(x);
+
+
+        const px=
+            x*
+            TILE_SIZE-
+            cameraX;
+
+
+        const py=
+            surface*
+            TILE_SIZE-
+            cameraY;
+
+
+        ctx.strokeStyle=
+            "#3e8e38";
+
+
+        ctx.lineWidth=2;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            px+9,
+            py
+        );
+
+
+        ctx.lineTo(
+            px+7,
+            py-9
+        );
+
+
+        ctx.moveTo(
+            px+13,
+            py
+        );
+
+
+        ctx.lineTo(
+            px+16,
+            py-10
+        );
+
+
+        ctx.stroke();
+
+    }
+
+
+    /*
+       FLORES
+    */
+
+    for(
+        let x=startX;
+        x<=endX;
+        x++
+    ){
+
+        if(
+            !hasFlowerAt(x)
+        ){
+
+            continue;
+
+        }
+
+
+        const surface=
+            getSurfaceBlockY(x);
+
+
+        const px=
+            x*
+            TILE_SIZE-
+            cameraX;
+
+
+        const py=
+            surface*
+            TILE_SIZE-
+            cameraY;
+
+
+        ctx.strokeStyle=
+            "#438c38";
+
+        ctx.lineWidth=1;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            px+16,
+            py
+        );
+
+        ctx.lineTo(
+            px+16,
+            py-10
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle=
+            seededRandom(
+                x,
+                surface,
+                603
+            )>.5
+            ?
+            "#f2d64b"
+            :
+            "#e95b73";
+
+
+        ctx.fillRect(
+            px+13,
+            py-13,
+            7,
+            7
+        );
+
+    }
+
+
+    /*
+       COGUMELOS
+    */
+
+    for(
+        let x=startX;
+        x<=endX;
+        x++
+    ){
+
+        if(
+            !hasMushroomAt(x)
+        ){
+
+            continue;
+
+        }
+
+
+        const surface=
+            getSurfaceBlockY(x);
+
+
+        const px=
+            x*
+            TILE_SIZE-
+            cameraX;
+
+
+        const py=
+            surface*
+            TILE_SIZE-
+            cameraY;
+
+
+        ctx.fillStyle=
+            "#e05a45";
+
+
+        ctx.fillRect(
+            px+10,
+            py-10,
+            12,
+            7
+        );
+
+
+        ctx.fillStyle=
+            "#d7d7d7";
+
+
+        ctx.fillRect(
+            px+15,
+            py-4,
+            3,
+            5
+        );
 
     }
 
@@ -4007,7 +5595,7 @@ function updateHUD(){
     document.getElementById(
         "chunkText"
     ).textContent=
-        `${getChunkX(player.x)}, ${getChunkY(player.x)}`;
+        `${getChunkX(player.x)}, ${getChunkY(player.y)}`;
 
 }
 
@@ -4148,7 +5736,9 @@ async function saveExploredChunks(){
         );
 
 
-    if(keys.length===0)
+    if(
+        keys.length===0
+    )
         return true;
 
 
@@ -4460,7 +6050,9 @@ function setSaveStatus(text){
    CRIAR MUNDO
 ============================================================ */
 
-async function createPlayerWorld(userId){
+async function createPlayerWorld(
+    userId
+){
 
     const seed=
         randomSeed();
@@ -4710,7 +6302,9 @@ async function loadPlayerWorld(){
         inventoryData.inventory.forEach(
             (saved,index)=>{
 
-                if(hotbar[index]){
+                if(
+                    hotbar[index]
+                ){
 
                     hotbar[index].count=
                         Number(
@@ -4764,9 +6358,12 @@ async function loadPlayerWorld(){
                     );
 
 
-                if(chunk.explored){
+                if(
+                    chunk.explored
+                ){
 
-                    exploredChunks[key]=true;
+                    exploredChunks[key]=
+                        true;
 
                 }
 
@@ -5067,7 +6664,9 @@ function setAccountMode(mode){
     accountMessage.textContent="";
 
 
-    if(mode==="login"){
+    if(
+        mode==="login"
+    ){
 
         loginTab.classList.add(
             "active"
@@ -5138,7 +6737,9 @@ async function login(){
     }
 
 
-    if(password.length<6){
+    if(
+        password.length<6
+    ){
 
         accountMessage.textContent=
             "A senha precisa ter pelo menos 6 caracteres.";
@@ -5224,7 +6825,9 @@ async function register(){
         confirmPasswordInput.value;
 
 
-    if(username.length<3){
+    if(
+        username.length<3
+    ){
 
         accountMessage.textContent=
             "O nome precisa ter pelo menos 3 caracteres.";
@@ -5234,7 +6837,9 @@ async function register(){
     }
 
 
-    if(password.length<6){
+    if(
+        password.length<6
+    ){
 
         accountMessage.textContent=
             "A senha precisa ter pelo menos 6 caracteres.";
@@ -5244,7 +6849,9 @@ async function register(){
     }
 
 
-    if(password!==confirm){
+    if(
+        password!==confirm
+    ){
 
         accountMessage.textContent=
             "As senhas não são iguais.";
@@ -5303,7 +6910,9 @@ async function register(){
     }
 
 
-    if(!data.session){
+    if(
+        !data.session
+    ){
 
         accountMessage.textContent=
             "Conta criada. Se a confirmação de e-mail estiver ativada no Supabase, confirme o e-mail antes de entrar.";
@@ -5464,7 +7073,9 @@ passwordInput.addEventListener(
     "keydown",
     event=>{
 
-        if(event.key==="Enter"){
+        if(
+            event.key==="Enter"
+        ){
 
             accountAction.click();
 
@@ -5607,9 +7218,13 @@ window.addEventListener(
         }
 
 
-        if(key===" "){
+        if(
+            key===" "
+        ){
 
-            if(!event.repeat){
+            if(
+                !event.repeat
+            ){
 
                 keys[key]=true;
 
