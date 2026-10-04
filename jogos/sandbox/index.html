@@ -6,7 +6,6 @@
 
 <title>Ludix - Sandbox</title>
 
-<!-- Evita o 404 do favicon.ico -->
 <link rel="icon" href="data:,">
 
 <style>
@@ -874,7 +873,9 @@ const player = {
     speed:4,
     jump:11,
 
-    onGround:false,
+    /* CORREÇÃO:
+       o jogador começa considerado no chão */
+    onGround:true,
 
     health:100,
     hunger:100
@@ -1739,7 +1740,7 @@ function collidesAt(x,y){
 
 
 /* ============================================================
-   SPAWN
+   CORREÇÃO DO CHÃO
 ============================================================ */
 
 function placePlayerAtSpawn(){
@@ -1749,13 +1750,61 @@ function placePlayerAtSpawn(){
 
     player.x=0;
 
+    /*
+       O jogador fica exatamente sobre o bloco.
+       Antes havia "-1", deixando o jogador
+       1 pixel acima do chão.
+    */
     player.y =
         surface*TILE_SIZE-
-        player.height-
-        1;
+        player.height;
 
     player.vx=0;
     player.vy=0;
+
+    /*
+       Começa parado e no chão.
+    */
+    player.onGround=true;
+
+}
+
+
+/*
+   Coloca o jogador exatamente sobre o chão
+   da posição atual quando necessário.
+*/
+function snapPlayerToGround(){
+
+    const blockX =
+        Math.floor(
+            player.x/TILE_SIZE
+        );
+
+    const surface =
+        getSurfaceBlockY(
+            blockX
+        );
+
+    const groundY =
+        surface*TILE_SIZE-
+        player.height;
+
+
+    /*
+       Só corrige quando a posição atual
+       está próxima ou abaixo do chão.
+    */
+    if(
+        player.y >= groundY-8 &&
+        player.y <= groundY+TILE_SIZE*2
+    ){
+
+        player.y=groundY;
+        player.vy=0;
+        player.onGround=true;
+
+    }
 
 }
 
@@ -1811,6 +1860,10 @@ function updatePlayer(){
     }
 
 
+    /*
+       Pulo somente quando Espaço está pressionado
+       e o jogador está no chão.
+    */
     if(
         (
             keys[" "] ||
@@ -1823,6 +1876,13 @@ function updatePlayer(){
             -player.jump;
 
         player.onGround=false;
+
+        /*
+           Impede que a mesma tecla
+           fique gerando vários pulos.
+        */
+        keys[" "]=false;
+        keys["space"]=false;
 
     }
 
@@ -3513,6 +3573,15 @@ async function loadPlayerWorld(){
         );
 
 
+    /*
+       Sempre começa o carregamento sem
+       velocidade ou pulo pendente.
+    */
+    player.vx=0;
+    player.vy=0;
+    player.onGround=false;
+
+
     const {
         data:inventoryData,
         error:inventoryError
@@ -3624,6 +3693,54 @@ async function loadPlayerWorld(){
     }
 
 
+    /*
+       Se a posição salva estiver dentro
+       do terreno, coloca o jogador no chão.
+    */
+    if(
+        collidesAt(
+            player.x,
+            player.y
+        )
+    ){
+
+        placePlayerAtSpawn();
+
+    }else{
+
+        const blockX =
+            Math.floor(
+                player.x/TILE_SIZE
+            );
+
+        const surface =
+            getSurfaceBlockY(
+                blockX
+            );
+
+        const groundY =
+            surface*TILE_SIZE-
+            player.height;
+
+        /*
+           Se o jogador estiver muito perto
+           do chão, corrige a posição.
+        */
+        if(
+            Math.abs(
+                player.y-groundY
+            )<=8
+        ){
+
+            player.y=groundY;
+            player.vy=0;
+            player.onGround=true;
+
+        }
+
+    }
+
+
     if(
         !Number.isFinite(player.x) ||
         !Number.isFinite(player.y)
@@ -3670,6 +3787,25 @@ async function startGame(){
     gameRunning=true;
 
 
+    /*
+       CORREÇÃO:
+       limpa qualquer estado de tecla que
+       possa ter ficado pressionado antes
+       de entrar no jogo.
+    */
+    keys[" "]=false;
+    keys["space"]=false;
+
+
+    /*
+       CORREÇÃO:
+       começa sem velocidade vertical
+       ou horizontal.
+    */
+    player.vx=0;
+    player.vy=0;
+
+
     pauseOverlay.classList.add(
         "hidden"
     );
@@ -3700,6 +3836,39 @@ async function startGame(){
     ){
 
         placePlayerAtSpawn();
+
+    }
+
+
+    /*
+       Verifica se o jogador está no chão.
+       Se estiver próximo da superfície,
+       deixa exatamente sobre ela.
+    */
+    const blockX =
+        Math.floor(
+            player.x/TILE_SIZE
+        );
+
+    const surface =
+        getSurfaceBlockY(
+            blockX
+        );
+
+    const groundY =
+        surface*TILE_SIZE-
+        player.height;
+
+
+    if(
+        Math.abs(
+            player.y-groundY
+        )<=8
+    ){
+
+        player.y=groundY;
+        player.vy=0;
+        player.onGround=true;
 
     }
 
@@ -4343,7 +4512,27 @@ window.addEventListener(
         }
 
 
-        keys[key]=true;
+        /*
+           CORREÇÃO:
+           Espaço só registra o primeiro
+           pressionamento. Segurar Espaço
+           não fica criando novos pulos.
+        */
+        if(
+            key===" "
+        ){
+
+            if(!event.repeat){
+
+                keys[key]=true;
+
+            }
+
+        }else{
+
+            keys[key]=true;
+
+        }
 
 
         if(
