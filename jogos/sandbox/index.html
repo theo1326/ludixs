@@ -287,7 +287,12 @@ button{
     border-radius:10px;
     padding:10px 14px;
     line-height:1.6;
-    min-width:210px;
+    min-width:230px;
+}
+
+#saveStatus{
+    color:#72e6a3;
+    font-size:12px;
 }
 
 #pauseButton{
@@ -585,7 +590,12 @@ button{
         <span id="xValue">0</span><br>
 
         📍 Y:
-        <span id="yValue">0</span>
+        <span id="yValue">0</span><br>
+
+        🗺️ Região:
+        <span id="chunkValue">0, 0</span><br>
+
+        💾 <span id="saveStatus">Salvo</span>
 
     </div>
 
@@ -648,20 +658,61 @@ let gameRunning = false;
 let gamePaused = false;
 
 const WORLD_SIZE = 1000000;
+
 const CHUNK_SIZE = 32;
 
 let worldSeed = 0;
 
+
+/* =========================================================
+   JOGADOR
+========================================================= */
+
 let player = {
+
     x:0,
+
     y:0,
+
     vx:0,
+
     vy:0,
+
     width:24,
+
     height:40,
+
     health:100,
+
     hunger:100
+
 };
+
+
+/* =========================================================
+   INVENTÁRIO
+========================================================= */
+
+let playerInventory = [];
+
+
+/* =========================================================
+   REGIÕES EXPLORADAS
+========================================================= */
+
+let exploredChunks = new Set();
+
+
+/* =========================================================
+   ALTERAÇÕES DO MUNDO
+========================================================= */
+
+let modifiedBlocks = {};
+
+
+/* =========================================================
+   TECLAS
+========================================================= */
 
 const keys = {};
 
@@ -704,6 +755,25 @@ function showMessage(message){
     document
         .getElementById("accountMessage")
         .textContent = message;
+
+}
+
+
+/* =========================================================
+   STATUS DE SALVAMENTO
+========================================================= */
+
+function setSaveStatus(message){
+
+    const element =
+        document.getElementById("saveStatus");
+
+    if(element){
+
+        element.textContent =
+            message;
+
+    }
 
 }
 
@@ -937,6 +1007,16 @@ async function registerUser(){
         );
 
 
+        await loadPlayerInventory(
+            data.user.id
+        );
+
+
+        await loadExploredChunks(
+            data.user.id
+        );
+
+
         showMessage(
             "Conta criada com sucesso!"
         );
@@ -1055,6 +1135,16 @@ async function loginUser(){
         );
 
 
+        await loadPlayerInventory(
+            data.user.id
+        );
+
+
+        await loadExploredChunks(
+            data.user.id
+        );
+
+
         openMenu();
 
 
@@ -1085,6 +1175,16 @@ async function createPlayerWorld(userId){
                 .select("*")
                 .eq("user_id",userId)
                 .maybeSingle();
+
+
+        if(existing.error){
+
+            console.error(
+                "Erro procurando mundo:",
+                existing.error
+            );
+
+        }
 
 
         if(existing.data){
@@ -1225,48 +1325,513 @@ async function loadPlayerWorld(userId){
 
 
 /* =========================================================
-   SALVAR MUNDO
+   SALVAR MUNDO PRINCIPAL
 ========================================================= */
 
 async function savePlayerWorld(){
 
     if(!currentPlayer){
 
-        return;
+        return false;
+
+    }
+
+
+    setSaveStatus(
+        "Salvando..."
+    );
+
+
+    try{
+
+        const { error } =
+            await supabaseClient
+                .from("worlds")
+                .update({
+
+                    player_x:player.x,
+
+                    player_y:player.y,
+
+                    health:player.health,
+
+                    hunger:player.hunger,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                })
+                .eq(
+                    "user_id",
+                    currentPlayer.id
+                );
+
+
+        if(error){
+
+            console.error(
+                "Erro salvando mundo:",
+                error
+            );
+
+            setSaveStatus(
+                "Erro ao salvar"
+            );
+
+            return false;
+
+        }
+
+
+        await savePlayerInventory();
+
+        await saveExploredChunks();
+
+
+        setSaveStatus(
+            "Salvo ✓"
+        );
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(
+            "Erro salvando progresso:",
+            error
+        );
+
+        setSaveStatus(
+            "Erro ao salvar"
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   INVENTÁRIO
+========================================================= */
+
+async function loadPlayerInventory(userId){
+
+    try{
+
+        const { data, error } =
+            await supabaseClient
+                .from("player_inventory")
+                .select("*")
+                .eq("user_id",userId)
+                .maybeSingle();
+
+
+        if(error){
+
+            console.error(
+                "Erro carregando inventário:",
+                error
+            );
+
+            playerInventory = [];
+
+            return;
+
+        }
+
+
+        if(data){
+
+            if(Array.isArray(data.inventory)){
+
+                playerInventory =
+                    data.inventory;
+
+            }else{
+
+                playerInventory = [];
+
+            }
+
+            return;
+
+        }
+
+
+        playerInventory = [];
+
+
+        const { error:insertError } =
+            await supabaseClient
+                .from("player_inventory")
+                .insert({
+
+                    user_id:userId,
+
+                    inventory:[]
+
+                });
+
+
+        if(insertError){
+
+            console.error(
+                "Erro criando inventário:",
+                insertError
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(error);
+
+        playerInventory = [];
+
+    }
+
+}
+
+
+/* =========================================================
+   SALVAR INVENTÁRIO
+========================================================= */
+
+async function savePlayerInventory(){
+
+    if(!currentPlayer){
+
+        return false;
 
     }
 
 
     try{
 
-        await supabaseClient
-            .from("worlds")
-            .update({
+        const { error } =
+            await supabaseClient
+                .from("player_inventory")
+                .upsert({
 
-                player_x:player.x,
+                    user_id:currentPlayer.id,
 
-                player_y:player.y,
+                    inventory:playerInventory,
 
-                health:player.health,
+                    updated_at:
+                        new Date().toISOString()
 
-                hunger:player.hunger,
+                },{
+                    onConflict:"user_id"
+                });
 
-                updated_at:
-                    new Date().toISOString()
 
-            })
-            .eq(
-                "user_id",
-                currentPlayer.id
+        if(error){
+
+            console.error(
+                "Erro salvando inventário:",
+                error
             );
+
+            return false;
+
+        }
+
+
+        return true;
 
 
     }catch(error){
 
         console.error(
-            "Erro salvando mundo:",
+            "Erro salvando inventário:",
             error
         );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHUNK ATUAL
+========================================================= */
+
+function getChunkX(worldX){
+
+    return Math.floor(
+        worldX / CHUNK_SIZE
+    );
+
+}
+
+
+function getChunkY(worldY){
+
+    return Math.floor(
+        worldY / CHUNK_SIZE
+    );
+
+}
+
+
+function getCurrentChunkKey(){
+
+    const chunkX =
+        getChunkX(player.x);
+
+    const chunkY =
+        getChunkY(player.y);
+
+
+    return chunkX + "," + chunkY;
+
+}
+
+
+/* =========================================================
+   MARCAR REGIÃO COMO EXPLORADA
+========================================================= */
+
+function markCurrentChunkExplored(){
+
+    const chunkX =
+        getChunkX(player.x);
+
+    const chunkY =
+        getChunkY(player.y);
+
+
+    const key =
+        chunkX + "," + chunkY;
+
+
+    exploredChunks.add(key);
+
+}
+
+
+/* =========================================================
+   CARREGAR REGIÕES
+========================================================= */
+
+async function loadExploredChunks(userId){
+
+    exploredChunks =
+        new Set();
+
+    modifiedBlocks = {};
+
+
+    try{
+
+        const { data, error } =
+            await supabaseClient
+                .from("world_chunks")
+                .select(
+                    "chunk_x,chunk_y,data,explored"
+                )
+                .eq(
+                    "user_id",
+                    userId
+                );
+
+
+        if(error){
+
+            console.error(
+                "Erro carregando regiões:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        if(!data){
+
+            return;
+
+        }
+
+
+        for(const chunk of data){
+
+            if(chunk.explored){
+
+                const key =
+                    chunk.chunk_x +
+                    "," +
+                    chunk.chunk_y;
+
+
+                exploredChunks.add(key);
+
+            }
+
+
+            if(
+                chunk.data &&
+                chunk.data.modifiedBlocks
+            ){
+
+                Object.assign(
+                    modifiedBlocks,
+                    chunk.data.modifiedBlocks
+                );
+
+            }
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Erro carregando regiões:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SALVAR REGIÕES
+========================================================= */
+
+async function saveExploredChunks(){
+
+    if(!currentPlayer){
+
+        return false;
+
+    }
+
+
+    try{
+
+        markCurrentChunkExplored();
+
+
+        const chunks = [];
+
+
+        for(const key of exploredChunks){
+
+            const parts =
+                key.split(",");
+
+
+            const chunkX =
+                Number(parts[0]);
+
+            const chunkY =
+                Number(parts[1]);
+
+
+            chunks.push({
+
+                user_id:
+                    currentPlayer.id,
+
+                chunk_x:
+                    chunkX,
+
+                chunk_y:
+                    chunkY,
+
+                explored:true,
+
+                data:{
+                    seed:worldSeed,
+
+                    modifiedBlocks:
+                        modifiedBlocks
+
+                },
+
+                updated_at:
+                    new Date().toISOString()
+
+            });
+
+        }
+
+
+        if(chunks.length === 0){
+
+            return true;
+
+        }
+
+
+        /*
+         * Salvamos em pequenos grupos para
+         * evitar uma requisição gigantesca.
+         */
+
+        const batchSize = 50;
+
+
+        for(
+            let i = 0;
+            i < chunks.length;
+            i += batchSize
+        ){
+
+            const batch =
+                chunks.slice(
+                    i,
+                    i + batchSize
+                );
+
+
+            const { error } =
+                await supabaseClient
+                    .from("world_chunks")
+                    .upsert(
+                        batch,
+                        {
+                            onConflict:
+                                "user_id,chunk_x,chunk_y"
+                        }
+                    );
+
+
+            if(error){
+
+                console.error(
+                    "Erro salvando regiões:",
+                    error
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(
+            "Erro salvando regiões:",
+            error
+        );
+
+        return false;
 
     }
 
@@ -1337,6 +1902,16 @@ async function logoutUser(){
     currentPlayer = null;
 
     gameRunning = false;
+
+    gamePaused = false;
+
+    playerInventory = [];
+
+    exploredChunks =
+        new Set();
+
+    modifiedBlocks = {};
+
 
     menuScreen
         .classList.add("hidden");
@@ -1443,6 +2018,14 @@ async function startGame(){
     }
 
 
+    /*
+     * Marca a região onde o jogador
+     * está começando como explorada.
+     */
+
+    markCurrentChunkExplored();
+
+
     gameRunning = true;
 
     gamePaused = false;
@@ -1495,6 +2078,12 @@ function updateHUD(){
         .getElementById("yValue")
         .textContent =
             Math.floor(player.y);
+
+
+    document
+        .getElementById("chunkValue")
+        .textContent =
+            getCurrentChunkKey();
 
 }
 
@@ -1594,6 +2183,14 @@ function updatePlayer(){
     player.y =
         ground -
         player.height;
+
+
+    /*
+     * Sempre que o jogador se move,
+     * a região atual é registrada.
+     */
+
+    markCurrentChunkExplored();
 
 
     updateHUD();
@@ -1841,6 +2438,13 @@ function pauseGame(){
         .classList
         .remove("hidden");
 
+
+    /*
+     * Salva imediatamente ao pausar.
+     */
+
+    savePlayerWorld();
+
 }
 
 
@@ -1865,11 +2469,18 @@ function resumeGame(){
 
 async function backToMenu(){
 
+    setSaveStatus(
+        "Salvando..."
+    );
+
+
     await savePlayerWorld();
+
 
     gameRunning = false;
 
     gamePaused = false;
+
 
     pauseScreen
         .classList
@@ -1878,6 +2489,7 @@ async function backToMenu(){
     gameScreen
         .classList
         .add("hidden");
+
 
     openMenu();
 
@@ -1903,6 +2515,49 @@ setInterval(
 
     },
     10000
+);
+
+
+/* =========================================================
+   SALVAR AO SAIR DA ABA
+========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if(
+            document.visibilityState ===
+            "hidden"
+        ){
+
+            if(currentPlayer){
+
+                savePlayerWorld();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SALVAR ANTES DE FECHAR
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if(currentPlayer){
+
+            savePlayerWorld();
+
+        }
+
+    }
 );
 
 
@@ -1946,6 +2601,16 @@ async function checkSession(){
 
 
                 await loadPlayerWorld(
+                    user.id
+                );
+
+
+                await loadPlayerInventory(
+                    user.id
+                );
+
+
+                await loadExploredChunks(
                     user.id
                 );
 
