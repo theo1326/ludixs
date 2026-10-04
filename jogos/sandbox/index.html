@@ -411,6 +411,7 @@ button{
 }
 
 @media(max-width:700px){
+
     .logo{
         font-size:34px;
     }
@@ -440,15 +441,19 @@ button{
 </div>
 
 <section id="accountScreen" class="screen hidden">
+
     <div class="account-box">
 
-        <div class="logo">🎮 ludix</div>
+        <div class="logo">
+            🎮 ludix
+        </div>
 
         <div class="subtitle">
             Sandbox Survival
         </div>
 
         <div class="tabs">
+
             <button id="loginTab" class="active">
                 Entrar
             </button>
@@ -456,9 +461,11 @@ button{
             <button id="registerTab">
                 Criar conta
             </button>
+
         </div>
 
         <div class="form-group">
+
             <label for="usernameInput">
                 Nome de usuário
             </label>
@@ -470,9 +477,11 @@ button{
                 autocomplete="username"
                 placeholder="Seu nome"
             >
+
         </div>
 
         <div class="form-group">
+
             <label for="passwordInput">
                 Senha
             </label>
@@ -483,12 +492,14 @@ button{
                 autocomplete="current-password"
                 placeholder="Sua senha"
             >
+
         </div>
 
         <div
             id="confirmGroup"
             class="form-group hidden"
         >
+
             <label for="confirmPasswordInput">
                 Confirmar senha
             </label>
@@ -499,6 +510,7 @@ button{
                 autocomplete="new-password"
                 placeholder="Digite novamente"
             >
+
         </div>
 
         <button
@@ -514,12 +526,16 @@ button{
         ></div>
 
     </div>
+
 </section>
 
 <section id="menuScreen" class="screen hidden">
+
     <div class="menu-box">
 
-        <h1>🌍 Ludix</h1>
+        <h1>
+            🌍 Ludix
+        </h1>
 
         <div
             id="menuUser"
@@ -547,13 +563,18 @@ button{
             </button>
 
         </div>
+
     </div>
+
 </section>
 
 <section id="worldScreen" class="screen hidden">
+
     <div class="world-box">
 
-        <h2>🌍 Mundo Ludix</h2>
+        <h2>
+            🌍 Mundo Ludix
+        </h2>
 
         <div class="info">
             <strong>Tamanho:</strong>
@@ -568,6 +589,16 @@ button{
         <div class="info">
             <strong>Biomas:</strong>
             10 tipos diferentes
+        </div>
+
+        <div class="info">
+            <strong>Terreno:</strong>
+            Montanhas, mares, rios e cavernas
+        </div>
+
+        <div class="info">
+            <strong>Clima:</strong>
+            Chuva dinâmica e nuvens
         </div>
 
         <div class="info">
@@ -591,7 +622,9 @@ button{
             </button>
 
         </div>
+
     </div>
+
 </section>
 
 <section id="gameScreen" class="screen hidden">
@@ -651,6 +684,7 @@ button{
             </div>
 
         </div>
+
     </div>
 
     <div id="controlsHint">
@@ -665,9 +699,12 @@ button{
     id="pauseOverlay"
     class="hidden"
 >
+
     <div class="pause-box">
 
-        <h2>⏸️ Jogo pausado</h2>
+        <h2>
+            ⏸️ Jogo pausado
+        </h2>
 
         <button id="resumeButton">
             Continuar
@@ -682,6 +719,7 @@ button{
         </button>
 
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -775,12 +813,43 @@ let accountMode = "login";
 ============================================================ */
 
 const WORLD_LIMIT = 1000000;
+
 const TILE_SIZE = 32;
+
 const CHUNK_SIZE = 32;
 
+const SEA_LEVEL = 13;
+
 let worldSeed = 0;
+
 let exploredChunks = {};
+
 let modifiedBlocks = {};
+
+
+/* ============================================================
+   CLIMA
+============================================================ */
+
+const weather = {
+
+    raining:false,
+
+    cloudCover:0,
+
+    targetCloudCover:0,
+
+    rainIntensity:0,
+
+    targetRainIntensity:0,
+
+    nextChange:0,
+
+    rainEnd:0,
+
+    clearEnd:0
+
+};
 
 
 /* ============================================================
@@ -814,6 +883,7 @@ const player = {
 ============================================================ */
 
 let cameraX = 0;
+
 let cameraY = 0;
 
 
@@ -824,7 +894,9 @@ let cameraY = 0;
 const keys = {};
 
 let selectedSlot = 0;
+
 let gamePaused = false;
+
 let gameRunning = false;
 
 
@@ -1142,7 +1214,9 @@ function seededRandom(x,y=0,extra=0){
 function noise1D(x){
 
     const x0=Math.floor(x);
+
     const x1=x0+1;
+
     const t=x-x0;
 
     const a=
@@ -1159,9 +1233,47 @@ function noise1D(x){
             91
         );
 
-    const smooth=t*t*(3-2*t);
+    const smooth=
+        t*t*(3-2*t);
 
     return a+(b-a)*smooth;
+
+}
+
+
+/* ============================================================
+   RUÍOS E MARES
+============================================================ */
+
+function isRiverAt(blockX){
+
+    const riverNoise=
+        noise1D(
+            blockX/75+500
+        );
+
+    const secondary=
+        noise1D(
+            blockX/180+900
+        );
+
+    return (
+        riverNoise>.445 &&
+        riverNoise<.555 &&
+        secondary>.25
+    );
+
+}
+
+
+function isSeaAt(blockX){
+
+    const seaNoise=
+        noise1D(
+            blockX/700+1400
+        );
+
+    return seaNoise<.18;
 
 }
 
@@ -1182,7 +1294,8 @@ function getBiome(blockX){
             blockX/900+100
         );
 
-    const value=n*.7+n2*.3;
+    const value=
+        n*.7+n2*.3;
 
     if(value<.10)
         return BIOMES[2];
@@ -1217,7 +1330,7 @@ function getBiome(blockX){
 
 
 /* ============================================================
-   TERRENO
+   TERRENO AVANÇADO
 ============================================================ */
 
 function getSurfaceBlockY(blockX){
@@ -1231,6 +1344,9 @@ function getSurfaceBlockY(blockX){
     const wave2=
         Math.sin(blockX/25)*2;
 
+    const wave3=
+        Math.sin(blockX/180)*5;
+
     const noise=
         (noise1D(blockX/12)-.5)*6;
 
@@ -1238,7 +1354,9 @@ function getSurfaceBlockY(blockX){
         12+
         wave1+
         wave2+
+        wave3+
         noise;
+
 
     if(biome.name==="Montanhas"){
 
@@ -1248,7 +1366,13 @@ function getSurfaceBlockY(blockX){
                 blockX/30
             )*15;
 
+        height+=
+            Math.sin(
+                blockX/16
+            )*4;
+
     }
+
 
     if(biome.name==="Deserto"){
 
@@ -1257,7 +1381,13 @@ function getSurfaceBlockY(blockX){
                 blockX/40
             )*3;
 
+        height+=
+            Math.sin(
+                blockX/55
+            )*2;
+
     }
+
 
     if(biome.name==="Pântano"){
 
@@ -1268,6 +1398,43 @@ function getSurfaceBlockY(blockX){
             )*2;
 
     }
+
+
+    if(biome.name==="Praia"){
+
+        height=
+            12+
+            noise1D(
+                blockX/45
+            )*2;
+
+    }
+
+
+    if(
+        isSeaAt(blockX) &&
+        biome.name!=="Montanhas"
+    ){
+
+        height+=
+            3+
+            noise1D(
+                blockX/35+50
+            )*4;
+
+    }
+
+
+    if(isRiverAt(blockX)){
+
+        height=
+            Math.min(
+                height,
+                SEA_LEVEL+1
+            );
+
+    }
+
 
     return Math.floor(height);
 
@@ -1281,7 +1448,67 @@ function getSurfacePixelY(worldX){
             worldX/TILE_SIZE
         );
 
-    return getSurfaceBlockY(blockX)*TILE_SIZE;
+    return getSurfaceBlockY(
+        blockX
+    )*TILE_SIZE;
+
+}
+
+
+/* ============================================================
+   CAVERNAS
+============================================================ */
+
+function caveNoise(blockX,blockY){
+
+    const a=
+        seededRandom(
+            Math.floor(blockX/3),
+            Math.floor(blockY/3),
+            812
+        );
+
+    const b=
+        seededRandom(
+            Math.floor(blockX/7),
+            Math.floor(blockY/7),
+            813
+        );
+
+    const c=
+        seededRandom(
+            blockX,
+            blockY,
+            814
+        );
+
+    return (
+        a*.45+
+        b*.35+
+        c*.20
+    );
+
+}
+
+
+function isCaveAt(blockX,blockY,surface){
+
+    const depth=
+        blockY-surface;
+
+    if(depth<6)
+        return false;
+
+    if(depth>35)
+        return false;
+
+    const cave=
+        caveNoise(
+            blockX,
+            blockY
+        );
+
+    return cave>.82;
 
 }
 
@@ -1347,6 +1574,15 @@ function hasTreeAt(blockX){
     if(!biome.tree)
         return false;
 
+    if(
+        isRiverAt(blockX) ||
+        isSeaAt(blockX)
+    ){
+
+        return false;
+
+    }
+
     return seededRandom(
         blockX,
         getSurfaceBlockY(blockX),
@@ -1358,12 +1594,83 @@ function hasTreeAt(blockX){
 
 function getTreeHeight(blockX){
 
-    return 3+
+    const biome=
+        getBiome(blockX);
+
+    let minimum=3;
+
+    let extra=3;
+
+    if(biome.name==="Taiga"){
+
+        minimum=4;
+        extra=4;
+
+    }
+
+    if(biome.name==="Floresta Sombria"){
+
+        minimum=4;
+        extra=5;
+
+    }
+
+    if(biome.name==="Pântano"){
+
+        minimum=3;
+        extra=2;
+
+    }
+
+    if(biome.name==="Savana"){
+
+        minimum=4;
+        extra=2;
+
+    }
+
+    return minimum+
         Math.floor(
             seededRandom(
                 blockX,
                 0,
                 444
+            )*extra
+        );
+
+}
+
+
+function hasCactusAt(blockX){
+
+    const biome=
+        getBiome(blockX);
+
+    if(
+        biome.name!=="Deserto"
+    ){
+
+        return false;
+
+    }
+
+    return seededRandom(
+        blockX,
+        getSurfaceBlockY(blockX),
+        555
+    )>.90;
+
+}
+
+
+function getCactusHeight(blockX){
+
+    return 1+
+        Math.floor(
+            seededRandom(
+                blockX,
+                0,
+                556
             )*3
         );
 
@@ -1380,7 +1687,7 @@ function generateBlock(blockX,blockY){
         blockX<-WORLD_LIMIT ||
         blockX>WORLD_LIMIT ||
         blockY<-100 ||
-        blockY>150
+        blockY>180
     ){
 
         return "air";
@@ -1391,32 +1698,78 @@ function generateBlock(blockX,blockY){
         getBiome(blockX);
 
     const surface=
-        getSurfaceBlockY(blockX);
+        getSurfaceBlockY(
+            blockX
+        );
+
+
+    /*
+       MARES E RIOS
+
+       A água fica no nível do mar
+       quando o terreno estiver abaixo
+       dele.
+    */
+
+    const waterRegion=
+        isSeaAt(blockX) ||
+        isRiverAt(blockX) ||
+        biome.name==="Pântano";
+
 
     if(
-        blockY>surface &&
-        blockY<=13 &&
-        (
-            biome.name==="Pântano" ||
-            biome.name==="Praia"
-        )
+        waterRegion &&
+        surface>SEA_LEVEL &&
+        blockY>=SEA_LEVEL &&
+        blockY<surface
     ){
 
         return "water";
 
     }
 
+
+    /*
+       Ar acima do terreno.
+    */
+
     if(blockY<surface)
         return "air";
+
+
+    /*
+       CAVERNAS
+    */
+
+    if(
+        isCaveAt(
+            blockX,
+            blockY,
+            surface
+        )
+    ){
+
+        return "air";
+
+    }
+
 
     const depth=
         blockY-surface;
 
+
     if(depth===0)
         return biome.surface;
 
+
     if(depth<=3)
         return biome.underground;
+
+
+    /*
+       Minérios mais raros conforme
+       aumenta a profundidade.
+    */
 
     const oreChance=
         seededRandom(
@@ -1425,32 +1778,36 @@ function generateBlock(blockX,blockY){
             700
         );
 
+
     if(
-        oreChance>.992 &&
-        depth>8
+        oreChance>.9975 &&
+        depth>10
     ){
 
         return "gold";
 
     }
 
+
     if(
-        oreChance>.975 &&
-        depth>5
+        oreChance>.987 &&
+        depth>6
     ){
 
         return "iron";
 
     }
 
+
     if(
-        oreChance>.94 &&
+        oreChance>.95 &&
         depth>4
     ){
 
         return "coal";
 
     }
+
 
     return "stone";
 
@@ -1513,7 +1870,9 @@ function setBlock(blockX,blockY,type){
         );
 
     if(!modifiedBlocks[chunk]){
+
         modifiedBlocks[chunk]={};
+
     }
 
     modifiedBlocks[chunk][
@@ -1641,10 +2000,13 @@ function placePlayerAtSpawn(){
         player.height;
 
     player.vx=0;
+
     player.vy=0;
+
     player.onGround=true;
 
     keys[" "]=false;
+
     keys["space"]=false;
 
 }
@@ -1662,7 +2024,9 @@ function snapPlayerToGround(){
     ){
 
         player.y=groundY;
+
         player.vy=0;
+
         player.onGround=true;
 
         return true;
@@ -1675,7 +2039,7 @@ function snapPlayerToGround(){
 
 
 /* ============================================================
-   MOVIMENTO — CORRIGIDO
+   MOVIMENTO
 ============================================================ */
 
 function updatePlayer(){
@@ -1684,11 +2048,8 @@ function updatePlayer(){
         return;
 
 
-    /* -------------------------
-       MOVIMENTO HORIZONTAL
-    ------------------------- */
-
     let direction=0;
+
 
     if(
         keys["a"] ||
@@ -1698,6 +2059,7 @@ function updatePlayer(){
         direction--;
 
     }
+
 
     if(
         keys["d"] ||
@@ -1710,15 +2072,21 @@ function updatePlayer(){
 
 
     const targetSpeed=
-        direction*player.speed;
+        direction*
+        player.speed;
 
 
     player.vx+=
-        (targetSpeed-player.vx)*.18;
+        (
+            targetSpeed-
+            player.vx
+        )*.18;
 
 
     if(
-        Math.abs(player.vx)<.02
+        Math.abs(
+            player.vx
+        )<.02
     ){
 
         player.vx=0;
@@ -1726,7 +2094,11 @@ function updatePlayer(){
     }
 
 
-    let nextX=
+    /*
+       Movimento horizontal
+    */
+
+    const nextX=
         player.x+
         player.vx;
 
@@ -1755,48 +2127,10 @@ function updatePlayer(){
         );
 
 
-    /* -------------------------
-       CHÃO REAL
-    ------------------------- */
-
     /*
-       Esta é a principal correção.
-
-       Se o jogador estiver praticamente
-       encostado no chão e estiver caindo,
-       ele é colocado exatamente sobre o chão
-       antes que a gravidade possa fazê-lo
-       atravessar e voltar.
-
-       Isso elimina o pequeno pulo/balanço
-       automático.
+       Pulo somente quando a tecla
+       foi realmente pressionada.
     */
-
-    if(
-        player.vy>=0
-    ){
-
-        const groundY=
-            getGroundY();
-
-
-        if(
-            player.y>=groundY-3 &&
-            player.y<=groundY+8
-        ){
-
-            player.y=groundY;
-            player.vy=0;
-            player.onGround=true;
-
-        }
-
-    }
-
-
-    /* -------------------------
-       PULO
-    ------------------------- */
 
     if(
         (
@@ -1817,9 +2151,9 @@ function updatePlayer(){
     }
 
 
-    /* -------------------------
-       GRAVIDADE
-    ------------------------- */
+    /*
+       Gravidade
+    */
 
     player.vy+=.55;
 
@@ -1827,18 +2161,13 @@ function updatePlayer(){
         player.vy=15;
 
 
-    /* -------------------------
-       MOVIMENTO VERTICAL
-    ------------------------- */
-
     const nextY=
         player.y+
         player.vy;
 
 
     /*
-       Enquanto estiver subindo,
-       usamos colisão normal.
+       Subindo
     */
 
     if(player.vy<0){
@@ -1851,6 +2180,7 @@ function updatePlayer(){
         ){
 
             player.y=nextY;
+
             player.onGround=false;
 
         }else{
@@ -1861,12 +2191,11 @@ function updatePlayer(){
 
     }
 
+
     /*
-       Enquanto estiver descendo,
-       usamos o chão diretamente.
-       Isso impede o jogador de ficar
-       oscilando entre dois pixels/blocos.
+       Descendo
     */
+
     else{
 
         const groundY=
@@ -1878,7 +2207,9 @@ function updatePlayer(){
         ){
 
             player.y=groundY;
+
             player.vy=0;
+
             player.onGround=true;
 
         }else if(
@@ -1889,14 +2220,10 @@ function updatePlayer(){
         ){
 
             player.y=nextY;
+
             player.onGround=false;
 
         }else{
-
-            /*
-               Caso encontre outro bloco,
-               mantém a colisão normal.
-            */
 
             const bottomBlock=
                 Math.floor(
@@ -1910,10 +2237,12 @@ function updatePlayer(){
 
 
             player.y=
-                bottomBlock*TILE_SIZE-
+                bottomBlock*
+                TILE_SIZE-
                 player.height;
 
             player.vy=0;
+
             player.onGround=true;
 
         }
@@ -1921,9 +2250,9 @@ function updatePlayer(){
     }
 
 
-    /* -------------------------
-       FOME
-    ------------------------- */
+    /*
+       Fome
+    */
 
     player.hunger-=.001;
 
@@ -1935,7 +2264,9 @@ function updatePlayer(){
         );
 
 
-    if(player.hunger<=0){
+    if(
+        player.hunger<=0
+    ){
 
         player.health-=.01;
 
@@ -1987,10 +2318,12 @@ function markCurrentChunkExplored(){
 function canReachBlock(blockX,blockY){
 
     const px=
-        player.x/TILE_SIZE;
+        player.x/
+        TILE_SIZE;
 
     const py=
-        player.y/TILE_SIZE;
+        player.y/
+        TILE_SIZE;
 
     const bx=
         blockX+.5;
@@ -1998,8 +2331,11 @@ function canReachBlock(blockX,blockY){
     const by=
         blockY+.5;
 
-    const dx=bx-px;
-    const dy=by-py;
+    const dx=
+        bx-px;
+
+    const dy=
+        by-py;
 
     return Math.sqrt(
         dx*dx+
@@ -2020,8 +2356,11 @@ function hasLineOfSight(
     endY
 ){
 
-    const dx=endX-startX;
-    const dy=endY-startY;
+    const dx=
+        endX-startX;
+
+    const dy=
+        endY-startY;
 
     const distance=
         Math.sqrt(
@@ -2040,13 +2379,16 @@ function hasLineOfSight(
         i++
     ){
 
-        const t=i/steps;
+        const t=
+            i/steps;
 
         const x=
-            startX+dx*t;
+            startX+
+            dx*t;
 
         const y=
-            startY+dy*t;
+            startY+
+            dy*t;
 
         const bx=
             Math.floor(x);
@@ -2084,12 +2426,18 @@ function screenToBlock(
     return {
 
         x:Math.floor(
-            (mouseX+cameraX)/
+            (
+                mouseX+
+                cameraX
+            )/
             TILE_SIZE
         ),
 
         y:Math.floor(
-            (mouseY+cameraY)/
+            (
+                mouseY+
+                cameraY
+            )/
             TILE_SIZE
         )
 
@@ -2107,8 +2455,10 @@ function handleCanvasClick(event){
     if(gamePaused)
         return;
 
+
     const rect=
         canvas.getBoundingClientRect();
+
 
     const mouseX=
         (
@@ -2120,6 +2470,7 @@ function handleCanvasClick(event){
             rect.width
         );
 
+
     const mouseY=
         (
             event.clientY-
@@ -2130,11 +2481,13 @@ function handleCanvasClick(event){
             rect.height
         );
 
+
     const target=
         screenToBlock(
             mouseX,
             mouseY
         );
+
 
     if(
         !canReachBlock(
@@ -2147,11 +2500,46 @@ function handleCanvasClick(event){
 
     }
 
+
+    /*
+       Linha de visão.
+    */
+
+    const playerCenterX=
+        (
+            player.x+
+            player.width/2
+        )/
+        TILE_SIZE;
+
+    const playerCenterY=
+        (
+            player.y+
+            player.height/2
+        )/
+        TILE_SIZE;
+
+
+    if(
+        !hasLineOfSight(
+            playerCenterX,
+            playerCenterY,
+            target.x+.5,
+            target.y+.5
+        )
+    ){
+
+        return;
+
+    }
+
+
     const current=
         getBlock(
             target.x,
             target.y
         );
+
 
     if(
         current!=="air" &&
@@ -2176,6 +2564,7 @@ function handleCanvasClick(event){
                 selectedSlot
             ];
 
+
         if(
             !item ||
             item.count<=0
@@ -2184,6 +2573,7 @@ function handleCanvasClick(event){
             return;
 
         }
+
 
         if(
             !BLOCKS[item.id] ||
@@ -2194,28 +2584,46 @@ function handleCanvasClick(event){
 
         }
 
+
         const blockPX=
-            target.x*TILE_SIZE;
+            target.x*
+            TILE_SIZE;
 
         const blockPY=
-            target.y*TILE_SIZE;
+            target.y*
+            TILE_SIZE;
+
 
         const overlaps=
             !(
-                blockPX+TILE_SIZE<=player.x ||
-                blockPX>=player.x+player.width ||
-                blockPY+TILE_SIZE<=player.y ||
-                blockPY>=player.y+player.height
+                blockPX+
+                TILE_SIZE<=
+                player.x ||
+
+                blockPX>=
+                player.x+
+                player.width ||
+
+                blockPY+
+                TILE_SIZE<=
+                player.y ||
+
+                blockPY>=
+                player.y+
+                player.height
             );
+
 
         if(overlaps)
             return;
+
 
         setBlock(
             target.x,
             target.y,
             item.id
         );
+
 
         item.count--;
 
@@ -2234,23 +2642,28 @@ function addItem(id,count){
 
     let slot=
         hotbar.find(
-            item=>item.id===id
+            item=>
+                item.id===id
         );
+
 
     if(!slot){
 
         slot=
             hotbar.find(
-                item=>item.count<=0
+                item=>
+                    item.count<=0
             );
 
     }
+
 
     if(slot){
 
         slot.count+=count;
 
     }
+
 
     updateHotbar();
 
@@ -2264,7 +2677,9 @@ function updateHotbar(){
             "hotbar"
         );
 
+
     element.innerHTML="";
+
 
     hotbar.forEach(
         (item,index)=>{
@@ -2274,13 +2689,17 @@ function updateHotbar(){
                     "div"
                 );
 
+
             slot.className=
                 "hot-slot"+
                 (
                     index===selectedSlot
-                    ?" selected"
-                    :""
+                    ?
+                    " selected"
+                    :
+                    ""
                 );
+
 
             slot.innerHTML=`
 
@@ -2298,6 +2717,7 @@ function updateHotbar(){
 
             `;
 
+
             slot.addEventListener(
                 "click",
                 ()=>{
@@ -2309,7 +2729,10 @@ function updateHotbar(){
                 }
             );
 
-            element.appendChild(slot);
+
+            element.appendChild(
+                slot
+            );
 
         }
     );
@@ -2318,27 +2741,168 @@ function updateHotbar(){
 
 
 /* ============================================================
-   DESENHO
+   CLIMA — INICIALIZAÇÃO
 ============================================================ */
 
-function resizeCanvas(){
+function initializeWeather(){
 
-    canvas.width=
-        window.innerWidth;
+    const now=
+        performance.now();
 
-    canvas.height=
-        window.innerHeight;
+    weather.raining=false;
+
+    weather.cloudCover=0;
+
+    weather.targetCloudCover=0;
+
+    weather.rainIntensity=0;
+
+    weather.targetRainIntensity=0;
+
+    weather.nextChange=
+        now+
+        25000+
+        Math.random()*30000;
+
+    weather.rainEnd=0;
+
+    weather.clearEnd=0;
 
 }
 
+
+/* ============================================================
+   CLIMA — ATUALIZAÇÃO
+============================================================ */
+
+function updateWeather(){
+
+    const now=
+        performance.now();
+
+
+    /*
+       Inicia uma nova mudança climática
+       quando chegar a hora.
+    */
+
+    if(
+        now>=weather.nextChange
+    ){
+
+        if(!weather.raining){
+
+            weather.raining=true;
+
+            weather.targetCloudCover=1;
+
+            weather.targetRainIntensity=.75+
+                Math.random()*.25;
+
+            weather.rainEnd=
+                now+
+                35000+
+                Math.random()*50000;
+
+        }else{
+
+            weather.raining=false;
+
+            weather.targetCloudCover=0;
+
+            weather.targetRainIntensity=0;
+
+            weather.clearEnd=
+                now+
+                18000+
+                Math.random()*22000;
+
+        }
+
+        weather.nextChange=
+            weather.raining
+            ?
+            weather.rainEnd
+            :
+            weather.clearEnd;
+
+    }
+
+
+    /*
+       Se a chuva estiver acabando,
+       garante que as nuvens comecem
+       a se afastar.
+    */
+
+    if(
+        weather.raining &&
+        now>=weather.rainEnd
+    ){
+
+        weather.raining=false;
+
+        weather.targetCloudCover=0;
+
+        weather.targetRainIntensity=0;
+
+        weather.nextChange=
+            now+
+            18000+
+            Math.random()*22000;
+
+    }
+
+
+    /*
+       Transição suave das nuvens.
+    */
+
+    weather.cloudCover+=
+        (
+            weather.targetCloudCover-
+            weather.cloudCover
+        )*.008;
+
+
+    weather.rainIntensity+=
+        (
+            weather.targetRainIntensity-
+            weather.rainIntensity
+        )*.02;
+
+
+    weather.cloudCover=
+        clamp(
+            weather.cloudCover,
+            0,
+            1
+        );
+
+
+    weather.rainIntensity=
+        clamp(
+            weather.rainIntensity,
+            0,
+            1
+        );
+
+}
+
+
+/* ============================================================
+   CÉU
+============================================================ */
 
 function drawSky(){
 
     const now=
         performance.now();
 
+
     const dayDuration=
         15*60*1000;
+
 
     const cycle=
         (
@@ -2347,28 +2911,72 @@ function drawSky(){
         )/
         (dayDuration*2);
 
+
     const brightness=
         Math.sin(
-            cycle*Math.PI*2
+            cycle*
+            Math.PI*
+            2
         )*.5+.5;
 
-    const r=
-        Math.floor(
-            20+brightness*90
-        );
 
-    const g=
-        Math.floor(
-            30+brightness*130
-        );
+    let r=
+        20+
+        brightness*
+        90;
 
-    const b=
-        Math.floor(
-            50+brightness*170
-        );
+
+    let g=
+        30+
+        brightness*
+        130;
+
+
+    let b=
+        50+
+        brightness*
+        170;
+
+
+    /*
+       Chuva escurece o céu
+       gradualmente.
+    */
+
+    const rainDark=
+        weather.cloudCover*
+        48;
+
+
+    r-=rainDark*.75;
+
+    g-=rainDark*.82;
+
+    b-=rainDark*.90;
+
+
+    r=clamp(
+        Math.floor(r),
+        5,
+        255
+    );
+
+    g=clamp(
+        Math.floor(g),
+        7,
+        255
+    );
+
+    b=clamp(
+        Math.floor(b),
+        12,
+        255
+    );
+
 
     ctx.fillStyle=
         `rgb(${r},${g},${b})`;
+
 
     ctx.fillRect(
         0,
@@ -2377,18 +2985,104 @@ function drawSky(){
         canvas.height
     );
 
+
+    /*
+       Névoa escura durante chuva forte.
+    */
+
+    if(weather.cloudCover>.35){
+
+        const alpha=
+            weather.cloudCover*
+            .20;
+
+        ctx.fillStyle=
+            `rgba(20,28,38,${alpha})`;
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   NUVENS
+============================================================ */
+
+function drawCloudShape(
+    x,
+    y,
+    scale,
+    color,
+    alpha
+){
+
+    ctx.save();
+
+    ctx.globalAlpha=alpha;
+
+    ctx.fillStyle=color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        28*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+35*scale,
+        y-12*scale,
+        36*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+75*scale,
+        y,
+        27*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+48*scale,
+        y+12*scale,
+        32*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
 }
 
 
 function drawClouds(){
 
-    const time=
-        performance.now()/10000;
+    const now=
+        performance.now();
 
-    ctx.save();
 
-    ctx.globalAlpha=.35;
-    ctx.fillStyle="#fff";
+    const normalTime=
+        now/10000;
+
+
+    /*
+       Nuvens normais.
+    */
 
     for(
         let i=0;
@@ -2399,50 +3093,213 @@ function drawClouds(){
         const x=
             (
                 i*420-
-                time*25
+                normalTime*25
             )%
             (
                 canvas.width+500
             );
 
+
+        const safeX=
+            x< -120
+            ?
+            x+
+            canvas.width+
+            500
+            :
+            x;
+
+
         const y=
             80+
             (i%4)*70;
 
-        ctx.beginPath();
 
-        ctx.arc(
-            x,
+        drawCloudShape(
+            safeX,
             y,
-            28,
-            0,
-            Math.PI*2
+            .85+
+            (i%3)*.12,
+            "#ffffff",
+            .22*
+            (1-
+                weather.cloudCover*
+                .8
+            )
         );
-
-        ctx.arc(
-            x+35,
-            y-12,
-            36,
-            0,
-            Math.PI*2
-        );
-
-        ctx.arc(
-            x+75,
-            y,
-            27,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
 
     }
+
+
+    /*
+       Nuvens negras de tempestade.
+
+       Elas aparecem gradualmente no começo
+       da chuva e vão se afastando devagar
+       quando ela termina.
+    */
+
+    if(weather.cloudCover>.01){
+
+        const darkTime=
+            now/7000;
+
+
+        for(
+            let i=0;
+            i<10;
+            i++
+        ){
+
+            const drift=
+                darkTime*
+                (
+                    35+
+                    i*4
+                );
+
+
+            const base=
+                (
+                    i*330-
+                    drift
+                )%
+                (
+                    canvas.width+650
+                );
+
+
+            const x=
+                base<
+                -150
+                ?
+                base+
+                canvas.width+
+                650
+                :
+                base;
+
+
+            const y=
+                55+
+                (i%5)*72;
+
+
+            const scale=
+                .95+
+                (i%4)*.15;
+
+
+            drawCloudShape(
+                x,
+                y,
+                scale,
+                "#101820",
+                .80*
+                weather.cloudCover
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   CHUVA
+============================================================ */
+
+function drawRain(){
+
+    if(
+        weather.rainIntensity<=.01
+    ){
+
+        return;
+
+    }
+
+
+    const now=
+        performance.now();
+
+
+    const amount=
+        Math.floor(
+            120+
+            weather.rainIntensity*
+            180
+        );
+
+
+    ctx.save();
+
+
+    ctx.strokeStyle=
+        "rgba(170,205,235,.48)";
+
+    ctx.lineWidth=1;
+
+
+    for(
+        let i=0;
+        i<amount;
+        i++
+    ){
+
+        const seed=
+            i*
+            17.123;
+
+
+        const x=
+            (
+                seed*
+                37+
+                now*
+                .18
+            )%
+            canvas.width;
+
+
+        const y=
+            (
+                seed*
+                73+
+                now*
+                .62
+            )%
+            canvas.height;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            y
+        );
+
+        ctx.lineTo(
+            x-4,
+            y+14+
+            weather.rainIntensity*
+            7
+        );
+
+        ctx.stroke();
+
+    }
+
 
     ctx.restore();
 
 }
 
+
+/* ============================================================
+   DESENHO DO MUNDO
+============================================================ */
 
 function drawWorld(){
 
@@ -2450,6 +3307,7 @@ function drawWorld(){
         Math.floor(
             cameraX/TILE_SIZE
         )-2;
+
 
     const endX=
         Math.ceil(
@@ -2460,10 +3318,12 @@ function drawWorld(){
             TILE_SIZE
         )+2;
 
+
     const startY=
         Math.floor(
             cameraY/TILE_SIZE
         )-2;
+
 
     const endY=
         Math.ceil(
@@ -2473,6 +3333,7 @@ function drawWorld(){
             )/
             TILE_SIZE
         )+2;
+
 
     for(
         let y=startY;
@@ -2492,21 +3353,28 @@ function drawWorld(){
                     y
                 );
 
+
             if(block==="air")
                 continue;
 
+
             const px=
-                x*TILE_SIZE-
+                x*
+                TILE_SIZE-
                 cameraX;
 
+
             const py=
-                y*TILE_SIZE-
+                y*
+                TILE_SIZE-
                 cameraY;
+
 
             if(block==="water"){
 
                 ctx.fillStyle=
                     "rgba(45,140,205,.72)";
+
 
                 ctx.fillRect(
                     px,
@@ -2515,15 +3383,59 @@ function drawWorld(){
                     TILE_SIZE
                 );
 
+
+                /*
+                   Pequenas ondas na superfície.
+                */
+
+                if(
+                    y===SEA_LEVEL
+                ){
+
+                    ctx.strokeStyle=
+                        "rgba(170,225,255,.42)";
+
+                    ctx.lineWidth=1;
+
+                    ctx.beginPath();
+
+                    ctx.moveTo(
+                        px+3,
+                        py+8
+                    );
+
+                    ctx.lineTo(
+                        px+13,
+                        py+8
+                    );
+
+                    ctx.moveTo(
+                        px+19,
+                        py+15
+                    );
+
+                    ctx.lineTo(
+                        px+29,
+                        py+15
+                    );
+
+                    ctx.stroke();
+
+                }
+
+
                 continue;
 
             }
 
+
             const info=
                 BLOCKS[block];
 
+
             ctx.fillStyle=
                 info.color;
+
 
             ctx.fillRect(
                 px,
@@ -2532,9 +3444,12 @@ function drawWorld(){
                 TILE_SIZE
             );
 
+
             if(block==="grass"){
 
-                ctx.fillStyle="#6ec553";
+                ctx.fillStyle=
+                    "#6ec553";
+
 
                 ctx.fillRect(
                     px,
@@ -2545,10 +3460,28 @@ function drawWorld(){
 
             }
 
+
+            if(block==="snow"){
+
+                ctx.fillStyle=
+                    "rgba(255,255,255,.45)";
+
+
+                ctx.fillRect(
+                    px,
+                    py,
+                    TILE_SIZE,
+                    7
+                );
+
+            }
+
+
             if(block==="stone"){
 
                 ctx.fillStyle=
                     "rgba(255,255,255,.08)";
+
 
                 ctx.fillRect(
                     px+5,
@@ -2557,6 +3490,7 @@ function drawWorld(){
                     4
                 );
 
+
                 ctx.fillRect(
                     px+20,
                     py+18,
@@ -2564,7 +3498,88 @@ function drawWorld(){
                     5
                 );
 
+
+                ctx.fillRect(
+                    px+12,
+                    py+26,
+                    3,
+                    3
+                );
+
             }
+
+
+            if(block==="coal"){
+
+                ctx.fillStyle=
+                    "#16191c";
+
+
+                ctx.fillRect(
+                    px+6,
+                    py+7,
+                    7,
+                    6
+                );
+
+
+                ctx.fillRect(
+                    px+19,
+                    py+19,
+                    6,
+                    7
+                );
+
+            }
+
+
+            if(block==="iron"){
+
+                ctx.fillStyle=
+                    "#d1c6b2";
+
+
+                ctx.fillRect(
+                    px+5,
+                    py+6,
+                    7,
+                    7
+                );
+
+
+                ctx.fillRect(
+                    px+19,
+                    py+18,
+                    6,
+                    6
+                );
+
+            }
+
+
+            if(block==="gold"){
+
+                ctx.fillStyle=
+                    "#ffe76a";
+
+
+                ctx.fillRect(
+                    px+6,
+                    py+6,
+                    7,
+                    7
+                );
+
+
+                ctx.fillRect(
+                    px+19,
+                    py+19,
+                    7,
+                    7
+                );
+
+            }
+
 
             if(block==="wood"){
 
@@ -2583,7 +3598,39 @@ function drawWorld(){
                     py+TILE_SIZE
                 );
 
+                ctx.moveTo(
+                    px+21,
+                    py
+                );
+
+                ctx.lineTo(
+                    px+21,
+                    py+TILE_SIZE
+                );
+
                 ctx.stroke();
+
+            }
+
+
+            if(block==="mud"){
+
+                ctx.fillStyle=
+                    "rgba(30,20,15,.18)";
+
+                ctx.fillRect(
+                    px+4,
+                    py+7,
+                    7,
+                    5
+                );
+
+                ctx.fillRect(
+                    px+20,
+                    py+20,
+                    6,
+                    5
+                );
 
             }
 
@@ -2591,7 +3638,10 @@ function drawWorld(){
 
     }
 
-    /* ÁRVORES */
+
+    /* ========================================================
+       ÁRVORES
+    ======================================================== */
 
     for(
         let x=startX;
@@ -2602,42 +3652,248 @@ function drawWorld(){
         if(!hasTreeAt(x))
             continue;
 
+
+        const biome=
+            getBiome(x);
+
+
         const surface=
             getSurfaceBlockY(x);
+
 
         const height=
             getTreeHeight(x);
 
+
         const baseX=
-            x*TILE_SIZE-
+            x*
+            TILE_SIZE-
             cameraX;
 
+
         const baseY=
-            surface*TILE_SIZE-
+            surface*
+            TILE_SIZE-
             cameraY;
 
-        ctx.fillStyle="#704625";
+
+        /*
+           Tronco.
+        */
+
+        ctx.fillStyle=
+            biome.name==="Taiga"
+            ?
+            "#68452d"
+            :
+            "#704625";
+
 
         ctx.fillRect(
             baseX+11,
-            baseY-height*TILE_SIZE,
+            baseY-
+            height*
+            TILE_SIZE,
             10,
-            height*TILE_SIZE
+            height*
+            TILE_SIZE
         );
 
-        ctx.fillStyle="#2e7938";
 
-        for(
-            let i=-1;
-            i<=1;
-            i++
+        /*
+           Copa por bioma.
+        */
+
+        let leafColor=
+            "#2e7938";
+
+
+        if(
+            biome.name==="Floresta Sombria"
+        ){
+
+            leafColor=
+                "#183f28";
+
+        }
+
+
+        if(
+            biome.name==="Pântano"
+        ){
+
+            leafColor=
+                "#315d31";
+
+        }
+
+
+        if(
+            biome.name==="Taiga"
+        ){
+
+            leafColor=
+                "#225b35";
+
+        }
+
+
+        if(
+            biome.name==="Savana"
+        ){
+
+            leafColor=
+                "#4f7e32";
+
+        }
+
+
+        ctx.fillStyle=
+            leafColor;
+
+
+        if(
+            biome.name==="Taiga"
+        ){
+
+            for(
+                let i=0;
+                i<3;
+                i++
+            ){
+
+                const width=
+                    42-
+                    i*7;
+
+                ctx.fillRect(
+                    baseX+
+                    16-
+                    width/2,
+                    baseY-
+                    height*
+                    TILE_SIZE+
+                    i*17,
+                    width,
+                    24
+                );
+
+            }
+
+        }else if(
+            biome.name==="Savana"
         ){
 
             ctx.fillRect(
-                baseX+i*14,
-                baseY-height*TILE_SIZE-20,
-                35,
-                30
+                baseX-18,
+                baseY-
+                height*
+                TILE_SIZE-
+                18,
+                58,
+                25
+            );
+
+            ctx.fillRect(
+                baseX+15,
+                baseY-
+                height*
+                TILE_SIZE-
+                8,
+                40,
+                22
+            );
+
+        }else{
+
+            for(
+                let i=-1;
+                i<=1;
+                i++
+            ){
+
+                ctx.fillRect(
+                    baseX+
+                    i*14,
+                    baseY-
+                    height*
+                    TILE_SIZE-
+                    20,
+                    35,
+                    30
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /* ========================================================
+       CACTOS
+    ======================================================== */
+
+    for(
+        let x=startX;
+        x<=endX;
+        x++
+    ){
+
+        if(
+            !hasCactusAt(x)
+        ){
+
+            continue;
+
+        }
+
+
+        const surface=
+            getSurfaceBlockY(x);
+
+
+        const height=
+            getCactusHeight(x);
+
+
+        const baseX=
+            x*
+            TILE_SIZE-
+            cameraX;
+
+
+        const baseY=
+            surface*
+            TILE_SIZE-
+            cameraY;
+
+
+        ctx.fillStyle=
+            "#27873d";
+
+
+        ctx.fillRect(
+            baseX+11,
+            baseY-
+            height*
+            TILE_SIZE,
+            10,
+            height*
+            TILE_SIZE
+        );
+
+
+        if(height>=2){
+
+            ctx.fillRect(
+                baseX+3,
+                baseY-
+                height*
+                TILE_SIZE+
+                22,
+                8,
+                20
             );
 
         }
@@ -2654,12 +3910,17 @@ function drawWorld(){
 function drawPlayer(){
 
     const px=
-        player.x-cameraX;
+        player.x-
+        cameraX;
 
     const py=
-        player.y-cameraY;
+        player.y-
+        cameraY;
 
-    ctx.fillStyle="#3c82f6";
+
+    ctx.fillStyle=
+        "#3c82f6";
+
 
     ctx.fillRect(
         px,
@@ -2668,7 +3929,10 @@ function drawPlayer(){
         player.height
     );
 
-    ctx.fillStyle="#f0c29b";
+
+    ctx.fillStyle=
+        "#f0c29b";
+
 
     ctx.fillRect(
         px+3,
@@ -2677,7 +3941,10 @@ function drawPlayer(){
         17
     );
 
-    ctx.fillStyle="#111";
+
+    ctx.fillStyle=
+        "#111";
+
 
     ctx.fillRect(
         px+7,
@@ -2685,6 +3952,7 @@ function drawPlayer(){
         3,
         3
     );
+
 
     ctx.fillRect(
         px+14,
@@ -2708,49 +3976,62 @@ function updateHUD(){
         currentUsername||
         "Jogador";
 
+
     const health=
         Math.round(
             player.health
         );
+
 
     const hunger=
         Math.round(
             player.hunger
         );
 
+
     document.getElementById(
         "healthText"
     ).textContent=
         health;
+
 
     document.getElementById(
         "hungerText"
     ).textContent=
         hunger;
 
+
     document.getElementById(
         "healthFill"
     ).style.width=
-        health+"%";
+        health+
+        "%";
+
 
     document.getElementById(
         "hungerFill"
     ).style.width=
-        hunger+"%";
+        hunger+
+        "%";
+
 
     document.getElementById(
         "posX"
     ).textContent=
         Math.floor(
-            player.x/TILE_SIZE
+            player.x/
+            TILE_SIZE
         );
+
 
     document.getElementById(
         "posY"
     ).textContent=
         Math.floor(
-            player.y/TILE_SIZE
+            player.y/
+            TILE_SIZE
         );
+
 
     document.getElementById(
         "chunkText"
@@ -2770,25 +4051,37 @@ function gameLoop(){
 
         if(!gamePaused){
 
+            updateWeather();
+
             updatePlayer();
 
         }
+
 
         cameraX=
             player.x-
             canvas.width/2;
 
+
         cameraY=
             player.y-
             canvas.height*.55;
 
+
         drawSky();
+
         drawClouds();
+
         drawWorld();
+
+        drawRain();
+
         drawPlayer();
+
         updateHUD();
 
     }
+
 
     requestAnimationFrame(
         gameLoop
@@ -2806,6 +4099,7 @@ async function savePlayerInventory(){
     if(!currentPlayer)
         return false;
 
+
     const inventoryData=
         hotbar.map(
             item=>({
@@ -2819,12 +4113,15 @@ async function savePlayerInventory(){
                 count:Math.max(
                     0,
                     Math.floor(
-                        Number(item.count)||0
+                        Number(
+                            item.count
+                        )||0
                     )
                 )
 
             })
         );
+
 
     const {error}=
         await supabaseClient
@@ -2841,9 +4138,11 @@ async function savePlayerInventory(){
                         new Date().toISOString()
                 },
                 {
-                    onConflict:"user_id"
+                    onConflict:
+                        "user_id"
                 }
             );
+
 
     if(error){
 
@@ -2855,6 +4154,7 @@ async function savePlayerInventory(){
         return false;
 
     }
+
 
     return true;
 
@@ -2870,13 +4170,16 @@ async function saveExploredChunks(){
     if(!currentPlayer)
         return false;
 
+
     const keys=
         Object.keys(
             exploredChunks
         );
 
+
     if(keys.length===0)
         return true;
+
 
     const batch=
         keys.map(
@@ -2885,17 +4188,20 @@ async function saveExploredChunks(){
                 const parts=
                     key.split(",");
 
+
                 const chunkX=
                     parseInt(
                         parts[0],
                         10
                     );
 
+
                 const chunkY=
                     parseInt(
                         parts[1],
                         10
                     );
+
 
                 return {
 
@@ -2915,6 +4221,7 @@ async function saveExploredChunks(){
                         modifiedBlocks:
                             modifiedBlocks[key]||
                             {}
+
                     },
 
                     explored:true,
@@ -2927,7 +4234,9 @@ async function saveExploredChunks(){
             }
         );
 
+
     const batchSize=50;
+
 
     for(
         let i=0;
@@ -2941,6 +4250,7 @@ async function saveExploredChunks(){
                 i+batchSize
             );
 
+
         const {error}=
             await supabaseClient
                 .from("world_chunks")
@@ -2951,6 +4261,7 @@ async function saveExploredChunks(){
                             "user_id,chunk_x,chunk_y"
                     }
                 );
+
 
         if(error){
 
@@ -2964,6 +4275,7 @@ async function saveExploredChunks(){
         }
 
     }
+
 
     return true;
 
@@ -2979,9 +4291,11 @@ async function savePlayerWorld(){
     if(!currentPlayer)
         return false;
 
+
     setSaveStatus(
         "Salvando..."
     );
+
 
     try{
 
@@ -2993,6 +4307,7 @@ async function savePlayerWorld(){
                 .auth
                 .getSession();
 
+
         if(
             sessionError||
             !sessionData.session
@@ -3003,13 +4318,16 @@ async function savePlayerWorld(){
                 sessionError
             );
 
+
             setSaveStatus(
                 "Sessão expirada"
             );
 
+
             return false;
 
         }
+
 
         const savedHealth=
             Math.max(
@@ -3024,6 +4342,7 @@ async function savePlayerWorld(){
                 )
             );
 
+
         const savedHunger=
             Math.max(
                 0,
@@ -3037,21 +4356,36 @@ async function savePlayerWorld(){
                 )
             );
 
+
         const savedX=
-            Number(player.x)||0;
+            Number(
+                player.x
+            )||0;
+
 
         const savedY=
-            Number(player.y)||0;
+            Number(
+                player.y
+            )||0;
+
 
         const {error}=
             await supabaseClient
                 .from("worlds")
                 .update({
 
-                    player_x:savedX,
-                    player_y:savedY,
-                    health:savedHealth,
-                    hunger:savedHunger,
+                    player_x:
+                        savedX,
+
+                    player_y:
+                        savedY,
+
+                    health:
+                        savedHealth,
+
+                    hunger:
+                        savedHunger,
+
                     updated_at:
                         new Date().toISOString()
 
@@ -3061,6 +4395,7 @@ async function savePlayerWorld(){
                     currentPlayer.id
                 );
 
+
         if(error){
 
             console.error(
@@ -3068,16 +4403,20 @@ async function savePlayerWorld(){
                 error
             );
 
+
             setSaveStatus(
                 "Erro ao salvar mundo"
             );
+
 
             return false;
 
         }
 
+
         const inventorySaved=
             await savePlayerInventory();
+
 
         if(!inventorySaved){
 
@@ -3089,8 +4428,10 @@ async function savePlayerWorld(){
 
         }
 
+
         const chunksSaved=
             await saveExploredChunks();
+
 
         if(!chunksSaved){
 
@@ -3102,9 +4443,11 @@ async function savePlayerWorld(){
 
         }
 
+
         setSaveStatus(
             "Salvo ✓"
         );
+
 
         return true;
 
@@ -3115,9 +4458,11 @@ async function savePlayerWorld(){
             error
         );
 
+
         setSaveStatus(
             "Erro ao salvar"
         );
+
 
         return false;
 
@@ -3149,20 +4494,35 @@ async function createPlayerWorld(userId){
     const seed=
         randomSeed();
 
+
     const {error:worldError}=
         await supabaseClient
             .from("worlds")
             .insert({
 
-                user_id:userId,
-                seed:seed,
-                world_size:WORLD_LIMIT,
-                player_x:0,
-                player_y:0,
-                health:100,
-                hunger:100
+                user_id:
+                    userId,
+
+                seed:
+                    seed,
+
+                world_size:
+                    WORLD_LIMIT,
+
+                player_x:
+                    0,
+
+                player_y:
+                    0,
+
+                health:
+                    100,
+
+                hunger:
+                    100
 
             });
+
 
     if(worldError){
 
@@ -3175,15 +4535,20 @@ async function createPlayerWorld(userId){
 
     }
 
+
     const {error:inventoryError}=
         await supabaseClient
             .from("player_inventory")
             .insert({
 
-                user_id:userId,
-                inventory:hotbar
+                user_id:
+                    userId,
+
+                inventory:
+                    hotbar
 
             });
+
 
     if(inventoryError){
 
@@ -3195,6 +4560,7 @@ async function createPlayerWorld(userId){
         throw inventoryError;
 
     }
+
 
     return seed;
 
@@ -3210,9 +4576,11 @@ async function loadPlayerWorld(){
     if(!currentPlayer)
         return false;
 
+
     setSaveStatus(
         "Carregando..."
     );
+
 
     const {
         data:world,
@@ -3227,6 +4595,7 @@ async function loadPlayerWorld(){
             )
             .maybeSingle();
 
+
     if(worldError){
 
         console.error(
@@ -3234,13 +4603,16 @@ async function loadPlayerWorld(){
             worldError
         );
 
+
         setSaveStatus(
             "Erro ao carregar"
         );
 
+
         return false;
 
     }
+
 
     if(!world){
 
@@ -3251,14 +4623,23 @@ async function loadPlayerWorld(){
                     currentPlayer.id
                 );
 
+
             placePlayerAtSpawn();
 
+
             exploredChunks={};
+
             modifiedBlocks={};
+
 
             markCurrentChunkExplored();
 
+
             await savePlayerWorld();
+
+
+            initializeWeather();
+
 
             return true;
 
@@ -3269,9 +4650,11 @@ async function loadPlayerWorld(){
                 error
             );
 
+
             setSaveStatus(
                 "Erro ao criar mundo"
             );
+
 
             return false;
 
@@ -3279,20 +4662,24 @@ async function loadPlayerWorld(){
 
     }
 
+
     worldSeed=
         Number(
             world.seed
         );
+
 
     player.x=
         Number(
             world.player_x
         )||0;
 
+
     player.y=
         Number(
             world.player_y
         )||0;
+
 
     player.health=
         clamp(
@@ -3303,6 +4690,7 @@ async function loadPlayerWorld(){
             100
         );
 
+
     player.hunger=
         clamp(
             Number(
@@ -3312,9 +4700,13 @@ async function loadPlayerWorld(){
             100
         );
 
+
     player.vx=0;
+
     player.vy=0;
+
     player.onGround=false;
+
 
     const {
         data:inventoryData,
@@ -3328,6 +4720,7 @@ async function loadPlayerWorld(){
                 currentPlayer.id
             )
             .maybeSingle();
+
 
     if(inventoryError){
 
@@ -3360,8 +4753,11 @@ async function loadPlayerWorld(){
 
     }
 
+
     exploredChunks={};
+
     modifiedBlocks={};
+
 
     const {
         data:chunks,
@@ -3376,6 +4772,7 @@ async function loadPlayerWorld(){
                 "user_id",
                 currentPlayer.id
             );
+
 
     if(chunksError){
 
@@ -3395,11 +4792,13 @@ async function loadPlayerWorld(){
                         chunk.chunk_y
                     );
 
+
                 if(chunk.explored){
 
                     exploredChunks[key]=true;
 
                 }
+
 
                 if(
                     chunk.data &&
@@ -3416,9 +4815,14 @@ async function loadPlayerWorld(){
 
     }
 
+
     if(
-        !Number.isFinite(player.x)||
-        !Number.isFinite(player.y)
+        !Number.isFinite(
+            player.x
+        )||
+        !Number.isFinite(
+            player.y
+        )
     ){
 
         placePlayerAtSpawn();
@@ -3428,19 +4832,17 @@ async function loadPlayerWorld(){
         const groundY=
             getGroundY();
 
-        /*
-           Ao carregar, se o jogador estiver
-           no chão ou praticamente no chão,
-           coloca exatamente sobre ele.
-        */
 
         if(
             player.y>=groundY-8 &&
             player.y<=groundY+8
         ){
 
-            player.y=groundY;
+            player.y=
+                groundY;
+
             player.vy=0;
+
             player.onGround=true;
 
         }else if(
@@ -3456,13 +4858,20 @@ async function loadPlayerWorld(){
 
     }
 
+
     markCurrentChunkExplored();
 
+
     updateHotbar();
+
+
+    initializeWeather();
+
 
     setSaveStatus(
         "Mundo carregado ✓"
     );
+
 
     return true;
 
@@ -3479,41 +4888,53 @@ async function startGame(){
         "hidden"
     );
 
+
     gameScreen.classList.remove(
         "hidden"
     );
 
+
     gamePaused=false;
+
     gameRunning=true;
 
+
     keys[" "]=false;
+
     keys["space"]=false;
 
+
     player.vx=0;
+
     player.vy=0;
+
 
     pauseOverlay.classList.add(
         "hidden"
     );
 
+
     resizeCanvas();
 
+
     updateHotbar();
+
     updateHUD();
 
+
     if(
-        !Number.isFinite(player.x)||
-        !Number.isFinite(player.y)
+        !Number.isFinite(
+            player.x
+        )||
+        !Number.isFinite(
+            player.y
+        )
     ){
 
         placePlayerAtSpawn();
 
     }
 
-    /*
-       Corrige somente posições realmente
-       inválidas ou dentro de um bloco.
-    */
 
     if(
         collidesAt(
@@ -3529,19 +4950,17 @@ async function startGame(){
         const groundY=
             getGroundY();
 
-        /*
-           Se estiver no chão, fixa exatamente
-           no chão e não deixa a gravidade
-           criar o pequeno movimento.
-        */
 
         if(
             player.y>=groundY-8 &&
             player.y<=groundY+8
         ){
 
-            player.y=groundY;
+            player.y=
+                groundY;
+
             player.vy=0;
+
             player.onGround=true;
 
         }else{
@@ -3551,6 +4970,9 @@ async function startGame(){
         }
 
     }
+
+
+    initializeWeather();
 
 }
 
@@ -3564,7 +4986,10 @@ function togglePause(){
     if(!gameRunning)
         return;
 
-    gamePaused=!gamePaused;
+
+    gamePaused=
+        !gamePaused;
+
 
     if(gamePaused){
 
@@ -3578,12 +5003,9 @@ function togglePause(){
             "hidden"
         );
 
-        /*
-           Ao voltar da pausa, não deixa
-           nenhuma tecla antiga causar pulo.
-        */
 
         keys[" "]=false;
+
         keys["space"]=false;
 
     }
@@ -3599,17 +5021,22 @@ async function returnToMenu(){
 
     gamePaused=true;
 
+
     pauseOverlay.classList.add(
         "hidden"
     );
 
+
     await savePlayerWorld();
 
+
     gameRunning=false;
+
 
     gameScreen.classList.add(
         "hidden"
     );
+
 
     menuScreen.classList.remove(
         "hidden"
@@ -3624,6 +5051,7 @@ async function returnToMenu(){
 
 let autosaveTimer=null;
 
+
 function startAutosave(){
 
     if(autosaveTimer){
@@ -3633,6 +5061,7 @@ function startAutosave(){
         );
 
     }
+
 
     autosaveTimer=
         setInterval(
@@ -3663,7 +5092,9 @@ function setAccountMode(mode){
 
     accountMode=mode;
 
+
     accountMessage.textContent="";
+
 
     if(mode==="login"){
 
@@ -3671,13 +5102,16 @@ function setAccountMode(mode){
             "active"
         );
 
+
         registerTab.classList.remove(
             "active"
         );
 
+
         confirmGroup.classList.add(
             "hidden"
         );
+
 
         accountAction.textContent=
             "Entrar";
@@ -3688,13 +5122,16 @@ function setAccountMode(mode){
             "active"
         );
 
+
         loginTab.classList.remove(
             "active"
         );
 
+
         confirmGroup.classList.remove(
             "hidden"
         );
+
 
         accountAction.textContent=
             "Criar conta";
@@ -3715,8 +5152,10 @@ async function login(){
             usernameInput.value
         );
 
+
     const password=
         passwordInput.value;
+
 
     if(!username){
 
@@ -3727,6 +5166,7 @@ async function login(){
 
     }
 
+
     if(password.length<6){
 
         accountMessage.textContent=
@@ -3736,13 +5176,16 @@ async function login(){
 
     }
 
+
     accountMessage.textContent=
         "Entrando...";
+
 
     const email=
         usernameToEmail(
             username
         );
+
 
     const {
         data,
@@ -3753,9 +5196,11 @@ async function login(){
             .signInWithPassword({
 
                 email,
+
                 password
 
             });
+
 
     if(error){
 
@@ -3764,19 +5209,24 @@ async function login(){
             error
         );
 
+
         accountMessage.textContent=
             error.message||
             "Não foi possível entrar.";
+
 
         return;
 
     }
 
+
     currentPlayer=
         data.user;
 
+
     currentUsername=
         username;
+
 
     await finishLogin();
 
@@ -3794,11 +5244,14 @@ async function register(){
             usernameInput.value
         );
 
+
     const password=
         passwordInput.value;
 
+
     const confirm=
         confirmPasswordInput.value;
+
 
     if(username.length<3){
 
@@ -3809,6 +5262,7 @@ async function register(){
 
     }
 
+
     if(password.length<6){
 
         accountMessage.textContent=
@@ -3817,6 +5271,7 @@ async function register(){
         return;
 
     }
+
 
     if(password!==confirm){
 
@@ -3827,13 +5282,16 @@ async function register(){
 
     }
 
+
     accountMessage.textContent=
         "Criando conta...";
+
 
     const email=
         usernameToEmail(
             username
         );
+
 
     const {
         data,
@@ -3844,6 +5302,7 @@ async function register(){
             .signUp({
 
                 email,
+
                 password,
 
                 options:{
@@ -3854,6 +5313,7 @@ async function register(){
 
             });
 
+
     if(error){
 
         console.error(
@@ -3861,13 +5321,16 @@ async function register(){
             error
         );
 
+
         accountMessage.textContent=
             error.message||
             "Não foi possível criar a conta.";
 
+
         return;
 
     }
+
 
     if(!data.session){
 
@@ -3878,11 +5341,14 @@ async function register(){
 
     }
 
+
     currentPlayer=
         data.user;
 
+
     currentUsername=
         username;
+
 
     await finishLogin();
 
@@ -3897,18 +5363,24 @@ async function finishLogin(){
 
     accountMessage.textContent="";
 
+
     menuUser.textContent=
-        "👤 "+currentUsername;
+        "👤 "+
+        currentUsername;
+
 
     accountScreen.classList.add(
         "hidden"
     );
 
+
     menuScreen.classList.remove(
         "hidden"
     );
 
+
     await loadPlayerWorld();
+
 
     startAutosave();
 
@@ -3930,35 +5402,48 @@ async function logout(){
 
     }
 
+
     gameRunning=false;
+
     gamePaused=false;
+
 
     await supabaseClient
         .auth
         .signOut();
 
+
     currentPlayer=null;
+
     currentUsername="";
+
 
     accountScreen.classList.remove(
         "hidden"
     );
 
+
     menuScreen.classList.add(
         "hidden"
     );
+
 
     worldScreen.classList.add(
         "hidden"
     );
 
+
     gameScreen.classList.add(
         "hidden"
     );
 
+
     usernameInput.value="";
+
     passwordInput.value="";
+
     confirmPasswordInput.value="";
+
     accountMessage.textContent="";
 
 }
@@ -3988,10 +5473,16 @@ accountAction.addEventListener(
     "click",
     ()=>{
 
-        if(accountMode==="login"){
+        if(
+            accountMode==="login"
+        ){
+
             login();
+
         }else{
+
             register();
+
         }
 
     }
@@ -4003,7 +5494,9 @@ passwordInput.addEventListener(
     event=>{
 
         if(event.key==="Enter"){
+
             accountAction.click();
+
         }
 
     }
@@ -4069,7 +5562,9 @@ document.getElementById(
 ).addEventListener(
     "click",
     async()=>{
+
         await startGame();
+
     }
 );
 
@@ -4087,7 +5582,9 @@ document.getElementById(
 ).addEventListener(
     "click",
     ()=>{
+
         togglePause();
+
     }
 );
 
@@ -4097,7 +5594,9 @@ document.getElementById(
 ).addEventListener(
     "click",
     async()=>{
+
         await savePlayerWorld();
+
     }
 );
 
@@ -4121,6 +5620,7 @@ window.addEventListener(
         const key=
             event.key.toLowerCase();
 
+
         if(
             [
                 "arrowleft",
@@ -4135,10 +5635,6 @@ window.addEventListener(
 
         }
 
-        /*
-           Espaço só é registrado uma vez.
-           Segurar Espaço não cria vários pulos.
-        */
 
         if(key===" "){
 
@@ -4154,6 +5650,7 @@ window.addEventListener(
 
         }
 
+
         if(
             key==="escape" &&
             gameRunning
@@ -4164,6 +5661,7 @@ window.addEventListener(
             return;
 
         }
+
 
         if(
             key>="1" &&
@@ -4247,6 +5745,9 @@ async function initialize(){
 
     setAccountMode("login");
 
+    initializeWeather();
+
+
     try{
 
         const {
@@ -4257,6 +5758,7 @@ async function initialize(){
                 .auth
                 .getSession();
 
+
         if(error){
 
             console.error(
@@ -4265,6 +5767,7 @@ async function initialize(){
             );
 
         }
+
 
         if(
             data &&
@@ -4275,6 +5778,7 @@ async function initialize(){
             currentPlayer=
                 data.session.user;
 
+
             currentUsername=
                 currentPlayer
                     .user_metadata
@@ -4283,6 +5787,7 @@ async function initialize(){
                     .email
                     ?.split("@")[0]||
                 "jogador";
+
 
             await finishLogin();
 
@@ -4301,15 +5806,18 @@ async function initialize(){
             error
         );
 
+
         accountScreen.classList.remove(
             "hidden"
         );
 
     }
 
+
     loading.classList.add(
         "hidden"
     );
+
 
     requestAnimationFrame(
         gameLoop
