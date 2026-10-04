@@ -47,21 +47,14 @@ canvas{
     height:100%;
 }
 
-/* =========================================================
-   TELAS
-========================================================= */
-
 .screen{
     position:absolute;
     inset:0;
     z-index:20;
-
     display:flex;
     justify-content:center;
     align-items:center;
-
     padding:20px;
-
     background:
         radial-gradient(
             circle at center,
@@ -71,26 +64,22 @@ canvas{
 }
 
 .panel{
-    width:min(450px,94vw);
-
-    padding:35px 28px;
-
+    width:min(520px,94vw);
+    max-height:94vh;
+    overflow-y:auto;
+    padding:30px 25px;
     text-align:center;
-
     border:1px solid #ffffff25;
     border-radius:18px;
-
     background:
         linear-gradient(
             145deg,
-            rgba(20,20,27,.96),
-            rgba(7,7,11,.96)
+            rgba(20,20,27,.97),
+            rgba(7,7,11,.97)
         );
-
     box-shadow:
         0 0 50px rgba(255,255,255,.05),
         inset 0 0 35px rgba(255,255,255,.025);
-
     backdrop-filter:blur(12px);
 }
 
@@ -98,9 +87,7 @@ canvas{
     font-size:clamp(38px,8vw,65px);
     font-weight:900;
     letter-spacing:3px;
-
     color:#f2f2f2;
-
     text-shadow:
         0 0 8px #ffffff,
         0 0 25px #ffffff55;
@@ -108,9 +95,7 @@ canvas{
 
 .subtitle{
     margin-top:8px;
-
     color:#888;
-
     font-size:14px;
     letter-spacing:5px;
     text-transform:uppercase;
@@ -118,68 +103,46 @@ canvas{
 
 .input{
     width:100%;
-
-    margin-top:30px;
-
+    margin-top:20px;
     padding:15px;
-
     border:1px solid #555;
     border-radius:10px;
-
     outline:none;
-
     background:#08080b;
-
     color:white;
-
     font-size:17px;
     text-align:center;
 }
 
 .input:focus{
     border-color:#aaa;
-
-    box-shadow:
-        0 0 15px #ffffff20;
+    box-shadow:0 0 15px #ffffff20;
 }
 
 .btn{
     width:100%;
-
-    margin-top:15px;
-
+    margin-top:12px;
     padding:15px;
-
     border:1px solid #ffffff30;
     border-radius:10px;
-
     cursor:pointer;
-
     color:white;
-
     font-size:17px;
     font-weight:bold;
-
     background:
         linear-gradient(
             135deg,
             #25252c,
             #111116
         );
-
-    box-shadow:
-        0 0 20px #00000055;
-
+    box-shadow:0 0 20px #00000055;
     transition:.15s;
 }
 
 .btn:hover{
     transform:translateY(-2px);
-
     border-color:#ffffff70;
-
-    box-shadow:
-        0 0 25px #ffffff12;
+    box-shadow:0 0 25px #ffffff12;
 }
 
 .btn.secondary{
@@ -188,12 +151,9 @@ canvas{
 }
 
 .help{
-    margin-top:25px;
-
+    margin-top:20px;
     color:#777;
-
     font-size:14px;
-
     line-height:1.7;
 }
 
@@ -202,53 +162,148 @@ canvas{
 }
 
 /* =========================================================
+   SELEÇÃO DE NAVE
+========================================================= */
+
+.shipSelector{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid #ffffff18;
+    border-radius:14px;
+    background:#08080d;
+}
+
+.shipTitle{
+    font-size:12px;
+    color:#888;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.shipName{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:3px;
+}
+
+.shipStatus{
+    font-size:12px;
+    color:#888;
+    min-height:17px;
+}
+
+.shipPreview{
+    height:145px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    margin:5px 0;
+}
+
+#shipPreview{
+    width:220px;
+    height:140px;
+}
+
+.shipArrows{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.shipArrow{
+    width:55px;
+    height:45px;
+    border:1px solid #ffffff30;
+    border-radius:9px;
+    background:#111116;
+    color:white;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.shipArrow:hover{
+    background:#25252c;
+}
+
+.shipCounter{
+    color:#777;
+    font-size:13px;
+}
+
+.unlockBox{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #ffffff12;
+}
+
+.unlockBox .input{
+    margin-top:7px;
+}
+
+.unlockBtn{
+    margin-top:8px;
+    padding:10px;
+    font-size:14px;
+}
+
+.unlockMessage{
+    min-height:18px;
+    margin-top:6px;
+    font-size:12px;
+    color:#777;
+}
+
+.freeText{
+    color:#aaa;
+}
+
+.lockText{
+    color:#aaa;
+}
+
+#playBtn{
+    margin-top:16px;
+}
+
+/* =========================================================
    HUD
 ========================================================= */
 
 #hud{
     position:absolute;
-
     top:18px;
     left:18px;
     right:18px;
-
     z-index:5;
-
     display:flex;
     justify-content:space-between;
-
     pointer-events:none;
 }
 
 .hudBox{
     min-width:90px;
-
     padding:8px 14px;
-
     border:1px solid #ffffff18;
     border-radius:6px;
-
     background:#050507cc;
-
     backdrop-filter:blur(5px);
 }
 
 .hudLabel{
     color:#777;
-
     font-size:10px;
-
     text-transform:uppercase;
     letter-spacing:1px;
 }
 
 .hudValue{
     margin-top:2px;
-
     font-size:20px;
-
     font-weight:bold;
-
     color:#eee;
 }
 
@@ -258,69 +313,49 @@ canvas{
 
 .rankTitle{
     font-size:32px;
-
     margin-bottom:20px;
-
-    text-shadow:
-        0 0 20px #ffffff44;
+    text-shadow:0 0 20px #ffffff44;
 }
 
 .ranking{
     max-height:360px;
-
     overflow-y:auto;
-
     text-align:left;
-
     margin-top:10px;
 }
 
 .rankRow{
     display:flex;
     align-items:center;
-
     gap:10px;
-
     padding:12px;
-
     margin-bottom:7px;
-
     border-radius:7px;
-
     background:#101014;
-
     border:1px solid #25252b;
 }
 
 .rankPosition{
     width:30px;
-
     font-weight:bold;
-
     color:#888;
 }
 
 .rankName{
     flex:1;
-
     overflow:hidden;
-
     text-overflow:ellipsis;
-
     white-space:nowrap;
 }
 
 .rankScore{
     font-weight:bold;
-
     color:#ddd;
 }
 
 .loading{
     color:#777;
-
     padding:20px;
-
     text-align:center;
 }
 
@@ -330,25 +365,25 @@ canvas{
 
 .finalScore{
     margin:20px 0;
-
     font-size:48px;
-
     font-weight:900;
-
     color:#eee;
-
-    text-shadow:
-        0 0 20px #ffffff44;
+    text-shadow:0 0 20px #ffffff44;
 }
-
-/* =========================================================
-   MOBILE
-========================================================= */
 
 @media(max-width:600px){
 
     .panel{
-        padding:28px 20px;
+        padding:25px 18px;
+    }
+
+    .shipPreview{
+        height:125px;
+    }
+
+    #shipPreview{
+        width:190px;
+        height:125px;
     }
 
     .hudBox{
@@ -372,7 +407,6 @@ canvas{
 <div id="game">
 
 <canvas id="canvas"></canvas>
-
 
 <!-- ======================================================
      MENU
@@ -398,6 +432,89 @@ canvas{
             placeholder="Digite seu nome"
         >
 
+        <!-- =================================================
+             SELEÇÃO DE NAVE
+        ================================================== -->
+
+        <div class="shipSelector">
+
+            <div class="shipTitle">
+                ESCOLHA SUA NAVE
+            </div>
+
+            <div id="shipName" class="shipName">
+                Caça Cinza
+            </div>
+
+            <div id="shipStatus" class="shipStatus">
+                GRATUITA
+            </div>
+
+            <div class="shipPreview">
+                <canvas id="shipPreview"></canvas>
+            </div>
+
+            <div class="shipArrows">
+
+                <button
+                    id="prevShipBtn"
+                    class="shipArrow"
+                    type="button"
+                >
+                    ◀
+                </button>
+
+                <div
+                    id="shipCounter"
+                    class="shipCounter"
+                >
+                    1 / 15
+                </div>
+
+                <button
+                    id="nextShipBtn"
+                    class="shipArrow"
+                    type="button"
+                >
+                    ▶
+                </button>
+
+            </div>
+
+            <div
+                id="unlockBox"
+                class="unlockBox hidden"
+            >
+
+                <div class="lockText">
+                    🔒 Esta nave está bloqueada
+                </div>
+
+                <input
+                    id="unlockPassword"
+                    class="input"
+                    maxlength="10"
+                    autocomplete="off"
+                    placeholder="Digite a senha"
+                >
+
+                <button
+                    id="unlockBtn"
+                    class="btn unlockBtn"
+                    type="button"
+                >
+                    🔓 DESBLOQUEAR
+                </button>
+
+                <div
+                    id="unlockMessage"
+                    class="unlockMessage"
+                ></div>
+
+            </div>
+
+        </div>
+
         <button id="playBtn" class="btn">
             ▶ JOGAR
         </button>
@@ -409,7 +526,8 @@ canvas{
         <div class="help">
             ⌨️ Segure <b>ESPAÇO</b> para subir<br>
             📱 Segure a tela para subir<br>
-            🚀 Desvie dos obstáculos e sobreviva!
+            🚀 Desvie dos obstáculos e sobreviva!<br>
+            ☠️ O chão e o teto são fatais!
         </div>
 
     </div>
@@ -546,7 +664,7 @@ const db =
 
 
 /* =========================================================
-   CANVAS
+   CANVAS PRINCIPAL
 ========================================================= */
 
 const canvas =
@@ -557,9 +675,7 @@ const ctx =
 
 let W = 0;
 let H = 0;
-
 let DPR = 1;
-
 
 function resize(){
 
@@ -600,10 +716,45 @@ function resize(){
 }
 
 
-window.addEventListener(
-    "resize",
-    resize
-);
+/* =========================================================
+   CANVAS DA PRÉVIA DA NAVE
+========================================================= */
+
+const shipPreview =
+    document.getElementById("shipPreview");
+
+const shipPreviewCtx =
+    shipPreview.getContext("2d");
+
+function resizeShipPreview(){
+
+    const rect =
+        shipPreview.getBoundingClientRect();
+
+    const dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+    shipPreview.width =
+        rect.width * dpr;
+
+    shipPreview.height =
+        rect.height * dpr;
+
+    shipPreviewCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    drawShipPreview();
+
+}
 
 
 /* =========================================================
@@ -658,33 +809,50 @@ const savingText =
 const rankingList =
     document.getElementById("rankingList");
 
+const shipNameEl =
+    document.getElementById("shipName");
+
+const shipStatusEl =
+    document.getElementById("shipStatus");
+
+const shipCounterEl =
+    document.getElementById("shipCounter");
+
+const prevShipBtn =
+    document.getElementById("prevShipBtn");
+
+const nextShipBtn =
+    document.getElementById("nextShipBtn");
+
+const unlockBox =
+    document.getElementById("unlockBox");
+
+const unlockPassword =
+    document.getElementById("unlockPassword");
+
+const unlockBtn =
+    document.getElementById("unlockBtn");
+
+const unlockMessage =
+    document.getElementById("unlockMessage");
+
 
 /* =========================================================
    ESTADO
 ========================================================= */
 
 let running = false;
-
 let animationId = 0;
-
 let player = null;
-
 let obstacles = [];
-
 let particles = [];
-
 let stars = [];
 
 let score = 0;
-
 let distance = 0;
-
 let gameSpeed = 5;
-
 let lastTime = 0;
-
 let playerNameValue = "";
-
 let holding = false;
 
 
@@ -693,12 +861,1227 @@ let holding = false;
 ========================================================= */
 
 let speedLevel = 0;
-
 let obstacleLevel = 0;
-
 let nextSpeedDistance = 150;
-
 let nextObstacleScore = 500;
+
+
+/* =========================================================
+   SISTEMA DAS 15 NAVES
+========================================================= */
+
+const ships = [
+
+    {
+        name:"Caça Cinza",
+        type:1,
+        free:true
+    },
+
+    {
+        name:"Caça Azul",
+        type:2,
+        free:true
+    },
+
+    {
+        name:"Nave Espacial",
+        type:3,
+        free:true
+    },
+
+    {
+        name:"Caça Pesado",
+        type:4,
+        free:true
+    },
+
+    {
+        name:"Caça Preto e Laranja",
+        type:5,
+        free:true
+    },
+
+    {
+        name:"Interceptor Prateado",
+        type:6,
+        free:false
+    },
+
+    {
+        name:"Falcão Blindado",
+        type:7,
+        free:false
+    },
+
+    {
+        name:"Predador Vermelho",
+        type:8,
+        free:false
+    },
+
+    {
+        name:"Lança Sombria",
+        type:9,
+        free:false
+    },
+
+    {
+        name:"Titã Azul",
+        type:10,
+        free:false
+    },
+
+    {
+        name:"Caçador Angular",
+        type:11,
+        free:false
+    },
+
+    {
+        name:"Asa de Ferro",
+        type:12,
+        free:false
+    },
+
+    {
+        name:"Interceptor Negro",
+        type:13,
+        free:false
+    },
+
+    {
+        name:"Tempestade",
+        type:14,
+        free:false
+    },
+
+    {
+        name:"Nave Imperial",
+        type:15,
+        free:false
+    }
+
+];
+
+let selectedShip = Number(
+    localStorage.getItem(
+        "spaceWavesSelectedShip"
+    )
+) || 0;
+
+let unlockedShips =
+    JSON.parse(
+        localStorage.getItem(
+            "spaceWavesUnlockedShips"
+        ) || "[0,1,2,3,4]"
+    );
+
+if(!Array.isArray(unlockedShips)){
+    unlockedShips = [0,1,2,3,4];
+}
+
+
+/* =========================================================
+   GARANTE AS 5 PRIMEIRAS
+========================================================= */
+
+for(let i=0;i<5;i++){
+
+    if(!unlockedShips.includes(i)){
+        unlockedShips.push(i);
+    }
+
+}
+
+
+/* =========================================================
+   NAVE ESTÁ DESBLOQUEADA?
+========================================================= */
+
+function isShipUnlocked(index){
+
+    return (
+        ships[index].free ||
+        unlockedShips.includes(index)
+    );
+
+}
+
+
+/* =========================================================
+   SALVAR NAVES
+========================================================= */
+
+function saveShipData(){
+
+    localStorage.setItem(
+        "spaceWavesSelectedShip",
+        String(selectedShip)
+    );
+
+    localStorage.setItem(
+        "spaceWavesUnlockedShips",
+        JSON.stringify(unlockedShips)
+    );
+
+}
+
+
+/* =========================================================
+   DESENHO DA NAVE GENÉRICA
+========================================================= */
+
+function drawShip(
+    context,
+    x,
+    y,
+    scale,
+    type,
+    rotation = 0
+){
+
+    context.save();
+
+    context.translate(
+        x,
+        y
+    );
+
+    context.rotate(
+        rotation
+    );
+
+    context.scale(
+        scale,
+        scale
+    );
+
+    context.lineJoin = "round";
+    context.lineCap = "round";
+
+
+    /* =====================================================
+       1 - CAÇA CINZA
+       Inspirado na primeira imagem
+    ===================================================== */
+
+    if(type === 1){
+
+        context.shadowBlur = 12;
+        context.shadowColor = "#ffffff55";
+
+        context.fillStyle = "#777b82";
+        context.strokeStyle = "#dfe3e8";
+        context.lineWidth = 1.8;
+
+        context.beginPath();
+
+        context.moveTo(30,0);
+        context.lineTo(8,-8);
+        context.lineTo(-5,-27);
+        context.lineTo(-12,-24);
+        context.lineTo(-18,-10);
+        context.lineTo(-36,-17);
+        context.lineTo(-55,-11);
+        context.lineTo(-34,0);
+        context.lineTo(-55,11);
+        context.lineTo(-36,17);
+        context.lineTo(-18,10);
+        context.lineTo(-12,24);
+        context.lineTo(-5,27);
+        context.lineTo(8,8);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#292d32";
+
+        context.beginPath();
+        context.moveTo(25,0);
+        context.lineTo(-4,-6);
+        context.lineTo(-13,0);
+        context.lineTo(-4,6);
+        context.closePath();
+        context.fill();
+
+        context.fillStyle="#eeeeee";
+        context.fillRect(-23,-4,7,8);
+
+    }
+
+
+    /* =====================================================
+       2 - CAÇA AZUL/VERDE
+    ===================================================== */
+
+    if(type === 2){
+
+        context.shadowBlur=15;
+        context.shadowColor="#49ff6655";
+
+        context.fillStyle="#17386d";
+        context.strokeStyle="#9ed7ff";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(34,0);
+        context.lineTo(4,-9);
+        context.lineTo(-2,-32);
+        context.lineTo(-12,-26);
+        context.lineTo(-16,-11);
+        context.lineTo(-57,-21);
+        context.lineTo(-64,-12);
+        context.lineTo(-32,0);
+        context.lineTo(-64,12);
+        context.lineTo(-57,21);
+        context.lineTo(-16,11);
+        context.lineTo(-12,26);
+        context.lineTo(-2,32);
+        context.lineTo(4,9);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#8cff32";
+        context.fillRect(-10,-7,15,14);
+
+        context.fillStyle="#263e86";
+        context.fillRect(-43,-16,14,5);
+        context.fillRect(-43,11,14,5);
+
+    }
+
+
+    /* =====================================================
+       3 - NAVE ESPACIAL HORIZONTAL
+    ===================================================== */
+
+    if(type === 3){
+
+        context.shadowBlur=14;
+        context.shadowColor="#ff8a3255";
+
+        context.fillStyle="#1d2024";
+        context.strokeStyle="#c8c8c8";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(58,0);
+        context.lineTo(38,-11);
+        context.lineTo(23,-15);
+        context.lineTo(12,-27);
+        context.lineTo(-5,-22);
+        context.lineTo(-12,-9);
+        context.lineTo(-43,-16);
+        context.lineTo(-53,-9);
+        context.lineTo(-28,0);
+        context.lineTo(-53,9);
+        context.lineTo(-43,16);
+        context.lineTo(-12,9);
+        context.lineTo(-5,22);
+        context.lineTo(12,27);
+        context.lineTo(23,15);
+        context.lineTo(38,11);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#df7924";
+        context.fillRect(-37,-12,12,5);
+        context.fillRect(-37,7,12,5);
+
+        context.fillStyle="#59a7ff";
+        context.beginPath();
+        context.arc(50,0,7,0,Math.PI*2);
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       4 - CAÇA PESADO AZUL
+    ===================================================== */
+
+    if(type === 4){
+
+        context.shadowBlur=18;
+        context.shadowColor="#438bff66";
+
+        context.fillStyle="#263f66";
+        context.strokeStyle="#a8c4e8";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(37,0);
+        context.lineTo(17,-13);
+        context.lineTo(8,-30);
+        context.lineTo(-8,-26);
+        context.lineTo(-16,-14);
+        context.lineTo(-39,-30);
+        context.lineTo(-55,-23);
+        context.lineTo(-44,-4);
+        context.lineTo(-58,0);
+        context.lineTo(-44,4);
+        context.lineTo(-55,23);
+        context.lineTo(-39,30);
+        context.lineTo(-16,14);
+        context.lineTo(-8,26);
+        context.lineTo(8,30);
+        context.lineTo(17,13);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#e84b9a";
+        context.beginPath();
+        context.ellipse(8,0,11,15,0,0,Math.PI*2);
+        context.fill();
+
+        context.fillStyle="#d88b38";
+
+        context.beginPath();
+        context.arc(-35,-20,6,0,Math.PI*2);
+        context.fill();
+
+        context.beginPath();
+        context.arc(-35,20,6,0,Math.PI*2);
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       5 - PRETO / LARANJA
+    ===================================================== */
+
+    if(type === 5){
+
+        context.shadowBlur=15;
+        context.shadowColor="#ff5a0055";
+
+        context.fillStyle="#262421";
+        context.strokeStyle="#d96a22";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(35,0);
+        context.lineTo(8,-12);
+        context.lineTo(-2,-34);
+        context.lineTo(-13,-29);
+        context.lineTo(-18,-12);
+        context.lineTo(-35,-28);
+        context.lineTo(-52,-34);
+        context.lineTo(-45,-8);
+        context.lineTo(-59,0);
+        context.lineTo(-45,8);
+        context.lineTo(-52,34);
+        context.lineTo(-35,28);
+        context.lineTo(-18,12);
+        context.lineTo(-13,29);
+        context.lineTo(-2,34);
+        context.lineTo(8,12);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#a93620";
+        context.fillRect(-8,-12,13,24);
+
+        context.fillStyle="#ff8a22";
+        context.beginPath();
+        context.moveTo(-42,-20);
+        context.lineTo(-29,-10);
+        context.lineTo(-39,-7);
+        context.closePath();
+        context.fill();
+
+        context.beginPath();
+        context.moveTo(-42,20);
+        context.lineTo(-29,10);
+        context.lineTo(-39,7);
+        context.closePath();
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       6 - INTERCEPTOR PRATEADO
+    ===================================================== */
+
+    if(type === 6){
+
+        context.shadowBlur=16;
+        context.shadowColor="#ffffff66";
+
+        context.fillStyle="#9aa0a8";
+        context.strokeStyle="#f4f4f4";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(42,0);
+        context.lineTo(7,-8);
+        context.lineTo(-12,-34);
+        context.lineTo(-20,-12);
+        context.lineTo(-52,-25);
+        context.lineTo(-43,-5);
+        context.lineTo(-63,0);
+        context.lineTo(-43,5);
+        context.lineTo(-52,25);
+        context.lineTo(-20,12);
+        context.lineTo(-12,34);
+        context.lineTo(7,8);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#343940";
+        context.beginPath();
+        context.moveTo(28,0);
+        context.lineTo(-15,-7);
+        context.lineTo(-15,7);
+        context.closePath();
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       7 - FALCÃO BLINDADO
+    ===================================================== */
+
+    if(type === 7){
+
+        context.shadowBlur=17;
+        context.shadowColor="#00b7ff55";
+
+        context.fillStyle="#384a58";
+        context.strokeStyle="#b9e8ff";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(43,0);
+        context.lineTo(14,-10);
+        context.lineTo(3,-25);
+        context.lineTo(-7,-21);
+        context.lineTo(-15,-10);
+        context.lineTo(-51,-18);
+        context.lineTo(-62,-8);
+        context.lineTo(-42,0);
+        context.lineTo(-62,8);
+        context.lineTo(-51,18);
+        context.lineTo(-15,10);
+        context.lineTo(-7,21);
+        context.lineTo(3,25);
+        context.lineTo(14,10);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#56d9ff";
+        context.fillRect(-5,-7,17,14);
+
+        context.fillStyle="#20282d";
+        context.fillRect(-40,-5,16,10);
+
+    }
+
+
+    /* =====================================================
+       8 - PREDADOR VERMELHO
+    ===================================================== */
+
+    if(type === 8){
+
+        context.shadowBlur=18;
+        context.shadowColor="#ff222266";
+
+        context.fillStyle="#4c1518";
+        context.strokeStyle="#e85c5c";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(44,0);
+        context.lineTo(12,-9);
+        context.lineTo(-2,-38);
+        context.lineTo(-11,-25);
+        context.lineTo(-20,-11);
+        context.lineTo(-48,-27);
+        context.lineTo(-59,-19);
+        context.lineTo(-43,-3);
+        context.lineTo(-66,0);
+        context.lineTo(-43,3);
+        context.lineTo(-59,19);
+        context.lineTo(-48,27);
+        context.lineTo(-20,11);
+        context.lineTo(-11,25);
+        context.lineTo(-2,38);
+        context.lineTo(12,9);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#ff4b2b";
+        context.beginPath();
+        context.moveTo(24,0);
+        context.lineTo(-8,-7);
+        context.lineTo(-8,7);
+        context.closePath();
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       9 - LANÇA SOMBRIA
+    ===================================================== */
+
+    if(type === 9){
+
+        context.shadowBlur=20;
+        context.shadowColor="#8844ff77";
+
+        context.fillStyle="#171522";
+        context.strokeStyle="#916dff";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(55,0);
+        context.lineTo(3,-8);
+        context.lineTo(-25,-42);
+        context.lineTo(-18,-10);
+        context.lineTo(-57,-22);
+        context.lineTo(-42,0);
+        context.lineTo(-57,22);
+        context.lineTo(-18,10);
+        context.lineTo(-25,42);
+        context.lineTo(3,8);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#a77bff";
+        context.beginPath();
+        context.moveTo(39,0);
+        context.lineTo(-13,-6);
+        context.lineTo(-13,6);
+        context.closePath();
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       10 - TITÃ AZUL
+    ===================================================== */
+
+    if(type === 10){
+
+        context.shadowBlur=20;
+        context.shadowColor="#268cff77";
+
+        context.fillStyle="#27496b";
+        context.strokeStyle="#8ed0ff";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(48,0);
+        context.lineTo(22,-12);
+        context.lineTo(14,-31);
+        context.lineTo(-2,-25);
+        context.lineTo(-12,-15);
+        context.lineTo(-32,-32);
+        context.lineTo(-53,-27);
+        context.lineTo(-46,-9);
+        context.lineTo(-63,0);
+        context.lineTo(-46,9);
+        context.lineTo(-53,27);
+        context.lineTo(-32,32);
+        context.lineTo(-12,15);
+        context.lineTo(-2,25);
+        context.lineTo(14,31);
+        context.lineTo(22,12);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#39bfff";
+        context.beginPath();
+        context.arc(5,0,10,0,Math.PI*2);
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       11 - CAÇADOR ANGULAR
+    ===================================================== */
+
+    if(type === 11){
+
+        context.shadowBlur=17;
+        context.shadowColor="#ffaa2266";
+
+        context.fillStyle="#38342d";
+        context.strokeStyle="#e0a94a";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(48,0);
+        context.lineTo(4,-11);
+        context.lineTo(-12,-39);
+        context.lineTo(-17,-14);
+        context.lineTo(-55,-27);
+        context.lineTo(-45,-7);
+        context.lineTo(-66,0);
+        context.lineTo(-45,7);
+        context.lineTo(-55,27);
+        context.lineTo(-17,14);
+        context.lineTo(-12,39);
+        context.lineTo(4,11);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#ffb52e";
+        context.fillRect(-8,-7,20,14);
+
+    }
+
+
+    /* =====================================================
+       12 - ASA DE FERRO
+    ===================================================== */
+
+    if(type === 12){
+
+        context.shadowBlur=15;
+        context.shadowColor="#dddddd55";
+
+        context.fillStyle="#50545a";
+        context.strokeStyle="#eeeeee";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(40,0);
+        context.lineTo(5,-7);
+        context.lineTo(-14,-31);
+        context.lineTo(-23,-10);
+        context.lineTo(-52,-19);
+        context.lineTo(-61,-11);
+        context.lineTo(-39,0);
+        context.lineTo(-61,11);
+        context.lineTo(-52,19);
+        context.lineTo(-23,10);
+        context.lineTo(-14,31);
+        context.lineTo(5,7);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#22252a";
+        context.fillRect(-12,-5,24,10);
+
+    }
+
+
+    /* =====================================================
+       13 - INTERCEPTOR NEGRO
+    ===================================================== */
+
+    if(type === 13){
+
+        context.shadowBlur=18;
+        context.shadowColor="#ffffff44";
+
+        context.fillStyle="#111216";
+        context.strokeStyle="#70757e";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(52,0);
+        context.lineTo(2,-7);
+        context.lineTo(-18,-36);
+        context.lineTo(-15,-11);
+        context.lineTo(-59,-24);
+        context.lineTo(-47,-6);
+        context.lineTo(-67,0);
+        context.lineTo(-47,6);
+        context.lineTo(-59,24);
+        context.lineTo(-15,11);
+        context.lineTo(-18,36);
+        context.lineTo(2,7);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#efefef";
+        context.beginPath();
+        context.moveTo(36,0);
+        context.lineTo(-10,-4);
+        context.lineTo(-10,4);
+        context.closePath();
+        context.fill();
+
+    }
+
+
+    /* =====================================================
+       14 - TEMPESTADE
+    ===================================================== */
+
+    if(type === 14){
+
+        context.shadowBlur=20;
+        context.shadowColor="#00e5ff77";
+
+        context.fillStyle="#143d45";
+        context.strokeStyle="#5ff3ff";
+        context.lineWidth=2;
+
+        context.beginPath();
+
+        context.moveTo(50,0);
+        context.lineTo(11,-8);
+        context.lineTo(-5,-33);
+        context.lineTo(-18,-13);
+        context.lineTo(-51,-28);
+        context.lineTo(-43,-7);
+        context.lineTo(-67,0);
+        context.lineTo(-43,7);
+        context.lineTo(-51,28);
+        context.lineTo(-18,13);
+        context.lineTo(-5,33);
+        context.lineTo(11,8);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#35eaff";
+        context.fillRect(-5,-6,18,12);
+
+    }
+
+
+    /* =====================================================
+       15 - NAVE IMPERIAL
+    ===================================================== */
+
+    if(type === 15){
+
+        context.shadowBlur=25;
+        context.shadowColor="#ffffff88";
+
+        context.fillStyle="#62656b";
+        context.strokeStyle="#ffffff";
+        context.lineWidth=2.2;
+
+        context.beginPath();
+
+        context.moveTo(60,0);
+        context.lineTo(20,-12);
+        context.lineTo(7,-40);
+        context.lineTo(-8,-27);
+        context.lineTo(-18,-13);
+        context.lineTo(-42,-34);
+        context.lineTo(-60,-30);
+        context.lineTo(-51,-9);
+        context.lineTo(-72,0);
+        context.lineTo(-51,9);
+        context.lineTo(-60,30);
+        context.lineTo(-42,34);
+        context.lineTo(-18,13);
+        context.lineTo(-8,27);
+        context.lineTo(7,40);
+        context.lineTo(20,12);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.fillStyle="#1d2229";
+
+        context.beginPath();
+        context.moveTo(43,0);
+        context.lineTo(-12,-8);
+        context.lineTo(-12,8);
+        context.closePath();
+        context.fill();
+
+        context.fillStyle="#dcefff";
+
+        context.beginPath();
+        context.arc(8,0,9,0,Math.PI*2);
+        context.fill();
+
+    }
+
+
+    /* motor */
+
+    context.shadowBlur=8;
+    context.shadowColor="#ff9d3355";
+
+    context.fillStyle="#ff9b35";
+
+    context.beginPath();
+
+    context.moveTo(
+        -48,
+        -3
+    );
+
+    context.lineTo(
+        -63,
+        0
+    );
+
+    context.lineTo(
+        -48,
+        3
+    );
+
+    context.closePath();
+
+    context.fill();
+
+
+    context.restore();
+
+}
+
+
+/* =========================================================
+   ATUALIZAR PRÉVIA
+========================================================= */
+
+function updateShipSelector(){
+
+    if(selectedShip < 0)
+        selectedShip = ships.length-1;
+
+    if(selectedShip >= ships.length)
+        selectedShip = 0;
+
+    const ship =
+        ships[selectedShip];
+
+    shipNameEl.textContent =
+        ship.name;
+
+    shipCounterEl.textContent =
+        (selectedShip+1) +
+        " / " +
+        ships.length;
+
+
+    if(isShipUnlocked(selectedShip)){
+
+        shipStatusEl.textContent =
+            "✓ DESBLOQUEADA";
+
+        shipStatusEl.className =
+            "shipStatus freeText";
+
+        unlockBox.classList.add(
+            "hidden"
+        );
+
+    }else{
+
+        shipStatusEl.textContent =
+            "🔒 BLOQUEADA";
+
+        shipStatusEl.className =
+            "shipStatus lockText";
+
+        unlockBox.classList.remove(
+            "hidden"
+        );
+
+        unlockPassword.value = "";
+
+        unlockMessage.textContent = "";
+
+    }
+
+    saveShipData();
+
+    drawShipPreview();
+
+}
+
+
+/* =========================================================
+   PRÉVIA
+========================================================= */
+
+function drawShipPreview(){
+
+    const width =
+        shipPreview.clientWidth || 220;
+
+    const height =
+        shipPreview.clientHeight || 140;
+
+    shipPreviewCtx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    const gradient =
+        shipPreviewCtx.createRadialGradient(
+            width/2,
+            height/2,
+            5,
+            width/2,
+            height/2,
+            width/2
+        );
+
+    gradient.addColorStop(
+        0,
+        "#222630"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#08090d"
+    );
+
+    shipPreviewCtx.fillStyle =
+        gradient;
+
+    shipPreviewCtx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* pequenas estrelas */
+
+    shipPreviewCtx.fillStyle =
+        "#ffffff";
+
+    shipPreviewCtx.globalAlpha =
+        .25;
+
+    for(let i=0;i<20;i++){
+
+        const x =
+            (i*37)%width;
+
+        const y =
+            (i*61)%height;
+
+        shipPreviewCtx.fillRect(
+            x,
+            y,
+            1,
+            1
+        );
+
+    }
+
+    shipPreviewCtx.globalAlpha=1;
+
+
+    drawShip(
+        shipPreviewCtx,
+        width/2,
+        height/2,
+        Math.min(
+            width/145,
+            height/100
+        ),
+        ships[selectedShip].type,
+        0
+    );
+
+
+    if(
+        !isShipUnlocked(selectedShip)
+    ){
+
+        shipPreviewCtx.fillStyle =
+            "#00000088";
+
+        shipPreviewCtx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+        shipPreviewCtx.font =
+            "bold 16px Arial";
+
+        shipPreviewCtx.fillStyle =
+            "#ffffff";
+
+        shipPreviewCtx.textAlign =
+            "center";
+
+        shipPreviewCtx.fillText(
+            "🔒 BLOQUEADA",
+            width/2,
+            height/2 + 55
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TROCAR NAVE
+========================================================= */
+
+prevShipBtn.addEventListener(
+    "click",
+    () => {
+
+        selectedShip--;
+
+        if(selectedShip < 0)
+            selectedShip = ships.length-1;
+
+        updateShipSelector();
+
+    }
+);
+
+
+nextShipBtn.addEventListener(
+    "click",
+    () => {
+
+        selectedShip++;
+
+        if(selectedShip >= ships.length)
+            selectedShip = 0;
+
+        updateShipSelector();
+
+    }
+);
+
+
+/* =========================================================
+   DESBLOQUEAR NAVE
+========================================================= */
+
+function unlockSelectedShip(){
+
+    if(
+        isShipUnlocked(selectedShip)
+    ){
+
+        return;
+
+    }
+
+
+    const password =
+        unlockPassword.value.trim();
+
+
+    if(password === "88"){
+
+        if(
+            !unlockedShips.includes(
+                selectedShip
+            )
+        ){
+
+            unlockedShips.push(
+                selectedShip
+            );
+
+        }
+
+        saveShipData();
+
+        shipStatusEl.textContent =
+            "✓ DESBLOQUEADA";
+
+        shipStatusEl.className =
+            "shipStatus freeText";
+
+        unlockMessage.textContent =
+            "Nave desbloqueada!";
+
+        unlockMessage.style.color =
+            "#8cff8c";
+
+        unlockBox.classList.add(
+            "hidden"
+        );
+
+        drawShipPreview();
+
+    }else{
+
+        unlockMessage.textContent =
+            "Senha incorreta.";
+
+        unlockMessage.style.color =
+            "#ff7777";
+
+    }
+
+}
+
+
+unlockBtn.addEventListener(
+    "click",
+    unlockSelectedShip
+);
+
+
+unlockPassword.addEventListener(
+    "keydown",
+    e => {
+
+        if(e.key === "Enter"){
+
+            unlockSelectedShip();
+
+        }
+
+    }
+);
 
 
 /* =========================================================
@@ -712,31 +2095,33 @@ function createStars(){
     const amount =
         Math.max(
             80,
-            Math.floor(W * H / 9000)
+            Math.floor(
+                W * H / 9000
+            )
         );
 
     for(
-        let i = 0;
-        i < amount;
+        let i=0;
+        i<amount;
         i++
     ){
 
         stars.push({
 
             x:
-                Math.random() * W,
+                Math.random()*W,
 
             y:
-                Math.random() * H,
+                Math.random()*H,
 
             size:
-                Math.random() * 1.8 + .3,
+                Math.random()*1.8+.3,
 
             speed:
-                Math.random() * .8 + .2,
+                Math.random()*.8+.2,
 
             alpha:
-                Math.random() * .7 + .2
+                Math.random()*.7+.2
 
         });
 
@@ -746,7 +2131,7 @@ function createStars(){
 
 
 /* =========================================================
-   NAVE
+   CRIAR PLAYER
 ========================================================= */
 
 function createPlayer(){
@@ -754,10 +2139,10 @@ function createPlayer(){
     player = {
 
         x:
-            W * .22,
+            W*.22,
 
         y:
-            H / 2,
+            H/2,
 
         size:
             11,
@@ -796,6 +2181,22 @@ function startGame(){
 
     }
 
+
+    if(
+        !isShipUnlocked(selectedShip)
+    ){
+
+        unlockMessage.textContent =
+            "Desbloqueie esta nave primeiro.";
+
+        unlockMessage.style.color =
+            "#ff7777";
+
+        return;
+
+    }
+
+
     playerName.style.borderColor =
         "#555";
 
@@ -805,30 +2206,34 @@ function startGame(){
             16
         );
 
-    menu.classList.add("hidden");
+    menu.classList.add(
+        "hidden"
+    );
 
-    rankingScreen.classList.add("hidden");
+    rankingScreen.classList.add(
+        "hidden"
+    );
 
-    gameOver.classList.add("hidden");
+    gameOver.classList.add(
+        "hidden"
+    );
 
-    hud.classList.remove("hidden");
+    hud.classList.remove(
+        "hidden"
+    );
+
 
     score = 0;
-
     distance = 0;
-
     gameSpeed = 5;
 
     speedLevel = 0;
-
     obstacleLevel = 0;
 
     nextSpeedDistance = 150;
-
     nextObstacleScore = 500;
 
     obstacles = [];
-
     particles = [];
 
     createPlayer();
@@ -836,7 +2241,6 @@ function startGame(){
     createInitialObstacles();
 
     running = true;
-
     holding = false;
 
     lastTime =
@@ -862,9 +2266,7 @@ window.addEventListener(
     "keydown",
     e => {
 
-        if(
-            e.code === "Space"
-        ){
+        if(e.code === "Space"){
 
             e.preventDefault();
 
@@ -881,9 +2283,7 @@ window.addEventListener(
     "keyup",
     e => {
 
-        if(
-            e.code === "Space"
-        ){
+        if(e.code === "Space"){
 
             e.preventDefault();
 
@@ -921,7 +2321,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   CRIAR OBSTÁCULOS INICIAIS
+   OBSTÁCULOS INICIAIS
 ========================================================= */
 
 function createInitialObstacles(){
@@ -929,7 +2329,7 @@ function createInitialObstacles(){
     obstacles = [];
 
     let x =
-        W + 300;
+        W+300;
 
     for(
         let i=0;
@@ -937,9 +2337,7 @@ function createInitialObstacles(){
         i++
     ){
 
-        createObstacleAt(
-            x
-        );
+        createObstacleAt(x);
 
         x +=
             300 +
@@ -951,52 +2349,41 @@ function createInitialObstacles(){
 
 
 /* =========================================================
-   CRIAR UM OBSTÁCULO
+   CRIAR OBSTÁCULO
 ========================================================= */
 
 function createObstacleAt(x){
 
-    const margin =
-        90;
+    const margin = 90;
 
     const usableHeight =
         Math.max(
             100,
-            H - margin*2
+            H-margin*2
         );
 
     const y =
-        margin +
+        margin+
         Math.random()*usableHeight;
-
 
     const typeRoll =
         Math.random();
 
 
-    /* ESPINHO */
-
-    if(
-        typeRoll < .32
-    ){
+    if(typeRoll < .32){
 
         obstacles.push({
 
-            type:
-                "spike",
-
-            x:
-                x,
-
-            y:
-                y,
+            type:"spike",
+            x:x,
+            y:y,
 
             size:
-                28 +
-                obstacleLevel * 2,
+                28+
+                obstacleLevel*2,
 
             flip:
-                Math.random() < .5
+                Math.random()<.5
 
         });
 
@@ -1005,32 +2392,20 @@ function createObstacleAt(x){
     }
 
 
-    /* SERRA */
-
-    if(
-        typeRoll < .57
-    ){
+    if(typeRoll < .57){
 
         obstacles.push({
 
-            type:
-                "saw",
-
-            x:
-                x,
-
-            y:
-                y,
+            type:"saw",
+            x:x,
+            y:y,
 
             radius:
-                22 +
-                obstacleLevel * 2,
+                22+
+                obstacleLevel*2,
 
-            rotation:
-                0,
-
-            rotationSpeed:
-                .15
+            rotation:0,
+            rotationSpeed:.15
 
         });
 
@@ -1039,29 +2414,20 @@ function createObstacleAt(x){
     }
 
 
-    /* FORMA GEOMÉTRICA */
-
-    if(
-        typeRoll < .82
-    ){
+    if(typeRoll < .82){
 
         obstacles.push({
 
-            type:
-                "diamond",
-
-            x:
-                x,
-
-            y:
-                y,
+            type:"diamond",
+            x:x,
+            y:y,
 
             size:
-                28 +
-                obstacleLevel * 2,
+                28+
+                obstacleLevel*2,
 
             rotation:
-                Math.PI / 4
+                Math.PI/4
 
         });
 
@@ -1069,25 +2435,16 @@ function createObstacleAt(x){
 
     }
 
-
-    /* BLOCO COM ESPINHOS */
 
     obstacles.push({
 
-        type:
-            "dangerBlock",
+        type:"dangerBlock",
 
-        x:
-            x,
+        x:x,
+        y:y,
 
-        y:
-            y,
-
-        width:
-            50,
-
-        height:
-            50
+        width:50,
+        height:50
 
     });
 
@@ -1095,7 +2452,7 @@ function createObstacleAt(x){
 
 
 /* =========================================================
-   ADICIONAR MAIS OBSTÁCULOS
+   MAIS OBSTÁCULOS
 ========================================================= */
 
 function addMoreObstacles(){
@@ -1103,11 +2460,11 @@ function addMoreObstacles(){
     obstacleLevel++;
 
     const amount =
-        3 +
+        3+
         obstacleLevel;
 
     let x =
-        W + 300;
+        W+300;
 
     for(
         let i=0;
@@ -1115,12 +2472,10 @@ function addMoreObstacles(){
         i++
     ){
 
-        createObstacleAt(
-            x
-        );
+        createObstacleAt(x);
 
         x +=
-            180 +
+            180+
             Math.random()*160;
 
     }
@@ -1147,12 +2502,10 @@ function createParticles(
         particles.push({
 
             x:x,
-
             y:y,
 
             vx:
-                -Math.random()*3 -
-                1,
+                -Math.random()*3-1,
 
             vy:
                 (Math.random()-.5)*3,
@@ -1170,7 +2523,7 @@ function createParticles(
 
 
 /* =========================================================
-   COLISÃO CÍRCULO / CÍRCULO
+   COLISÃO CÍRCULO
 ========================================================= */
 
 function circleCollision(
@@ -1188,13 +2541,13 @@ function circleCollision(
     const dy =
         y1-y2;
 
-    return (
-        dx*dx +
+    return(
+        dx*dx+
         dy*dy
     ) <
     (
         r1+r2
-    ) *
+    )*
     (
         r1+r2
     );
@@ -1213,41 +2566,28 @@ function collision(){
 
 
     /*
-       IMPORTANTE:
-       O chão e o teto NÃO MATAM.
-       Eles apenas impedem a nave
-       de sair da área jogável.
+       AGORA O CHÃO E O TETO MATAM.
+       Não existe mais correção de posição.
     */
 
-    const ceiling =
-        38;
-
-    const floor =
-        H - 38;
+    const ceiling = 38;
+    const floor = H-38;
 
 
     if(
-        p.y - p.size < ceiling
+        p.y-p.size <= ceiling
     ){
 
-        p.y =
-            ceiling +
-            p.size;
-
-        p.velocity = 0;
+        return true;
 
     }
 
 
     if(
-        p.y + p.size > floor
+        p.y+p.size >= floor
     ){
 
-        p.y =
-            floor -
-            p.size;
-
-        p.velocity = 0;
+        return true;
 
     }
 
@@ -1256,31 +2596,27 @@ function collision(){
         const o of obstacles
     ){
 
-        /* =================================================
-           ESPINHO
-        ================================================= */
+        /* ESPINHO */
 
         if(
             o.type === "spike"
         ){
 
             const dx =
-                p.x -
-                o.x;
+                p.x-o.x;
 
             const dy =
-                p.y -
-                o.y;
+                p.y-o.y;
 
             const dist =
                 Math.sqrt(
-                    dx*dx +
+                    dx*dx+
                     dy*dy
                 );
 
             if(
                 dist <
-                p.size +
+                p.size+
                 o.size*.55
             ){
 
@@ -1291,9 +2627,7 @@ function collision(){
         }
 
 
-        /* =================================================
-           SERRA
-        ================================================= */
+        /* SERRA */
 
         if(
             o.type === "saw"
@@ -1317,9 +2651,7 @@ function collision(){
         }
 
 
-        /* =================================================
-           DIAMANTE
-        ================================================= */
+        /* DIAMANTE */
 
         if(
             o.type === "diamond"
@@ -1343,9 +2675,7 @@ function collision(){
         }
 
 
-        /* =================================================
-           BLOCO PERIGOSO
-        ================================================= */
+        /* BLOCO */
 
         if(
             o.type === "dangerBlock"
@@ -1412,8 +2742,8 @@ function loop(time){
 function update(dt){
 
     distance +=
-        gameSpeed *
-        .09 *
+        gameSpeed*
+        .09*
         dt;
 
     score =
@@ -1422,25 +2752,16 @@ function update(dt){
         );
 
 
-    /* =====================================================
-       VELOCIDADE A CADA 150 METROS
-    ===================================================== */
-
     while(
-        distance >=
+        distance>=
         nextSpeedDistance
     ){
 
         speedLevel++;
 
-        /*
-           Aumenta a velocidade
-           progressivamente.
-        */
-
         gameSpeed =
-            5 +
-            speedLevel * 1.15;
+            5+
+            speedLevel*1.15;
 
         nextSpeedDistance +=
             150;
@@ -1448,24 +2769,15 @@ function update(dt){
     }
 
 
-    /*
-       Garante a velocidade correta
-       mesmo depois de grandes saltos.
-    */
-
     gameSpeed =
-        5 +
+        5+
         Math.floor(
-            distance / 150
-        ) * 1.15;
+            distance/150
+        )*1.15;
 
-
-    /* =====================================================
-       MAIS OBSTÁCULOS A CADA 500 SCORE
-    ===================================================== */
 
     while(
-        score >=
+        score>=
         nextObstacleScore
     ){
 
@@ -1481,44 +2793,35 @@ function update(dt){
         score;
 
     distanceEl.textContent =
-        Math.floor(distance) +
-        "m";
+        Math.floor(distance)+"m";
 
     speedEl.textContent =
         (gameSpeed/5)
-        .toFixed(1) +
-        "x";
+        .toFixed(1)+"x";
 
 
-    /* =====================================================
-       MOVIMENTO DA NAVE
-    ===================================================== */
+    /* MOVIMENTO */
 
     const direction =
         holding
         ? -1
         : 1;
 
-
     player.velocity =
-        direction *
+        direction*
         player.waveSpeed;
 
-
     player.y +=
-        player.velocity *
+        player.velocity*
         dt;
 
-
     player.angle =
-        direction < 0
+        direction<0
         ? -.65
         : .65;
 
 
-    /* =====================================================
-       MOVIMENTO DOS OBSTÁCULOS
-    ===================================================== */
+    /* OBSTÁCULOS */
 
     for(
         let i=obstacles.length-1;
@@ -1530,16 +2833,16 @@ function update(dt){
             obstacles[i];
 
         o.x -=
-            gameSpeed *
+            gameSpeed*
             dt;
 
 
         if(
-            o.type === "saw"
+            o.type==="saw"
         ){
 
             o.rotation +=
-                o.rotationSpeed *
+                o.rotationSpeed*
                 dt;
 
         }
@@ -1559,11 +2862,6 @@ function update(dt){
     }
 
 
-    /*
-       Mantém obstáculos chegando
-       continuamente.
-    */
-
     const lastObstacle =
         obstacles.length
         ? obstacles[
@@ -1575,13 +2873,13 @@ function update(dt){
     if(
         !lastObstacle ||
         lastObstacle.x <
-        W - 250
+        W-250
     ){
 
         let amount =
-            1 +
+            1+
             Math.floor(
-                obstacleLevel / 2
+                obstacleLevel/2
             );
 
 
@@ -1600,32 +2898,28 @@ function update(dt){
 
             const x =
                 last
-                ? last.x +
-                  240 +
+                ? last.x+
+                  240+
                   Math.random()*180
-                : W + 300;
+                : W+300;
 
-            createObstacleAt(
-                x
-            );
+            createObstacleAt(x);
 
         }
 
     }
 
 
-    /* =====================================================
-       ESTRELAS
-    ===================================================== */
+    /* ESTRELAS */
 
     for(
         const star of stars
     ){
 
         star.x -=
-            star.speed *
-            gameSpeed *
-            .35 *
+            star.speed*
+            gameSpeed*
+            .35*
             dt;
 
         if(
@@ -1633,7 +2927,7 @@ function update(dt){
         ){
 
             star.x =
-                W +
+                W+
                 Math.random()*100;
 
             star.y =
@@ -1644,9 +2938,7 @@ function update(dt){
     }
 
 
-    /* =====================================================
-       PARTÍCULAS
-    ===================================================== */
+    /* PARTÍCULAS */
 
     for(
         let i=particles.length-1;
@@ -1658,19 +2950,16 @@ function update(dt){
             particles[i];
 
         p.x +=
-            p.vx *
-            dt;
+            p.vx*dt;
 
         p.y +=
-            p.vy *
-            dt;
+            p.vy*dt;
 
         p.life -=
-            .035 *
-            dt;
+            .035*dt;
 
         if(
-            p.life <= 0
+            p.life<=0
         ){
 
             particles.splice(
@@ -1683,31 +2972,28 @@ function update(dt){
     }
 
 
-    /* =====================================================
-       RASTRO
-    ===================================================== */
+    /* RASTRO */
 
     if(
-        Math.random() < .7
+        Math.random()<.7
     ){
 
         particles.push({
 
             x:
-                player.x - 12,
+                player.x-12,
 
             y:
                 player.y,
 
             vx:
-                -2 -
+                -2-
                 Math.random()*2,
 
             vy:
                 (Math.random()-.5),
 
-            life:
-                .7,
+            life:.7,
 
             size:
                 Math.random()*2+1
@@ -1768,8 +3054,6 @@ function drawBackground(){
     );
 
 
-    /* estrelas */
-
     for(
         const star of stars
     ){
@@ -1789,19 +3073,14 @@ function drawBackground(){
 
     }
 
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
 
 
-    /* linhas horizontais */
+    ctx.globalAlpha=.08;
 
-    ctx.globalAlpha =
-        .08;
+    ctx.strokeStyle="#ffffff";
 
-    ctx.strokeStyle =
-        "#ffffff";
-
-    ctx.lineWidth =
-        1;
+    ctx.lineWidth=1;
 
     for(
         let y=0;
@@ -1825,7 +3104,7 @@ function drawBackground(){
 
     }
 
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
 
 }
 
@@ -1836,16 +3115,10 @@ function drawBackground(){
 
 function drawBorders(){
 
-    const borderHeight =
-        38;
+    const borderHeight=38;
 
 
-    /*
-       TETO
-    */
-
-    ctx.fillStyle =
-        "#cfcfd3";
+    ctx.fillStyle="#cfcfd3";
 
     ctx.fillRect(
         0,
@@ -1855,12 +3128,7 @@ function drawBorders(){
     );
 
 
-    /*
-       CHÃO
-    */
-
-    ctx.fillStyle =
-        "#cfcfd3";
+    ctx.fillStyle="#cfcfd3";
 
     ctx.fillRect(
         0,
@@ -1870,12 +3138,7 @@ function drawBorders(){
     );
 
 
-    /*
-       linhas internas
-    */
-
-    ctx.fillStyle =
-        "#77777d";
+    ctx.fillStyle="#77777d";
 
     ctx.fillRect(
         0,
@@ -1892,15 +3155,9 @@ function drawBorders(){
     );
 
 
-    /*
-       pequenos detalhes
-    */
+    ctx.strokeStyle="#ffffff55";
 
-    ctx.strokeStyle =
-        "#ffffff55";
-
-    ctx.lineWidth =
-        2;
+    ctx.lineWidth=2;
 
     for(
         let x=0;
@@ -1952,38 +3209,24 @@ function drawObstacles(){
         const o of obstacles
     ){
 
-        /* =================================================
-           ESPINHO
-        ================================================= */
+        /* ESPINHO */
 
         if(
-            o.type === "spike"
+            o.type==="spike"
         ){
 
             ctx.save();
 
-            ctx.fillStyle =
-                "#cfcfd3";
+            ctx.fillStyle="#cfcfd3";
+            ctx.strokeStyle="#ffffff";
+            ctx.lineWidth=2;
 
-            ctx.strokeStyle =
-                "#ffffff";
-
-            ctx.lineWidth =
-                2;
-
-            ctx.shadowBlur =
-                12;
-
-            ctx.shadowColor =
-                "#ffffff44";
-
+            ctx.shadowBlur=12;
+            ctx.shadowColor="#ffffff44";
 
             ctx.beginPath();
 
-
-            if(
-                o.flip
-            ){
+            if(o.flip){
 
                 ctx.moveTo(
                     o.x-o.size,
@@ -2022,7 +3265,6 @@ function drawObstacles(){
             ctx.closePath();
 
             ctx.fill();
-
             ctx.stroke();
 
             ctx.restore();
@@ -2030,12 +3272,10 @@ function drawObstacles(){
         }
 
 
-        /* =================================================
-           SERRA CIRCULAR
-        ================================================= */
+        /* SERRA */
 
         if(
-            o.type === "saw"
+            o.type==="saw"
         ){
 
             ctx.save();
@@ -2049,32 +3289,16 @@ function drawObstacles(){
                 o.rotation
             );
 
+            ctx.shadowBlur=14;
+            ctx.shadowColor="#ffffff55";
 
-            ctx.shadowBlur =
-                14;
-
-            ctx.shadowColor =
-                "#ffffff55";
-
-
-            /*
-               dentes da serra
-            */
-
-            ctx.fillStyle =
-                "#d5d5d9";
-
-            ctx.strokeStyle =
-                "#ffffff";
-
-            ctx.lineWidth =
-                2;
+            ctx.fillStyle="#d5d5d9";
+            ctx.strokeStyle="#ffffff";
+            ctx.lineWidth=2;
 
             ctx.beginPath();
 
-
-            const teeth =
-                16;
+            const teeth=16;
 
             for(
                 let i=0;
@@ -2083,8 +3307,8 @@ function drawObstacles(){
             ){
 
                 const angle =
-                    i *
-                    Math.PI*2 /
+                    i*
+                    Math.PI*2/
                     teeth;
 
                 const radius =
@@ -2093,11 +3317,11 @@ function drawObstacles(){
                     : o.radius;
 
                 const x =
-                    Math.cos(angle) *
+                    Math.cos(angle)*
                     radius;
 
                 const y =
-                    Math.sin(angle) *
+                    Math.sin(angle)*
                     radius;
 
                 if(i===0)
@@ -2110,16 +3334,10 @@ function drawObstacles(){
             ctx.closePath();
 
             ctx.fill();
-
             ctx.stroke();
 
 
-            /*
-               centro
-            */
-
-            ctx.fillStyle =
-                "#55555b";
+            ctx.fillStyle="#55555b";
 
             ctx.beginPath();
 
@@ -2132,12 +3350,10 @@ function drawObstacles(){
             );
 
             ctx.fill();
-
             ctx.stroke();
 
 
-            ctx.fillStyle =
-                "#111116";
+            ctx.fillStyle="#111116";
 
             ctx.beginPath();
 
@@ -2151,18 +3367,15 @@ function drawObstacles(){
 
             ctx.fill();
 
-
             ctx.restore();
 
         }
 
 
-        /* =================================================
-           DIAMANTE
-        ================================================= */
+        /* DIAMANTE */
 
         if(
-            o.type === "diamond"
+            o.type==="diamond"
         ){
 
             ctx.save();
@@ -2176,20 +3389,12 @@ function drawObstacles(){
                 o.rotation
             );
 
-            ctx.fillStyle =
-                "#bfc0c5";
+            ctx.fillStyle="#bfc0c5";
+            ctx.strokeStyle="#ffffff";
+            ctx.lineWidth=2;
 
-            ctx.strokeStyle =
-                "#ffffff";
-
-            ctx.lineWidth =
-                2;
-
-            ctx.shadowBlur =
-                12;
-
-            ctx.shadowColor =
-                "#ffffff44";
+            ctx.shadowBlur=12;
+            ctx.shadowColor="#ffffff44";
 
             ctx.beginPath();
 
@@ -2216,7 +3421,6 @@ function drawObstacles(){
             ctx.closePath();
 
             ctx.fill();
-
             ctx.stroke();
 
             ctx.restore();
@@ -2224,30 +3428,20 @@ function drawObstacles(){
         }
 
 
-        /* =================================================
-           BLOCO PERIGOSO
-        ================================================= */
+        /* BLOCO */
 
         if(
-            o.type === "dangerBlock"
+            o.type==="dangerBlock"
         ){
 
             ctx.save();
 
-            ctx.fillStyle =
-                "#bfc0c5";
+            ctx.fillStyle="#bfc0c5";
+            ctx.strokeStyle="#ffffff";
+            ctx.lineWidth=2;
 
-            ctx.strokeStyle =
-                "#ffffff";
-
-            ctx.lineWidth =
-                2;
-
-            ctx.shadowBlur =
-                12;
-
-            ctx.shadowColor =
-                "#ffffff44";
+            ctx.shadowBlur=12;
+            ctx.shadowColor="#ffffff44";
 
             ctx.fillRect(
                 o.x,
@@ -2264,15 +3458,8 @@ function drawObstacles(){
             );
 
 
-            /*
-               X no centro
-            */
-
-            ctx.strokeStyle =
-                "#55555b";
-
-            ctx.lineWidth =
-                3;
+            ctx.strokeStyle="#55555b";
+            ctx.lineWidth=3;
 
             ctx.beginPath();
 
@@ -2299,12 +3486,7 @@ function drawObstacles(){
             ctx.stroke();
 
 
-            /*
-               pequenos espinhos
-            */
-
-            ctx.fillStyle =
-                "#eeeeef";
+            ctx.fillStyle="#eeeeef";
 
             for(
                 let i=0;
@@ -2313,8 +3495,8 @@ function drawObstacles(){
             ){
 
                 const sx =
-                    o.x +
-                    5 +
+                    o.x+
+                    5+
                     i*13;
 
                 ctx.beginPath();
@@ -2350,13 +3532,14 @@ function drawObstacles(){
 
 
 /* =========================================================
-   NAVE
+   NAVE DO JOGADOR
 ========================================================= */
 
 function drawPlayer(){
 
     if(!player)
         return;
+
 
     ctx.save();
 
@@ -2395,8 +3578,7 @@ function drawPlayer(){
         "#ffffff"
     );
 
-    ctx.fillStyle =
-        trail;
+    ctx.fillStyle=trail;
 
     ctx.beginPath();
 
@@ -2419,86 +3601,21 @@ function drawPlayer(){
 
     ctx.fill();
 
-
-    /* brilho */
-
-    ctx.shadowBlur =
-        18;
-
-    ctx.shadowColor =
-        "#ffffff";
-
-
-    /* nave */
-
-    ctx.fillStyle =
-        "#ffffff";
-
-    ctx.strokeStyle =
-        "#ffffff";
-
-    ctx.lineWidth =
-        2;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        18,
-        0
-    );
-
-    ctx.lineTo(
-        -8,
-        -9
-    );
-
-    ctx.lineTo(
-        -3,
-        0
-    );
-
-    ctx.lineTo(
-        -8,
-        9
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-    ctx.stroke();
-
-
-    /* centro */
-
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle =
-        "#55555c";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        9,
-        0
-    );
-
-    ctx.lineTo(
-        -3,
-        -4
-    );
-
-    ctx.lineTo(
-        -3,
-        4
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
     ctx.restore();
+
+
+    /*
+       Desenha a nave escolhida.
+    */
+
+    drawShip(
+        ctx,
+        player.x,
+        player.y,
+        .42,
+        ships[selectedShip].type,
+        player.angle
+    );
 
 }
 
@@ -2519,8 +3636,7 @@ function drawParticles(){
                 p.life
             );
 
-        ctx.fillStyle =
-            "#ffffff";
+        ctx.fillStyle="#ffffff";
 
         ctx.beginPath();
 
@@ -2536,7 +3652,7 @@ function drawParticles(){
 
     }
 
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
 
 }
 
@@ -2569,19 +3685,21 @@ async function endGame(){
     if(!running)
         return;
 
-    running = false;
+    running=false;
 
-    holding = false;
+    holding=false;
 
     cancelAnimationFrame(
         animationId
     );
+
 
     createParticles(
         player.x,
         player.y,
         35
     );
+
 
     finalScoreEl.textContent =
         score;
@@ -2680,7 +3798,7 @@ async function loadRanking(){
 
         if(
             !data ||
-            data.length === 0
+            data.length===0
         ){
 
             rankingList.innerHTML =
@@ -2691,7 +3809,7 @@ async function loadRanking(){
         }
 
 
-        const best = {};
+        const best={};
 
 
         for(
@@ -2707,12 +3825,11 @@ async function loadRanking(){
 
             if(
                 !best[name] ||
-                Number(row.score) >
+                Number(row.score)>
                 Number(best[name].score)
             ){
 
-                best[name] =
-                    row;
+                best[name]=row;
 
             }
 
@@ -2722,8 +3839,8 @@ async function loadRanking(){
         const ranking =
             Object.values(best)
             .sort(
-                (a,b) =>
-                    Number(b.score) -
+                (a,b)=>
+                    Number(b.score)-
                     Number(a.score)
             )
             .slice(
@@ -2735,7 +3852,7 @@ async function loadRanking(){
         rankingList.innerHTML =
             ranking
             .map(
-                (row,index) => {
+                (row,index)=>{
 
                     return `
 
@@ -2834,9 +3951,9 @@ menuBtn.addEventListener(
     "click",
     () => {
 
-        running = false;
+        running=false;
 
-        holding = false;
+        holding=false;
 
         gameOver.classList.add(
             "hidden"
@@ -2849,6 +3966,8 @@ menuBtn.addEventListener(
         menu.classList.remove(
             "hidden"
         );
+
+        updateShipSelector();
 
     }
 );
@@ -2896,9 +4015,7 @@ playerName.addEventListener(
     "keydown",
     e => {
 
-        if(
-            e.key === "Enter"
-        ){
+        if(e.key==="Enter"){
 
             startGame();
 
@@ -2914,9 +4031,25 @@ playerName.addEventListener(
 
 resize();
 
+resizeShipPreview();
+
 createPlayer();
 
+updateShipSelector();
+
 draw();
+
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        resize();
+
+        resizeShipPreview();
+
+    }
+);
 
 </script>
 
