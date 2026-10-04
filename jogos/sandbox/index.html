@@ -315,7 +315,7 @@ button{
 }
 
 /* =========================
-   PAUSE
+   PAUSA
 ========================= */
 
 #pauseScreen{
@@ -353,6 +353,7 @@ button{
 }
 
 @media(max-width:600px){
+
     .info{
         grid-template-columns:1fr;
     }
@@ -364,6 +365,7 @@ button{
     .accountBox{
         padding:22px;
     }
+
 }
 </style>
 </head>
@@ -698,13 +700,16 @@ const ctx =
 ========================================================= */
 
 function showMessage(message){
-    document.getElementById("accountMessage").textContent =
-        message;
+
+    document
+        .getElementById("accountMessage")
+        .textContent = message;
+
 }
 
 
 /* =========================================================
-   ABRIR LOGIN
+   LOGIN
 ========================================================= */
 
 function showLogin(){
@@ -726,11 +731,12 @@ function showLogin(){
         .classList.add("hidden");
 
     showMessage("");
+
 }
 
 
 /* =========================================================
-   ABRIR CADASTRO
+   CADASTRO
 ========================================================= */
 
 function showRegister(){
@@ -752,11 +758,12 @@ function showRegister(){
         .classList.remove("hidden");
 
     showMessage("");
+
 }
 
 
 /* =========================================================
-   NORMALIZAR NOME
+   NORMALIZAR USUÁRIO
 ========================================================= */
 
 function normalizeUsername(username){
@@ -769,7 +776,7 @@ function normalizeUsername(username){
 
 
 /* =========================================================
-   E-MAIL TÉCNICO
+   EMAIL INTERNO
 ========================================================= */
 
 function usernameToEmail(username){
@@ -778,7 +785,7 @@ function usernameToEmail(username){
         normalizeUsername(username);
 
     return normalized +
-        "@accounts.ludix.local";
+        "@ludixs.com";
 
 }
 
@@ -813,6 +820,7 @@ async function registerUser(){
         );
 
         return;
+
     }
 
 
@@ -823,6 +831,7 @@ async function registerUser(){
         );
 
         return;
+
     }
 
 
@@ -833,6 +842,7 @@ async function registerUser(){
         );
 
         return;
+
     }
 
 
@@ -843,10 +853,13 @@ async function registerUser(){
         );
 
         return;
+
     }
 
 
-    showMessage("Criando sua conta...");
+    showMessage(
+        "Criando sua conta..."
+    );
 
 
     const email =
@@ -895,6 +908,7 @@ async function registerUser(){
             }
 
             return;
+
         }
 
 
@@ -905,6 +919,7 @@ async function registerUser(){
             );
 
             return;
+
         }
 
 
@@ -927,11 +942,14 @@ async function registerUser(){
         );
 
 
-        setTimeout(() => {
+        setTimeout(
+            () => {
 
-            openMenu();
+                openMenu();
 
-        },700);
+            },
+            700
+        );
 
 
     }catch(error){
@@ -972,10 +990,13 @@ async function loginUser(){
         );
 
         return;
+
     }
 
 
-    showMessage("Entrando...");
+    showMessage(
+        "Entrando..."
+    );
 
 
     const email =
@@ -1003,6 +1024,7 @@ async function loginUser(){
             );
 
             return;
+
         }
 
 
@@ -1013,6 +1035,7 @@ async function loginUser(){
             );
 
             return;
+
         }
 
 
@@ -1049,7 +1072,7 @@ async function loginUser(){
 
 
 /* =========================================================
-   CRIAR MUNDO DO JOGADOR
+   CRIAR MUNDO
 ========================================================= */
 
 async function createPlayerWorld(userId){
@@ -1065,6 +1088,21 @@ async function createPlayerWorld(userId){
 
 
         if(existing.data){
+
+            worldSeed =
+                Number(existing.data.seed);
+
+            player.x =
+                Number(existing.data.player_x);
+
+            player.y =
+                Number(existing.data.player_y);
+
+            player.health =
+                Number(existing.data.health);
+
+            player.hunger =
+                Number(existing.data.hunger);
 
             return existing.data;
 
@@ -1109,20 +1147,14 @@ async function createPlayerWorld(userId){
             );
 
             return null;
+
         }
 
 
-        player.x =
-            data.player_x;
-
-        player.y =
-            data.player_y;
-
-        player.health =
-            data.health;
-
-        player.hunger =
-            data.hunger;
+        player.x = 0;
+        player.y = 0;
+        player.health = 100;
+        player.hunger = 100;
 
 
         return data;
@@ -1340,6 +1372,7 @@ function resizeCanvas(){
 
 }
 
+
 window.addEventListener(
     "resize",
     resizeCanvas
@@ -1347,7 +1380,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   RANDOM SEED
+   RANDOM
 ========================================================= */
 
 function seededRandom(x,y){
@@ -1424,7 +1457,9 @@ async function startGame(){
     updateHUD();
 
 
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+        gameLoop
+    );
 
 }
 
@@ -1475,9 +1510,7 @@ window.addEventListener(
         keys[event.key.toLowerCase()] = true;
 
 
-        if(
-            event.key === "Escape"
-        ){
+        if(event.key === "Escape"){
 
             if(gameRunning){
 
@@ -1569,7 +1602,7 @@ function updatePlayer(){
 
 
 /* =========================================================
-   DESENHAR
+   DESENHAR MUNDO
 ========================================================= */
 
 function drawWorld(){
@@ -1700,7 +1733,9 @@ function drawWorld(){
 
         if(
             seededRandom(
-                Math.floor(worldX / blockSize),
+                Math.floor(
+                    worldX / blockSize
+                ),
                 2
             ) > .85
         ){
@@ -1788,7 +1823,7 @@ function gameLoop(){
 
 
 /* =========================================================
-   PAUSAR
+   PAUSA
 ========================================================= */
 
 function pauseGame(){
@@ -1798,6 +1833,7 @@ function pauseGame(){
         return;
 
     }
+
 
     gamePaused = true;
 
@@ -1824,7 +1860,7 @@ function resumeGame(){
 
 
 /* =========================================================
-   VOLTAR AO MENU
+   MENU
 ========================================================= */
 
 async function backToMenu(){
@@ -1871,7 +1907,7 @@ setInterval(
 
 
 /* =========================================================
-   VERIFICAR SESSÃO EXISTENTE
+   SESSÃO EXISTENTE
 ========================================================= */
 
 async function checkSession(){
@@ -1921,7 +1957,6 @@ async function checkSession(){
             }
 
         }
-
 
     }catch(error){
 
