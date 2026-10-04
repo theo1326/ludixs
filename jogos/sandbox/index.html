@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Ludix - Sandbox</title>
-
 <meta name="description" content="Ludix Sandbox - Mundo de sobrevivência">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -39,7 +38,7 @@ button{
 }
 
 /* =========================
-   TELA DE CONTA
+   CONTA
 ========================= */
 
 #accountScreen{
@@ -48,8 +47,7 @@ button{
     display:flex;
     align-items:center;
     justify-content:center;
-    background:
-        radial-gradient(circle at top,#1f4055,#10151b 60%);
+    background:radial-gradient(circle at top,#1f4055,#10151b 60%);
 }
 
 .accountBox{
@@ -157,8 +155,7 @@ button{
     display:flex;
     justify-content:center;
     align-items:center;
-    background:
-        linear-gradient(#162d38,#10151b);
+    background:linear-gradient(#162d38,#10151b);
 }
 
 .menuBox{
@@ -200,12 +197,8 @@ button{
     background:#5b3030;
 }
 
-.logoutButton:hover{
-    background:#793d3d;
-}
-
 /* =========================
-   INFO DO MUNDO
+   MUNDO
 ========================= */
 
 #worldScreen{
@@ -275,20 +268,19 @@ button{
     width:100%;
     height:100%;
     image-rendering:pixelated;
-    cursor:crosshair;
 }
 
 #hud{
     position:absolute;
     left:12px;
     top:12px;
-    z-index:10;
-    background:rgba(0,0,0,.58);
+    z-index:20;
+    background:rgba(0,0,0,.62);
     border:1px solid rgba(255,255,255,.2);
     border-radius:10px;
     padding:10px 14px;
     line-height:1.55;
-    min-width:245px;
+    min-width:250px;
     pointer-events:none;
 }
 
@@ -301,13 +293,67 @@ button{
     position:absolute;
     right:12px;
     top:12px;
-    z-index:10;
+    z-index:20;
     border:0;
     border-radius:9px;
     padding:10px 16px;
-    background:rgba(0,0,0,.6);
+    background:rgba(0,0,0,.65);
     color:white;
     font-weight:bold;
+}
+
+#help{
+    position:absolute;
+    left:50%;
+    bottom:12px;
+    transform:translateX(-50%);
+    z-index:20;
+    background:rgba(0,0,0,.58);
+    padding:8px 14px;
+    border-radius:10px;
+    font-size:13px;
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+#hotbar{
+    position:absolute;
+    left:50%;
+    bottom:42px;
+    transform:translateX(-50%);
+    z-index:21;
+    display:flex;
+    gap:5px;
+    background:rgba(0,0,0,.55);
+    padding:6px;
+    border-radius:10px;
+}
+
+.hotSlot{
+    width:48px;
+    height:48px;
+    border:2px solid #555;
+    border-radius:7px;
+    background:#20252a;
+    color:white;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+}
+
+.hotSlot.selected{
+    border-color:#ffd84d;
+    box-shadow:0 0 0 2px rgba(255,216,77,.3);
+}
+
+.hotSlot span{
+    position:absolute;
+    right:3px;
+    bottom:1px;
+    font-size:11px;
+    color:white;
 }
 
 #loading{
@@ -319,80 +365,6 @@ button{
     justify-content:center;
     background:#10151b;
     font-size:22px;
-}
-
-/* =========================
-   INVENTÁRIO
-========================= */
-
-#inventoryBar{
-    position:absolute;
-    z-index:20;
-    bottom:18px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:5px;
-    padding:7px;
-    border-radius:10px;
-    background:rgba(0,0,0,.65);
-    border:2px solid rgba(255,255,255,.2);
-}
-
-.inventorySlot{
-    width:58px;
-    height:58px;
-    border:2px solid #555;
-    border-radius:6px;
-    background:rgba(30,30,30,.9);
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
-}
-
-.inventorySlot.selected{
-    border-color:#fff;
-    box-shadow:0 0 0 2px #43c8ff;
-}
-
-.inventoryIcon{
-    width:28px;
-    height:28px;
-    image-rendering:pixelated;
-}
-
-.inventoryNumber{
-    position:absolute;
-    left:4px;
-    top:2px;
-    font-size:12px;
-    color:#ddd;
-}
-
-.inventoryAmount{
-    position:absolute;
-    right:4px;
-    bottom:2px;
-    font-size:13px;
-    font-weight:bold;
-    color:white;
-    text-shadow:1px 1px 2px black;
-}
-
-#blockHint{
-    position:absolute;
-    z-index:15;
-    bottom:88px;
-    left:50%;
-    transform:translateX(-50%);
-    padding:6px 12px;
-    border-radius:8px;
-    background:rgba(0,0,0,.55);
-    font-size:13px;
-    color:#eee;
-    pointer-events:none;
 }
 
 /* =========================
@@ -433,7 +405,7 @@ button{
     font-weight:bold;
 }
 
-@media(max-width:700px){
+@media(max-width:600px){
 
     .info{
         grid-template-columns:1fr;
@@ -447,29 +419,30 @@ button{
         padding:22px;
     }
 
-    .inventorySlot{
-        width:42px;
-        height:42px;
-    }
-
-    #inventoryBar{
-        gap:2px;
-        padding:4px;
-    }
-
     #hud{
         min-width:205px;
-        font-size:13px;
+        font-size:12px;
+    }
+
+    #hotbar{
+        bottom:35px;
+        gap:3px;
+    }
+
+    .hotSlot{
+        width:40px;
+        height:40px;
+        font-size:19px;
+    }
+
+    #help{
+        display:none;
     }
 }
 </style>
 </head>
 
 <body>
-
-<!-- =========================
-     LOADING
-========================= -->
 
 <div id="loading">
     Carregando Ludix Sandbox...
@@ -493,17 +466,11 @@ button{
 
         <div class="tabs">
 
-            <button
-                id="loginTab"
-                class="tab active"
-                onclick="showLogin()">
+            <button id="loginTab" class="tab active" onclick="showLogin()">
                 Entrar
             </button>
 
-            <button
-                id="registerTab"
-                class="tab"
-                onclick="showRegister()">
+            <button id="registerTab" class="tab" onclick="showRegister()">
                 Criar conta
             </button>
 
@@ -528,9 +495,7 @@ button{
                 autocomplete="current-password"
                 placeholder="Digite sua senha">
 
-            <button
-                class="mainButton"
-                onclick="loginUser()">
+            <button class="mainButton" onclick="loginUser()">
                 ENTRAR
             </button>
 
@@ -563,9 +528,7 @@ button{
                 autocomplete="new-password"
                 placeholder="Digite a senha novamente">
 
-            <button
-                class="mainButton"
-                onclick="registerUser()">
+            <button class="mainButton" onclick="registerUser()">
                 CRIAR CONTA
             </button>
 
@@ -591,15 +554,11 @@ button{
             Bem-vindo, <strong id="menuUsername"></strong>
         </p>
 
-        <button
-            class="menuButton"
-            onclick="openWorld()">
+        <button class="menuButton" onclick="openWorld()">
             🌍 JOGAR
         </button>
 
-        <button
-            class="menuButton logoutButton"
-            onclick="logoutUser()">
+        <button class="menuButton logoutButton" onclick="logoutUser()">
             SAIR DA CONTA
         </button>
 
@@ -641,9 +600,7 @@ button{
 
         </div>
 
-        <button
-            class="startGame"
-            onclick="startGame()">
+        <button class="startGame" onclick="startGame()">
             🌱 ENTRAR NO MUNDO
         </button>
 
@@ -679,23 +636,21 @@ button{
         <span id="chunkValue">0, 0</span><br>
 
         🧱 Bloco:
-        <span id="selectedBlockName">Grama</span><br>
+        <span id="blockValue">Grama</span><br>
 
         💾 <span id="saveStatus">Salvo</span>
 
     </div>
 
-    <div id="blockHint">
-        Clique esquerdo: quebrar • Clique direito: colocar • 1–7: selecionar
-    </div>
-
-    <div id="inventoryBar"></div>
-
-    <button
-        id="pauseButton"
-        onclick="pauseGame()">
+    <button id="pauseButton" onclick="pauseGame()">
         ⏸ PAUSAR
     </button>
+
+    <div id="hotbar"></div>
+
+    <div id="help">
+        A/D ou ←/→ mover • Espaço pular • Clique esquerdo quebrar • Clique direito colocar • 1-9 selecionar
+    </div>
 
 </section>
 
@@ -741,20 +696,22 @@ const supabaseClient =
 
 
 /* =========================================================
-   VARIÁVEIS PRINCIPAIS
+   VARIÁVEIS
 ========================================================= */
 
 let currentPlayer = null;
 
 let gameRunning = false;
-
 let gamePaused = false;
 
 const WORLD_SIZE = 1000000;
 
+/*
+ * Cada região possui 32 x 32 blocos.
+ */
 const CHUNK_SIZE = 32;
 
-const BLOCK_SIZE = 32;
+const TILE_SIZE = 32;
 
 let worldSeed = 0;
 
@@ -766,20 +723,18 @@ let worldSeed = 0;
 let player = {
 
     x:0,
-
     y:0,
 
     vx:0,
-
     vy:0,
 
-    width:24,
-
-    height:40,
+    width:22,
+    height:42,
 
     health:100,
+    hunger:100,
 
-    hunger:100
+    onGround:false
 
 };
 
@@ -792,106 +747,111 @@ let playerInventory = [];
 
 
 /*
- * Os sete primeiros espaços são
- * os blocos que podem ser usados.
+ * Barra rápida inicial.
+ *
+ * O sistema foi preparado para receber
+ * muito mais itens posteriormente.
  */
 
-const HOTBAR = [
+const hotbarItems = [
 
-    "grass",
-    "dirt",
-    "stone",
-    "sand",
-    "water",
-    "wood",
-    "leaves"
+    {
+        id:"dirt",
+        name:"Terra",
+        icon:"🟫"
+    },
+
+    {
+        id:"grass",
+        name:"Grama",
+        icon:"🌱"
+    },
+
+    {
+        id:"stone",
+        name:"Pedra",
+        icon:"🪨"
+    },
+
+    {
+        id:"wood",
+        name:"Madeira",
+        icon:"🪵"
+    },
+
+    {
+        id:"sand",
+        name:"Areia",
+        icon:"🟨"
+    },
+
+    {
+        id:"cobblestone",
+        name:"Pedregulho",
+        icon:"⬜"
+    },
+
+    {
+        id:"coal",
+        name:"Carvão",
+        icon:"⚫"
+    },
+
+    {
+        id:"iron",
+        name:"Ferro",
+        icon:"🔘"
+    },
+
+    {
+        id:"leaves",
+        name:"Folhas",
+        icon:"🍃"
+    }
 
 ];
 
-
-let selectedSlot = 0;
+let selectedHotbar = 0;
 
 
 /* =========================================================
    REGIÕES EXPLORADAS
 ========================================================= */
 
-let exploredChunks =
-    new Set();
+let exploredChunks = new Set();
 
 
 /* =========================================================
-   ALTERAÇÕES
-=========================================================
-
-   Formato:
-
-   {
-       "x,y": "stone"
-   }
-
-   Somente alterações feitas pelo
-   jogador ficam aqui.
-
+   ALTERAÇÕES DO MUNDO
 ========================================================= */
+
+/*
+ * IMPORTANTE:
+ *
+ * Agora as alterações são guardadas por região.
+ *
+ * Exemplo:
+ *
+ * modifiedBlocks["0,0"]["5,20"] = "stone"
+ *
+ * Isso evita guardar o mundo inteiro.
+ */
 
 let modifiedBlocks = {};
 
 
 /* =========================================================
-   TIPOS DE BLOCO
+   CACHE LOCAL DAS REGIÕES
 ========================================================= */
 
-const BLOCKS = {
+const generatedChunks = new Map();
 
-    air:{
-        name:"Ar",
-        solid:false
-    },
 
-    grass:{
-        name:"Grama",
-        solid:true,
-        color:"#4c9b45"
-    },
+/* =========================================================
+   TECLAS
+========================================================= */
 
-    dirt:{
-        name:"Terra",
-        solid:true,
-        color:"#795548"
-    },
-
-    stone:{
-        name:"Pedra",
-        solid:true,
-        color:"#777b80"
-    },
-
-    sand:{
-        name:"Areia",
-        solid:true,
-        color:"#d8c078"
-    },
-
-    water:{
-        name:"Água",
-        solid:false,
-        color:"#348fd1"
-    },
-
-    wood:{
-        name:"Madeira",
-        solid:true,
-        color:"#704522"
-    },
-
-    leaves:{
-        name:"Folhas",
-        solid:true,
-        color:"#2f7d32"
-    }
-
-};
+const keys = {};
 
 
 /* =========================================================
@@ -937,7 +897,7 @@ function showMessage(message){
 
 
 /* =========================================================
-   STATUS DE SALVAMENTO
+   STATUS
 ========================================================= */
 
 function setSaveStatus(message){
@@ -956,7 +916,7 @@ function setSaveStatus(message){
 
 
 /* =========================================================
-   LOGIN
+   LOGIN / CADASTRO
 ========================================================= */
 
 function showLogin(){
@@ -982,10 +942,6 @@ function showLogin(){
 }
 
 
-/* =========================================================
-   CADASTRO
-========================================================= */
-
 function showRegister(){
 
     document
@@ -1010,7 +966,7 @@ function showRegister(){
 
 
 /* =========================================================
-   NORMALIZAR USUÁRIO
+   USUÁRIO
 ========================================================= */
 
 function normalizeUsername(username){
@@ -1022,16 +978,9 @@ function normalizeUsername(username){
 }
 
 
-/* =========================================================
-   EMAIL INTERNO
-========================================================= */
-
 function usernameToEmail(username){
 
-    const normalized =
-        normalizeUsername(username);
-
-    return normalized +
+    return normalizeUsername(username) +
         "@ludixs.com";
 
 }
@@ -1104,18 +1053,16 @@ async function registerUser(){
     }
 
 
-    showMessage(
-        "Criando sua conta..."
-    );
-
-
-    const email =
-        usernameToEmail(username);
+    showMessage("Criando sua conta...");
 
 
     try{
 
-        const { data, error } =
+        const email =
+            usernameToEmail(username);
+
+
+        const {data,error} =
             await supabaseClient.auth.signUp({
 
                 email:email,
@@ -1200,11 +1147,7 @@ async function registerUser(){
 
 
         setTimeout(
-            () => {
-
-                openMenu();
-
-            },
+            openMenu,
             700
         );
 
@@ -1251,18 +1194,16 @@ async function loginUser(){
     }
 
 
-    showMessage(
-        "Entrando..."
-    );
-
-
-    const email =
-        usernameToEmail(username);
+    showMessage("Entrando...");
 
 
     try{
 
-        const { data, error } =
+        const email =
+            usernameToEmail(username);
+
+
+        const {data,error} =
             await supabaseClient.auth.signInWithPassword({
 
                 email:email,
@@ -1392,7 +1333,7 @@ async function createPlayerWorld(userId){
             );
 
 
-        const { data, error } =
+        const {data,error} =
             await supabaseClient
                 .from("worlds")
                 .insert({
@@ -1430,10 +1371,11 @@ async function createPlayerWorld(userId){
 
         player.x = 0;
 
-        player.y = 0;
+        player.y =
+            getSurfaceY(0) -
+            player.height;
 
         player.health = 100;
-
         player.hunger = 100;
 
 
@@ -1457,7 +1399,7 @@ async function createPlayerWorld(userId){
 
 async function loadPlayerWorld(userId){
 
-    const { data, error } =
+    const {data,error} =
         await supabaseClient
             .from("worlds")
             .select("*")
@@ -1505,192 +1447,14 @@ async function loadPlayerWorld(userId){
 
 
 /* =========================================================
-   SALVAR MUNDO PRINCIPAL
-========================================================= */
-
-async function savePlayerWorld(){
-
-    if(!currentPlayer){
-
-        return false;
-
-    }
-
-
-    setSaveStatus(
-        "Salvando..."
-    );
-
-
-    try{
-
-        const { error } =
-            await supabaseClient
-                .from("worlds")
-                .update({
-
-                    player_x:player.x,
-
-                    player_y:player.y,
-
-                    health:player.health,
-
-                    hunger:player.hunger,
-
-                    updated_at:
-                        new Date().toISOString()
-
-                })
-                .eq(
-                    "user_id",
-                    currentPlayer.id
-                );
-
-
-        if(error){
-
-            console.error(
-                "Erro salvando mundo:",
-                error
-            );
-
-            setSaveStatus(
-                "Erro ao salvar"
-            );
-
-            return false;
-
-        }
-
-
-        await savePlayerInventory();
-
-        await saveExploredChunks();
-
-
-        setSaveStatus(
-            "Salvo ✓"
-        );
-
-
-        return true;
-
-
-    }catch(error){
-
-        console.error(
-            "Erro salvando progresso:",
-            error
-        );
-
-        setSaveStatus(
-            "Erro ao salvar"
-        );
-
-        return false;
-
-    }
-
-}
-
-
-/* =========================================================
    INVENTÁRIO
-========================================================= */
-
-function createDefaultInventory(){
-
-    return [
-
-        {
-            type:"grass",
-            amount:20
-        },
-
-        {
-            type:"dirt",
-            amount:30
-        },
-
-        {
-            type:"stone",
-            amount:20
-        },
-
-        {
-            type:"sand",
-            amount:15
-        },
-
-        {
-            type:"water",
-            amount:10
-        },
-
-        {
-            type:"wood",
-            amount:10
-        },
-
-        {
-            type:"leaves",
-            amount:10
-        }
-
-    ];
-
-}
-
-
-/* =========================================================
-   NORMALIZAR INVENTÁRIO
-========================================================= */
-
-function normalizeInventory(){
-
-    const result = [];
-
-
-    for(const type of HOTBAR){
-
-        const found =
-            playerInventory.find(
-                item => item.type === type
-            );
-
-
-        result.push({
-
-            type:type,
-
-            amount:
-                found
-                    ? Math.max(
-                        0,
-                        Number(found.amount) || 0
-                    )
-                    : 0
-
-        });
-
-    }
-
-
-    playerInventory =
-        result;
-
-}
-
-
-/* =========================================================
-   CARREGAR INVENTÁRIO
 ========================================================= */
 
 async function loadPlayerInventory(userId){
 
     try{
 
-        const { data, error } =
+        const {data,error} =
             await supabaseClient
                 .from("player_inventory")
                 .select("*")
@@ -1705,12 +1469,7 @@ async function loadPlayerInventory(userId){
                 error
             );
 
-            playerInventory =
-                createDefaultInventory();
-
-            normalizeInventory();
-
-            updateInventoryUI();
+            playerInventory = [];
 
             return;
 
@@ -1719,43 +1478,27 @@ async function loadPlayerInventory(userId){
 
         if(data){
 
-            if(Array.isArray(data.inventory)){
-
-                playerInventory =
-                    data.inventory;
-
-            }else{
-
-                playerInventory =
-                    createDefaultInventory();
-
-            }
-
-            normalizeInventory();
-
-            updateInventoryUI();
+            playerInventory =
+                Array.isArray(data.inventory)
+                    ? data.inventory
+                    : [];
 
             return;
 
         }
 
 
-        playerInventory =
-            createDefaultInventory();
+        playerInventory = [];
 
 
-        normalizeInventory();
-
-
-        const { error:insertError } =
+        const {error:insertError} =
             await supabaseClient
                 .from("player_inventory")
                 .insert({
 
                     user_id:userId,
 
-                    inventory:
-                        playerInventory
+                    inventory:[]
 
                 });
 
@@ -1770,19 +1513,11 @@ async function loadPlayerInventory(userId){
         }
 
 
-        updateInventoryUI();
-
-
     }catch(error){
 
         console.error(error);
 
-        playerInventory =
-            createDefaultInventory();
-
-        normalizeInventory();
-
-        updateInventoryUI();
+        playerInventory = [];
 
     }
 
@@ -1804,16 +1539,14 @@ async function savePlayerInventory(){
 
     try{
 
-        const { error } =
+        const {error} =
             await supabaseClient
                 .from("player_inventory")
                 .upsert({
 
-                    user_id:
-                        currentPlayer.id,
+                    user_id:currentPlayer.id,
 
-                    inventory:
-                        playerInventory,
+                    inventory:playerInventory,
 
                     updated_at:
                         new Date().toISOString()
@@ -1840,10 +1573,7 @@ async function savePlayerInventory(){
 
     }catch(error){
 
-        console.error(
-            "Erro salvando inventário:",
-            error
-        );
+        console.error(error);
 
         return false;
 
@@ -1853,7 +1583,7 @@ async function savePlayerInventory(){
 
 
 /* =========================================================
-   CHUNK
+   CHUNKS
 ========================================================= */
 
 function getChunkX(worldX){
@@ -1876,47 +1606,26 @@ function getChunkY(worldY){
 
 function getCurrentChunkKey(){
 
-    const chunkX =
-        getChunkX(player.x);
-
-    const chunkY =
-        getChunkY(player.y);
-
-
-    return chunkX + "," + chunkY;
+    return (
+        getChunkX(player.x) +
+        "," +
+        getChunkY(player.y)
+    );
 
 }
 
-
-function chunkKey(chunkX,chunkY){
-
-    return chunkX + "," + chunkY;
-
-}
-
-
-/* =========================================================
-   MARCAR REGIÃO
-========================================================= */
 
 function markCurrentChunkExplored(){
 
-    const chunkX =
-        getChunkX(player.x);
-
-    const chunkY =
-        getChunkY(player.y);
-
-
     exploredChunks.add(
-        chunkKey(chunkX,chunkY)
+        getCurrentChunkKey()
     );
 
 }
 
 
 /* =========================================================
-   CARREGAR REGIÕES
+   CARREGAR CHUNKS
 ========================================================= */
 
 async function loadExploredChunks(userId){
@@ -1930,7 +1639,7 @@ async function loadExploredChunks(userId){
 
     try{
 
-        const { data, error } =
+        const {data,error} =
             await supabaseClient
                 .from("world_chunks")
                 .select(
@@ -1964,10 +1673,9 @@ async function loadExploredChunks(userId){
         for(const chunk of data){
 
             const key =
-                chunkKey(
-                    chunk.chunk_x,
-                    chunk.chunk_y
-                );
+                chunk.chunk_x +
+                "," +
+                chunk.chunk_y;
 
 
             if(chunk.explored){
@@ -1978,8 +1686,10 @@ async function loadExploredChunks(userId){
 
 
             /*
-             * Agora cada chunk possui somente
-             * suas próprias alterações.
+             * Novo formato:
+             *
+             * cada chunk guarda somente
+             * as alterações daquele chunk.
              */
 
             if(
@@ -1987,18 +1697,8 @@ async function loadExploredChunks(userId){
                 chunk.data.modifiedBlocks
             ){
 
-                const localChanges =
+                modifiedBlocks[key] =
                     chunk.data.modifiedBlocks;
-
-
-                for(
-                    const localKey in localChanges
-                ){
-
-                    modifiedBlocks[localKey] =
-                        localChanges[localKey];
-
-                }
 
             }
 
@@ -2007,10 +1707,7 @@ async function loadExploredChunks(userId){
 
     }catch(error){
 
-        console.error(
-            "Erro carregando regiões:",
-            error
-        );
+        console.error(error);
 
     }
 
@@ -2018,67 +1715,7 @@ async function loadExploredChunks(userId){
 
 
 /* =========================================================
-   OBTER ALTERAÇÕES DE UM CHUNK
-========================================================= */
-
-function getModifiedBlocksForChunk(
-    chunkX,
-    chunkY
-){
-
-    const result = {};
-
-
-    const minX =
-        chunkX * CHUNK_SIZE;
-
-    const minY =
-        chunkY * CHUNK_SIZE;
-
-    const maxX =
-        minX + CHUNK_SIZE - 1;
-
-    const maxY =
-        minY + CHUNK_SIZE - 1;
-
-
-    for(
-        const key in modifiedBlocks
-    ){
-
-        const parts =
-            key.split(",");
-
-
-        const x =
-            Number(parts[0]);
-
-        const y =
-            Number(parts[1]);
-
-
-        if(
-            x >= minX &&
-            x <= maxX &&
-            y >= minY &&
-            y <= maxY
-        ){
-
-            result[key] =
-                modifiedBlocks[key];
-
-        }
-
-    }
-
-
-    return result;
-
-}
-
-
-/* =========================================================
-   SALVAR REGIÕES
+   SALVAR CHUNKS
 ========================================================= */
 
 async function saveExploredChunks(){
@@ -2111,13 +1748,6 @@ async function saveExploredChunks(){
                 Number(parts[1]);
 
 
-            const localModifiedBlocks =
-                getModifiedBlocksForChunk(
-                    chunkX,
-                    chunkY
-                );
-
-
             chunks.push({
 
                 user_id:
@@ -2133,11 +1763,10 @@ async function saveExploredChunks(){
 
                 data:{
 
-                    seed:
-                        worldSeed,
+                    seed:worldSeed,
 
                     modifiedBlocks:
-                        localModifiedBlocks
+                        modifiedBlocks[key] || {}
 
                 },
 
@@ -2172,7 +1801,7 @@ async function saveExploredChunks(){
                 );
 
 
-            const { error } =
+            const {error} =
                 await supabaseClient
                     .from("world_chunks")
                     .upsert(
@@ -2203,9 +1832,86 @@ async function saveExploredChunks(){
 
     }catch(error){
 
-        console.error(
-            "Erro salvando regiões:",
-            error
+        console.error(error);
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   SALVAR MUNDO
+========================================================= */
+
+async function savePlayerWorld(){
+
+    if(!currentPlayer){
+
+        return false;
+
+    }
+
+
+    setSaveStatus("Salvando...");
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("worlds")
+                .update({
+
+                    player_x:player.x,
+
+                    player_y:player.y,
+
+                    health:player.health,
+
+                    hunger:player.hunger,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                })
+                .eq(
+                    "user_id",
+                    currentPlayer.id
+                );
+
+
+        if(error){
+
+            console.error(error);
+
+            setSaveStatus(
+                "Erro ao salvar"
+            );
+
+            return false;
+
+        }
+
+
+        await savePlayerInventory();
+
+        await saveExploredChunks();
+
+
+        setSaveStatus("Salvo ✓");
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(error);
+
+        setSaveStatus(
+            "Erro ao salvar"
         );
 
         return false;
@@ -2221,20 +1927,15 @@ async function saveExploredChunks(){
 
 function openMenu(){
 
-    accountScreen
-        .classList.add("hidden");
+    accountScreen.classList.add("hidden");
 
-    worldScreen
-        .classList.add("hidden");
+    worldScreen.classList.add("hidden");
 
-    gameScreen
-        .classList.add("hidden");
+    gameScreen.classList.add("hidden");
 
-    pauseScreen
-        .classList.add("hidden");
+    pauseScreen.classList.add("hidden");
 
-    menuScreen
-        .classList.remove("hidden");
+    menuScreen.classList.remove("hidden");
 
 
     document
@@ -2245,17 +1946,11 @@ function openMenu(){
 }
 
 
-/* =========================================================
-   ABRIR MUNDO
-========================================================= */
-
 function openWorld(){
 
-    menuScreen
-        .classList.add("hidden");
+    menuScreen.classList.add("hidden");
 
-    worldScreen
-        .classList.remove("hidden");
+    worldScreen.classList.remove("hidden");
 
 
     document
@@ -2267,7 +1962,7 @@ function openWorld(){
 
 
 /* =========================================================
-   SAIR
+   LOGOUT
 ========================================================= */
 
 async function logoutUser(){
@@ -2275,6 +1970,7 @@ async function logoutUser(){
     await savePlayerWorld();
 
     await supabaseClient.auth.signOut();
+
 
     currentPlayer = null;
 
@@ -2284,26 +1980,22 @@ async function logoutUser(){
 
     playerInventory = [];
 
-    exploredChunks =
-        new Set();
+    exploredChunks = new Set();
 
     modifiedBlocks = {};
 
+    generatedChunks.clear();
 
-    menuScreen
-        .classList.add("hidden");
 
-    worldScreen
-        .classList.add("hidden");
+    menuScreen.classList.add("hidden");
 
-    gameScreen
-        .classList.add("hidden");
+    worldScreen.classList.add("hidden");
 
-    pauseScreen
-        .classList.add("hidden");
+    gameScreen.classList.add("hidden");
 
-    accountScreen
-        .classList.remove("hidden");
+    pauseScreen.classList.add("hidden");
+
+    accountScreen.classList.remove("hidden");
 
     showLogin();
 
@@ -2337,7 +2029,7 @@ window.addEventListener(
 
 function seededRandom(x,y){
 
-    let value =
+    const value =
         Math.sin(
             x * 12.9898 +
             y * 78.233 +
@@ -2353,32 +2045,30 @@ function seededRandom(x,y){
 
 
 /* =========================================================
-   NOISE SIMPLES
+   NOISE
 ========================================================= */
 
 function smoothNoise(x){
 
-    const left =
+    const x0 =
         Math.floor(x);
 
-    const right =
-        left + 1;
+    const x1 =
+        x0 + 1;
 
-
-    const fraction =
-        x - left;
+    const t =
+        x - x0;
 
 
     const a =
-        seededRandom(left,17);
+        seededRandom(x0,11);
 
     const b =
-        seededRandom(right,17);
+        seededRandom(x1,11);
 
 
     const smooth =
-        fraction * fraction *
-        (3 - 2 * fraction);
+        t * t * (3 - 2 * t);
 
 
     return a +
@@ -2389,156 +2079,373 @@ function smoothNoise(x){
 
 
 /* =========================================================
-   ALTURA DO TERRENO
+   BIOMAS
 ========================================================= */
 
-function terrainHeight(worldX){
+const BIOMES = [
 
-    const base =
-        13;
+    {
+        id:"plains",
+        name:"Planície",
+        grass:"#55a847",
+        dirt:"#795548",
+        surface:"grass"
+    },
 
+    {
+        id:"forest",
+        name:"Floresta",
+        grass:"#438b3c",
+        dirt:"#684936",
+        surface:"grass"
+    },
 
-    const large =
-        smoothNoise(
-            worldX / 80
-        ) * 8;
+    {
+        id:"desert",
+        name:"Deserto",
+        grass:"#d9bd68",
+        dirt:"#c9a858",
+        surface:"sand"
+    },
 
+    {
+        id:"swamp",
+        name:"Pântano",
+        grass:"#526e3c",
+        dirt:"#4c4932",
+        surface:"mud"
+    },
 
-    const medium =
-        smoothNoise(
-            worldX / 30
-        ) * 5;
+    {
+        id:"snow",
+        name:"Neve",
+        grass:"#e6f3f5",
+        dirt:"#aab8ba",
+        surface:"snow"
+    },
 
+    {
+        id:"taiga",
+        name:"Taiga",
+        grass:"#42735b",
+        dirt:"#554838",
+        surface:"grass"
+    },
 
-    const small =
-        smoothNoise(
-            worldX / 10
-        ) * 2;
+    {
+        id:"savanna",
+        name:"Savana",
+        grass:"#9da84d",
+        dirt:"#896f45",
+        surface:"grass"
+    },
 
+    {
+        id:"jungle",
+        name:"Selva",
+        grass:"#31833c",
+        dirt:"#5e452d",
+        surface:"grass"
+    },
 
-    let height =
-        base +
-        large +
-        medium +
-        small;
+    {
+        id:"mountains",
+        name:"Montanhas",
+        grass:"#777d7d",
+        dirt:"#55585a",
+        surface:"stone"
+    },
 
-
-    /*
-     * Pequena montanha ocasional.
-     */
-
-    const mountainNoise =
-        smoothNoise(
-            worldX / 180
-        );
-
-
-    if(mountainNoise > 0.72){
-
-        height +=
-            (mountainNoise - 0.72) *
-            35;
-
+    {
+        id:"coast",
+        name:"Litoral",
+        grass:"#d5bd75",
+        dirt:"#c6a866",
+        surface:"sand"
     }
 
-
-    return Math.max(
-        4,
-        Math.floor(height)
-    );
-
-}
+];
 
 
 /* =========================================================
-   NÍVEL DA ÁGUA
-========================================================= */
-
-function waterLevel(){
-
-    return 13;
-
-}
-
-
-/* =========================================================
-   BIOMA BÁSICO
+   BIOMA POR X
 ========================================================= */
 
 function getBiome(worldX){
 
     const value =
         smoothNoise(
-            worldX / 260
+            worldX / 850
         );
 
 
-    if(value < 0.20){
-
-        return "desert";
-
-    }
-
-
-    if(value < 0.38){
-
-        return "plains";
-
-    }
+    const index =
+        Math.floor(
+            value * BIOMES.length
+        );
 
 
-    if(value < 0.58){
-
-        return "forest";
-
-    }
-
-
-    if(value < 0.76){
-
-        return "hills";
-
-    }
-
-
-    return "mountains";
+    return BIOMES[
+        Math.max(
+            0,
+            Math.min(
+                BIOMES.length - 1,
+                index
+            )
+        )
+    ];
 
 }
 
 
 /* =========================================================
-   BLOCO NATURAL
+   ALTURA BASE
 ========================================================= */
 
-function getNaturalBlock(
-    blockX,
-    blockY
-){
+function getSurfaceY(worldX){
 
-    const ground =
-        terrainHeight(
-            blockX
+    const biome =
+        getBiome(worldX);
+
+
+    let base =
+        16;
+
+
+    const large =
+        smoothNoise(
+            worldX / 300
         );
 
 
-    const water =
-        waterLevel();
+    const medium =
+        smoothNoise(
+            worldX / 100
+        );
+
+
+    const small =
+        smoothNoise(
+            worldX / 35
+        );
+
+
+    base +=
+        Math.floor(
+            large * 10
+        );
+
+
+    base +=
+        Math.floor(
+            medium * 5
+        );
+
+
+    base +=
+        Math.floor(
+            small * 2
+        );
 
 
     /*
-     * Acima do terreno.
+     * Montanhas.
      */
 
-    if(blockY < ground){
+    if(biome.id === "mountains"){
+
+        const mountain =
+            smoothNoise(
+                worldX / 120
+            );
+
+        base +=
+            Math.floor(
+                mountain * 20
+            );
+
+    }
+
+
+    /*
+     * Pântano mais plano.
+     */
+
+    if(biome.id === "swamp"){
+
+        base =
+            17 +
+            Math.floor(
+                medium * 2
+            );
+
+    }
+
+
+    /*
+     * Deserto com pequenas dunas.
+     */
+
+    if(biome.id === "desert"){
+
+        base =
+            17 +
+            Math.floor(
+                medium * 5
+            );
+
+    }
+
+
+    return base;
+
+}
+
+
+/* =========================================================
+   CHAVE DE BLOCO
+========================================================= */
+
+function blockKey(x,y){
+
+    return x + "," + y;
+
+}
+
+
+/* =========================================================
+   CHUNK DE BLOCO
+========================================================= */
+
+function getChunkKeyFromBlock(x,y){
+
+    return (
+        Math.floor(x / CHUNK_SIZE) +
+        "," +
+        Math.floor(y / CHUNK_SIZE)
+    );
+
+}
+
+
+/* =========================================================
+   ALTERAÇÕES
+========================================================= */
+
+function getModifiedBlock(x,y){
+
+    const chunkKey =
+        getChunkKeyFromBlock(x,y);
+
+
+    const localX =
+        ((x % CHUNK_SIZE) +
+            CHUNK_SIZE) %
+        CHUNK_SIZE;
+
+
+    const localY =
+        ((y % CHUNK_SIZE) +
+            CHUNK_SIZE) %
+        CHUNK_SIZE;
+
+
+    if(
+        modifiedBlocks[chunkKey] &&
+        Object.prototype.hasOwnProperty.call(
+            modifiedBlocks[chunkKey],
+            blockKey(localX,localY)
+        )
+    ){
+
+        return modifiedBlocks[chunkKey][
+            blockKey(localX,localY)
+        ];
+
+    }
+
+
+    return undefined;
+
+}
+
+
+function setModifiedBlock(x,y,type){
+
+    const chunkKey =
+        getChunkKeyFromBlock(x,y);
+
+
+    if(!modifiedBlocks[chunkKey]){
+
+        modifiedBlocks[chunkKey] = {};
+
+    }
+
+
+    const localX =
+        ((x % CHUNK_SIZE) +
+            CHUNK_SIZE) %
+        CHUNK_SIZE;
+
+
+    const localY =
+        ((y % CHUNK_SIZE) +
+            CHUNK_SIZE) %
+        CHUNK_SIZE;
+
+
+    modifiedBlocks[chunkKey][
+        blockKey(localX,localY)
+    ] = type;
+
+
+    generatedChunks.delete(
+        chunkKey
+    );
+
+}
+
+
+/* =========================================================
+   GERAÇÃO DO BLOCO
+========================================================= */
+
+function generateBlock(x,y){
+
+    /*
+     * Limite vertical visual.
+     */
+
+    if(y < 0){
+
+        return null;
+
+    }
+
+
+    const surface =
+        getSurfaceY(x);
+
+
+    /*
+     * Céu acima da superfície.
+     */
+
+    if(y < surface){
 
         /*
-         * Água em áreas abaixo
-         * do nível do mar.
+         * Água nas regiões mais baixas.
          */
 
+        const biome =
+            getBiome(x);
+
+
         if(
-            blockY >= ground &&
-            blockY <= water
+            biome.id === "coast" &&
+            y >= surface &&
+            y < surface + 3
         ){
 
             return "water";
@@ -2546,19 +2453,23 @@ function getNaturalBlock(
         }
 
 
-        return "air";
+        return null;
 
     }
 
 
     /*
-     * Superfície.
+     * Camada superficial.
      */
 
-    if(blockY === ground){
+    if(y === surface){
+
+        const biome =
+            getBiome(x);
+
 
         if(
-            ground <= water
+            biome.surface === "sand"
         ){
 
             return "sand";
@@ -2566,13 +2477,29 @@ function getNaturalBlock(
         }
 
 
-        const biome =
-            getBiome(blockX);
+        if(
+            biome.surface === "snow"
+        ){
+
+            return "snow";
+
+        }
 
 
-        if(biome === "desert"){
+        if(
+            biome.surface === "stone"
+        ){
 
-            return "sand";
+            return "stone";
+
+        }
+
+
+        if(
+            biome.surface === "mud"
+        ){
+
+            return "mud";
 
         }
 
@@ -2583,16 +2510,26 @@ function getNaturalBlock(
 
 
     /*
-     * Camada de terra.
+     * Subsolo.
      */
 
-    if(blockY < ground + 4){
+    if(
+        y > surface &&
+        y <= surface + 3
+    ){
 
         const biome =
-            getBiome(blockX);
+            getBiome(x);
 
 
-        if(biome === "desert"){
+        if(biome.id === "swamp"){
+
+            return "mud";
+
+        }
+
+
+        if(biome.surface === "sand"){
 
             return "sand";
 
@@ -2608,387 +2545,405 @@ function getNaturalBlock(
      * Pedra.
      */
 
+    if(
+        y > surface + 3 &&
+        y < 60
+    ){
+
+        /*
+         * Minérios raros.
+         */
+
+        const ore =
+            seededRandom(
+                x,
+                y + 500
+            );
+
+
+        if(
+            y > 20 &&
+            ore > 0.985
+        ){
+
+            return "iron";
+
+        }
+
+
+        if(
+            y > 10 &&
+            ore > 0.965
+        ){
+
+            return "coal";
+
+        }
+
+
+        return "stone";
+
+    }
+
+
+    /*
+     * Rochas profundas.
+     */
+
+    if(y >= 60){
+
+        const ore =
+            seededRandom(
+                x,
+                y + 900
+            );
+
+
+        if(ore > 0.992){
+
+            return "iron";
+
+        }
+
+
+        return "stone";
+
+    }
+
+
     return "stone";
 
 }
 
 
 /* =========================================================
-   BLOCO DE ÁGUA
+   OBJETOS NATURAIS
 ========================================================= */
 
-function isNaturalWater(
-    blockX,
-    blockY
-){
-
-    const ground =
-        terrainHeight(
-            blockX
-        );
-
-
-    const water =
-        waterLevel();
-
-
-    if(
-        ground <= water &&
-        blockY >= ground &&
-        blockY <= water
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-/* =========================================================
-   ÁRVORES
-========================================================= */
-
-function getNaturalTreeBlock(
-    blockX,
-    blockY
-){
+function hasTreeAt(x){
 
     const biome =
-        getBiome(blockX);
+        getBiome(x);
 
 
     if(
-        biome !== "forest" &&
-        biome !== "plains"
+        biome.id !== "forest" &&
+        biome.id !== "taiga" &&
+        biome.id !== "jungle" &&
+        biome.id !== "swamp" &&
+        biome.id !== "savanna"
     ){
-
-        return null;
-
-    }
-
-
-    const ground =
-        terrainHeight(
-            blockX
-        );
-
-
-    if(
-        blockY <= ground - 6 ||
-        blockY > ground + 4
-    ){
-
-        return null;
-
-    }
-
-
-    /*
-     * Determina se existe árvore
-     * naquele ponto.
-     */
-
-    const treeRandom =
-        seededRandom(
-            Math.floor(blockX / 7),
-            99
-        );
-
-
-    if(
-        treeRandom < 0.91
-    ){
-
-        return null;
-
-    }
-
-
-    const localX =
-        Math.abs(
-            blockX -
-            Math.round(blockX / 7) * 7
-        );
-
-
-    /*
-     * Tronco.
-     */
-
-    if(
-        localX === 0 &&
-        blockY >= ground - 5 &&
-        blockY <= ground - 1
-    ){
-
-        return "wood";
-
-    }
-
-
-    /*
-     * Copa.
-     */
-
-    if(
-        blockY >= ground - 7 &&
-        blockY <= ground - 4 &&
-        Math.abs(localX) <= 2
-    ){
-
-        return "leaves";
-
-    }
-
-
-    if(
-        blockY === ground - 8 &&
-        localX === 0
-    ){
-
-        return "leaves";
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =========================================================
-   OBTER BLOCO
-========================================================= */
-
-function getBlock(
-    blockX,
-    blockY
-){
-
-    const key =
-        blockX + "," + blockY;
-
-
-    /*
-     * Alteração feita pelo jogador
-     * sempre tem prioridade.
-     */
-
-    if(
-        Object.prototype.hasOwnProperty.call(
-            modifiedBlocks,
-            key
-        )
-    ){
-
-        return modifiedBlocks[key];
-
-    }
-
-
-    /*
-     * Água natural.
-     */
-
-    if(
-        isNaturalWater(
-            blockX,
-            blockY
-        )
-    ){
-
-        return "water";
-
-    }
-
-
-    /*
-     * Árvore.
-
-     * Só verifica quando estamos
-     * próximos da superfície.
-     */
-
-    const tree =
-        getNaturalTreeBlock(
-            blockX,
-            blockY
-        );
-
-
-    if(tree){
-
-        return tree;
-
-    }
-
-
-    return getNaturalBlock(
-        blockX,
-        blockY
-    );
-
-}
-
-
-/* =========================================================
-   ALTERAR BLOCO
-========================================================= */
-
-function setBlock(
-    blockX,
-    blockY,
-    blockType
-){
-
-    const key =
-        blockX + "," + blockY;
-
-
-    const natural =
-        getNaturalBlock(
-            blockX,
-            blockY
-        );
-
-
-    /*
-     * Se o bloco colocado for igual
-     * ao natural, não precisamos salvar
-     * alteração.
-     */
-
-    if(blockType === natural){
-
-        delete modifiedBlocks[key];
-
-    }else{
-
-        modifiedBlocks[key] =
-            blockType;
-
-    }
-
-
-    /*
-     * Também registra a região.
-     */
-
-    const chunkX =
-        getChunkX(blockX * BLOCK_SIZE);
-
-    const chunkY =
-        getChunkY(blockY * BLOCK_SIZE);
-
-
-    exploredChunks.add(
-        chunkKey(
-            chunkX,
-            chunkY
-        )
-    );
-
-}
-
-
-/* =========================================================
-   COLISÃO
-========================================================= */
-
-function isSolidBlock(
-    blockX,
-    blockY
-){
-
-    const type =
-        getBlock(
-            blockX,
-            blockY
-        );
-
-
-    if(!type){
 
         return false;
 
     }
 
 
-    return !!BLOCKS[type]?.solid;
+    const r =
+        seededRandom(
+            Math.floor(x / 5),
+            777
+        );
+
+
+    return r > 0.88;
+
+}
+
+
+function getTreeHeight(x){
+
+    const biome =
+        getBiome(x);
+
+
+    if(biome.id === "jungle"){
+
+        return 7;
+
+    }
+
+
+    if(biome.id === "taiga"){
+
+        return 5;
+
+    }
+
+
+    if(biome.id === "savanna"){
+
+        return 4;
+
+    }
+
+
+    return 5;
 
 }
 
 
 /* =========================================================
-   TERRENO EM PIXELS
+   BLOCO FINAL
 ========================================================= */
 
-function getGroundPixel(worldX){
+function getBlock(x,y){
 
-    return terrainHeight(
-        Math.floor(
-            worldX / BLOCK_SIZE
-        )
-    ) * BLOCK_SIZE;
+    const modified =
+        getModifiedBlock(x,y);
+
+
+    if(modified !== undefined){
+
+        if(modified === "air"){
+
+            return null;
+
+        }
+
+
+        return modified;
+
+    }
+
+
+    /*
+     * Água abaixo de regiões costeiras.
+     */
+
+    const base =
+        generateBlock(x,y);
+
+
+    return base;
 
 }
 
 
 /* =========================================================
-   INVENTÁRIO - ADICIONAR
+   SÓLIDO
 ========================================================= */
 
-function addItem(
-    type,
-    amount = 1
-){
+function isSolidBlock(type){
 
-    const item =
+    return (
+        type &&
+        type !== "water" &&
+        type !== "leaves"
+    );
+
+}
+
+
+/* =========================================================
+   CORES
+========================================================= */
+
+function getBlockColor(type){
+
+    switch(type){
+
+        case "grass":
+            return "#4f9f43";
+
+        case "dirt":
+            return "#795548";
+
+        case "stone":
+            return "#777b7d";
+
+        case "sand":
+            return "#d7bd72";
+
+        case "mud":
+            return "#514c34";
+
+        case "snow":
+            return "#eef6f7";
+
+        case "wood":
+            return "#80552f";
+
+        case "leaves":
+            return "#32853b";
+
+        case "coal":
+            return "#282828";
+
+        case "iron":
+            return "#b4a79a";
+
+        case "cobblestone":
+            return "#696969";
+
+        case "water":
+            return "rgba(55,150,220,.72)";
+
+        default:
+            return "#ff00ff";
+
+    }
+
+}
+
+
+/* =========================================================
+   NOME DO BLOCO
+========================================================= */
+
+function getBlockName(type){
+
+    const names = {
+
+        grass:"Grama",
+
+        dirt:"Terra",
+
+        stone:"Pedra",
+
+        sand:"Areia",
+
+        mud:"Lama",
+
+        snow:"Neve",
+
+        wood:"Madeira",
+
+        leaves:"Folhas",
+
+        coal:"Carvão",
+
+        iron:"Ferro",
+
+        cobblestone:"Pedregulho",
+
+        water:"Água"
+
+    };
+
+
+    return names[type] || "Ar";
+
+}
+
+
+/* =========================================================
+   HOTBAR
+========================================================= */
+
+function renderHotbar(){
+
+    const hotbar =
+        document.getElementById("hotbar");
+
+
+    hotbar.innerHTML = "";
+
+
+    for(
+        let i = 0;
+        i < hotbarItems.length;
+        i++
+    ){
+
+        const item =
+            hotbarItems[i];
+
+
+        const button =
+            document.createElement("button");
+
+
+        button.className =
+            "hotSlot" +
+            (
+                i === selectedHotbar
+                    ? " selected"
+                    : ""
+            );
+
+
+        button.innerHTML =
+            item.icon +
+            "<span>" +
+            (i + 1) +
+            "</span>";
+
+
+        button.title =
+            item.name;
+
+
+        button.onclick =
+            () => {
+
+                selectedHotbar = i;
+
+                renderHotbar();
+
+            };
+
+
+        hotbar.appendChild(button);
+
+    }
+
+}
+
+
+/* =========================================================
+   INVENTÁRIO DO ITEM
+========================================================= */
+
+function inventoryCount(id){
+
+    const found =
         playerInventory.find(
-            entry => entry.type === type
+            item => item.id === id
+        );
+
+
+    return found
+        ? Number(found.amount) || 0
+        : 0;
+
+}
+
+
+function addItem(id,amount=1){
+
+    let item =
+        playerInventory.find(
+            entry => entry.id === id
         );
 
 
     if(!item){
 
-        playerInventory.push({
+        item = {
 
-            type:type,
+            id:id,
 
-            amount:amount
+            amount:0
 
-        });
+        };
 
-    }else{
 
-        item.amount += amount;
+        playerInventory.push(item);
 
     }
 
 
-    normalizeInventory();
-
-    updateInventoryUI();
+    item.amount += amount;
 
 }
 
 
-/* =========================================================
-   INVENTÁRIO - REMOVER
-========================================================= */
-
-function removeItem(
-    type,
-    amount = 1
-){
+function removeItem(id,amount=1){
 
     const item =
         playerInventory.find(
-            entry => entry.type === type
+            entry => entry.id === id
         );
 
 
@@ -3009,7 +2964,15 @@ function removeItem(
     item.amount -= amount;
 
 
-    updateInventoryUI();
+    if(item.amount <= 0){
+
+        playerInventory =
+            playerInventory.filter(
+                entry =>
+                    entry.id !== id
+            );
+
+    }
 
 
     return true;
@@ -3018,454 +2981,44 @@ function removeItem(
 
 
 /* =========================================================
-   QUANTIDADE
+   BLOCO DA HOTBAR
 ========================================================= */
 
-function getItemAmount(type){
+function getSelectedBlock(){
 
-    const item =
-        playerInventory.find(
-            entry => entry.type === type
-        );
-
-
-    if(!item){
-
-        return 0;
-
-    }
-
-
-    return Number(item.amount) || 0;
+    return hotbarItems[
+        selectedHotbar
+    ].id;
 
 }
 
 
 /* =========================================================
-   ÍCONE DO BLOCO
+   CONVERTER TELA → MUNDO
 ========================================================= */
 
-function drawBlockIcon(
-    context,
-    type,
-    x,
-    y,
-    size
-){
-
-    if(type === "grass"){
-
-        context.fillStyle =
-            "#795548";
-
-        context.fillRect(
-            x,
-            y + size * .25,
-            size,
-            size * .75
-        );
-
-        context.fillStyle =
-            "#4c9b45";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size * .30
-        );
-
-        return;
-
-    }
-
-
-    if(type === "dirt"){
-
-        context.fillStyle =
-            "#795548";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        return;
-
-    }
-
-
-    if(type === "stone"){
-
-        context.fillStyle =
-            "#777b80";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        context.fillStyle =
-            "#666a6f";
-
-        context.fillRect(
-            x + size * .2,
-            y + size * .25,
-            size * .15,
-            size * .12
-        );
-
-        context.fillRect(
-            x + size * .6,
-            y + size * .55,
-            size * .2,
-            size * .15
-        );
-
-        return;
-
-    }
-
-
-    if(type === "sand"){
-
-        context.fillStyle =
-            "#d8c078";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        return;
-
-    }
-
-
-    if(type === "water"){
-
-        context.fillStyle =
-            "#348fd1";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        context.fillStyle =
-            "rgba(255,255,255,.25)";
-
-        context.fillRect(
-            x + 4,
-            y + 5,
-            size - 8,
-            3
-        );
-
-        return;
-
-    }
-
-
-    if(type === "wood"){
-
-        context.fillStyle =
-            "#704522";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        context.fillStyle =
-            "#a36b38";
-
-        context.fillRect(
-            x + size * .35,
-            y,
-            size * .15,
-            size
-        );
-
-        return;
-
-    }
-
-
-    if(type === "leaves"){
-
-        context.fillStyle =
-            "#2f7d32";
-
-        context.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-        context.fillStyle =
-            "#439a42";
-
-        context.fillRect(
-            x + size * .15,
-            y + size * .15,
-            size * .25,
-            size * .25
-        );
-
-        return;
-
-    }
-
-}
-
-
-/* =========================================================
-   ATUALIZAR INVENTÁRIO VISUAL
-========================================================= */
-
-function updateInventoryUI(){
-
-    const bar =
-        document.getElementById(
-            "inventoryBar"
-        );
-
-
-    if(!bar){
-
-        return;
-
-    }
-
-
-    bar.innerHTML = "";
-
-
-    for(
-        let i = 0;
-        i < HOTBAR.length;
-        i++
-    ){
-
-        const type =
-            HOTBAR[i];
-
-
-        const slot =
-            document.createElement(
-                "div"
-            );
-
-
-        slot.className =
-            "inventorySlot";
-
-
-        if(i === selectedSlot){
-
-            slot.classList.add(
-                "selected"
-            );
-
-        }
-
-
-        const number =
-            document.createElement(
-                "span"
-            );
-
-
-        number.className =
-            "inventoryNumber";
-
-        number.textContent =
-            i + 1;
-
-
-        const icon =
-            document.createElement(
-                "canvas"
-            );
-
-
-        icon.className =
-            "inventoryIcon";
-
-        icon.width = 28;
-
-        icon.height = 28;
-
-
-        drawBlockIcon(
-            icon.getContext("2d"),
-            type,
-            0,
-            0,
-            28
-        );
-
-
-        const amount =
-            document.createElement(
-                "span"
-            );
-
-
-        amount.className =
-            "inventoryAmount";
-
-        amount.textContent =
-            getItemAmount(type);
-
-
-        slot.appendChild(number);
-
-        slot.appendChild(icon);
-
-        slot.appendChild(amount);
-
-
-        slot.addEventListener(
-            "click",
-            () => {
-
-                selectedSlot = i;
-
-                updateInventoryUI();
-
-                updateSelectedBlockName();
-
-            }
-        );
-
-
-        bar.appendChild(slot);
-
-    }
-
-}
-
-
-/* =========================================================
-   BLOCO SELECIONADO
-========================================================= */
-
-function getSelectedBlockType(){
-
-    return HOTBAR[selectedSlot];
-
-}
-
-
-function updateSelectedBlockName(){
-
-    const type =
-        getSelectedBlockType();
-
-
-    const element =
-        document.getElementById(
-            "selectedBlockName"
-        );
-
-
-    if(element){
-
-        element.textContent =
-            BLOCKS[type].name;
-
-    }
-
-}
-
-
-/* =========================================================
-   CÂMERA
-========================================================= */
-
-function getCameraX(){
-
-    return player.x -
-        canvas.width / 2;
-
-}
-
-
-function getCameraY(){
-
-    /*
-     * O jogador fica aproximadamente
-     * no meio vertical da tela.
-     */
-
-    return player.y -
-        canvas.height * 0.55;
-
-}
-
-
-/* =========================================================
-   COORDENADAS DO MOUSE
-========================================================= */
-
-function mouseToWorldBlock(
-    event
-){
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-
-    const mouseX =
-        event.clientX -
-        rect.left;
-
-
-    const mouseY =
-        event.clientY -
-        rect.top;
-
+function screenToWorld(mouseX,mouseY){
 
     const cameraX =
-        getCameraX();
+        player.x -
+        canvas.width / 2;
+
 
     const cameraY =
-        getCameraY();
-
-
-    const worldPixelX =
-        cameraX +
-        mouseX;
-
-
-    const worldPixelY =
-        cameraY +
-        mouseY;
+        player.y -
+        canvas.height * 0.55;
 
 
     return {
 
         x:Math.floor(
-            worldPixelX /
-            BLOCK_SIZE
+            (mouseX + cameraX) /
+            TILE_SIZE
         ),
 
         y:Math.floor(
-            worldPixelY /
-            BLOCK_SIZE
+            (mouseY + cameraY) /
+            TILE_SIZE
         )
 
     };
@@ -3474,55 +3027,34 @@ function mouseToWorldBlock(
 
 
 /* =========================================================
-   DISTÂNCIA DO BLOCO
+   ALCANCE
 ========================================================= */
 
-function blockIsInReach(
-    blockX,
-    blockY
-){
+function canReachBlock(x,y){
 
-    const playerCenterX =
-        player.x +
-        player.width / 2;
+    const px =
+        player.x /
+        TILE_SIZE;
 
-
-    const playerCenterY =
-        player.y +
-        player.height / 2;
-
-
-    const blockCenterX =
-        blockX *
-        BLOCK_SIZE +
-        BLOCK_SIZE / 2;
-
-
-    const blockCenterY =
-        blockY *
-        BLOCK_SIZE +
-        BLOCK_SIZE / 2;
-
-
-    const dx =
-        blockCenterX -
-        playerCenterX;
-
-
-    const dy =
-        blockCenterY -
-        playerCenterY;
+    const py =
+        player.y /
+        TILE_SIZE;
 
 
     const distance =
         Math.sqrt(
-            dx * dx +
-            dy * dy
+            Math.pow(
+                x - px,
+                2
+            ) +
+            Math.pow(
+                y - py,
+                2
+            )
         );
 
 
-    return distance <=
-        BLOCK_SIZE * 5;
+    return distance <= 5;
 
 }
 
@@ -3531,10 +3063,7 @@ function blockIsInReach(
    QUEBRAR BLOCO
 ========================================================= */
 
-function breakBlock(
-    blockX,
-    blockY
-){
+function breakBlockAt(mouseX,mouseY){
 
     if(!gameRunning || gamePaused){
 
@@ -3543,12 +3072,17 @@ function breakBlock(
     }
 
 
-    if(
-        !blockIsInReach(
-            blockX,
-            blockY
-        )
-    ){
+    const pos =
+        screenToWorld(
+            mouseX,
+            mouseY
+        );
+
+
+    if(!canReachBlock(
+        pos.x,
+        pos.y
+    )){
 
         return;
 
@@ -3557,16 +3091,19 @@ function breakBlock(
 
     const type =
         getBlock(
-            blockX,
-            blockY
+            pos.x,
+            pos.y
         );
 
 
-    if(
-        !type ||
-        type === "air" ||
-        type === "water"
-    ){
+    if(!type){
+
+        return;
+
+    }
+
+
+    if(type === "water"){
 
         return;
 
@@ -3574,30 +3111,38 @@ function breakBlock(
 
 
     /*
-     * Não permite quebrar diretamente
-     * o bloco do jogador.
+     * Não permite quebrar
+     * diretamente o bloco sob o jogador.
      */
 
-    const blockLeft =
-        blockX * BLOCK_SIZE;
+    const playerLeft =
+        Math.floor(
+            player.x / TILE_SIZE
+        );
 
-    const blockTop =
-        blockY * BLOCK_SIZE;
+    const playerRight =
+        Math.floor(
+            (player.x + player.width) /
+            TILE_SIZE
+        );
 
-    const blockRight =
-        blockLeft +
-        BLOCK_SIZE;
+    const playerTop =
+        Math.floor(
+            player.y / TILE_SIZE
+        );
 
-    const blockBottom =
-        blockTop +
-        BLOCK_SIZE;
+    const playerBottom =
+        Math.floor(
+            (player.y + player.height) /
+            TILE_SIZE
+        );
 
 
     if(
-        player.x < blockRight &&
-        player.x + player.width > blockLeft &&
-        player.y < blockBottom &&
-        player.y + player.height > blockTop
+        pos.x >= playerLeft &&
+        pos.x <= playerRight &&
+        pos.y >= playerTop &&
+        pos.y <= playerBottom
     ){
 
         return;
@@ -3605,33 +3150,33 @@ function breakBlock(
     }
 
 
-    setBlock(
-        blockX,
-        blockY,
+    setModifiedBlock(
+        pos.x,
+        pos.y,
         "air"
     );
 
 
     /*
-     * Água não gera item.
+     * Drop simples.
      */
 
-    if(type !== "water"){
-
-        addItem(
-            type,
-            1
-        );
-
-    }
+    const drop =
+        type === "grass"
+            ? "dirt"
+            : type;
 
 
-    setSaveStatus(
-        "Alteração pendente"
+    addItem(
+        drop,
+        1
     );
 
 
-    drawWorld();
+    markCurrentChunkExplored();
+
+
+    updateHUD();
 
 }
 
@@ -3640,10 +3185,7 @@ function breakBlock(
    COLOCAR BLOCO
 ========================================================= */
 
-function placeBlock(
-    blockX,
-    blockY
-){
+function placeBlockAt(mouseX,mouseY){
 
     if(!gameRunning || gamePaused){
 
@@ -3652,10 +3194,27 @@ function placeBlock(
     }
 
 
+    const pos =
+        screenToWorld(
+            mouseX,
+            mouseY
+        );
+
+
+    if(!canReachBlock(
+        pos.x,
+        pos.y
+    )){
+
+        return;
+
+    }
+
+
     if(
-        !blockIsInReach(
-            blockX,
-            blockY
+        getBlock(
+            pos.x,
+            pos.y
         )
     ){
 
@@ -3664,55 +3223,69 @@ function placeBlock(
     }
 
 
-    const selectedType =
-        getSelectedBlockType();
+    const selected =
+        getSelectedBlock();
 
+
+    /*
+     * Só permite colocar se houver item.
+     */
 
     if(
-        getItemAmount(
-            selectedType
+        inventoryCount(
+            selected
         ) <= 0
     ){
 
-        return;
+        /*
+         * Para facilitar os testes iniciais,
+         * terra começa disponível.
+         */
 
-    }
+        if(
+            selected === "dirt" &&
+            playerInventory.length === 0
+        ){
 
+            addItem(
+                "dirt",
+                20
+            );
 
-    const existing =
-        getBlock(
-            blockX,
-            blockY
-        );
+        }else{
 
+            return;
 
-    if(
-        existing !== "air" &&
-        existing !== "water"
-    ){
-
-        return;
+        }
 
     }
 
 
     /*
-     * Não permite colocar dentro
-     * do jogador.
+     * Impede colocar bloco dentro do jogador.
      */
 
     const blockLeft =
-        blockX * BLOCK_SIZE;
+        pos.x * TILE_SIZE;
 
     const blockTop =
-        blockY * BLOCK_SIZE;
+        pos.y * TILE_SIZE;
+
+    const blockRight =
+        blockLeft + TILE_SIZE;
+
+    const blockBottom =
+        blockTop + TILE_SIZE;
 
 
     if(
-        player.x < blockLeft + BLOCK_SIZE &&
-        player.x + player.width > blockLeft &&
-        player.y < blockTop + BLOCK_SIZE &&
-        player.y + player.height > blockTop
+        blockRight > player.x &&
+        blockLeft <
+            player.x + player.width &&
+        blockBottom >
+            player.y &&
+        blockTop <
+            player.y + player.height
     ){
 
         return;
@@ -3722,7 +3295,7 @@ function placeBlock(
 
     if(
         !removeItem(
-            selectedType,
+            selected,
             1
         )
     ){
@@ -3732,19 +3305,17 @@ function placeBlock(
     }
 
 
-    setBlock(
-        blockX,
-        blockY,
-        selectedType
+    setModifiedBlock(
+        pos.x,
+        pos.y,
+        selected
     );
 
 
-    setSaveStatus(
-        "Alteração pendente"
-    );
+    markCurrentChunkExplored();
 
 
-    drawWorld();
+    updateHUD();
 
 }
 
@@ -3757,33 +3328,25 @@ canvas.addEventListener(
     "mousedown",
     event => {
 
-        if(event.button === 0){
+        if(
+            event.button === 0
+        ){
 
-            const block =
-                mouseToWorldBlock(
-                    event
-                );
-
-
-            breakBlock(
-                block.x,
-                block.y
+            breakBlockAt(
+                event.clientX,
+                event.clientY
             );
 
         }
 
 
-        if(event.button === 2){
+        if(
+            event.button === 2
+        ){
 
-            const block =
-                mouseToWorldBlock(
-                    event
-                );
-
-
-            placeBlock(
-                block.x,
-                block.y
+            placeBlockAt(
+                event.clientX,
+                event.clientY
             );
 
         }
@@ -3791,10 +3354,6 @@ canvas.addEventListener(
     }
 );
 
-
-/*
- * Desativa menu do botão direito.
- */
 
 canvas.addEventListener(
     "contextmenu",
@@ -3814,26 +3373,73 @@ window.addEventListener(
     "keydown",
     event => {
 
-        keys[
-            event.key.toLowerCase()
-        ] = true;
+        const key =
+            event.key.toLowerCase();
+
+
+        keys[key] = true;
 
 
         /*
-         * Seleção da hotbar.
+         * Evita a página reagir às setas.
          */
 
         if(
-            event.key >= "1" &&
-            event.key <= "7"
+            key === "arrowleft" ||
+            key === "arrowright" ||
+            key === "arrowup" ||
+            key === "arrowdown" ||
+            key === " "
         ){
 
-            selectedSlot =
-                Number(event.key) - 1;
+            event.preventDefault();
 
-            updateInventoryUI();
+        }
 
-            updateSelectedBlockName();
+
+        /*
+         * Espaço = pular.
+         */
+
+        if(
+            key === " " &&
+            player.onGround &&
+            gameRunning &&
+            !gamePaused
+        ){
+
+            player.vy =
+                -10;
+
+            player.onGround =
+                false;
+
+        }
+
+
+        /*
+         * Números = hotbar.
+         */
+
+        const number =
+            Number(event.key);
+
+
+        if(
+            number >= 1 &&
+            number <= 9
+        ){
+
+            if(
+                hotbarItems[number - 1]
+            ){
+
+                selectedHotbar =
+                    number - 1;
+
+                renderHotbar();
+
+            }
 
         }
 
@@ -3873,78 +3479,378 @@ window.addEventListener(
 
 
 /* =========================================================
-   MOVIMENTO
+   COLISÃO
+========================================================= */
+
+function collidesAt(
+    x,
+    y,
+    width,
+    height
+){
+
+    const left =
+        Math.floor(
+            x / TILE_SIZE
+        );
+
+    const right =
+        Math.floor(
+            (x + width - 1) /
+            TILE_SIZE
+        );
+
+    const top =
+        Math.floor(
+            y / TILE_SIZE
+        );
+
+    const bottom =
+        Math.floor(
+            (y + height - 1) /
+            TILE_SIZE
+        );
+
+
+    for(
+        let bx = left;
+        bx <= right;
+        bx++
+    ){
+
+        for(
+            let by = top;
+            by <= bottom;
+            by++
+        ){
+
+            if(
+                isSolidBlock(
+                    getBlock(
+                        bx,
+                        by
+                    )
+                )
+            ){
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================================================
+   MOVIMENTO HORIZONTAL
+========================================================= */
+
+function moveHorizontal(amount){
+
+    if(amount === 0){
+
+        return;
+
+    }
+
+
+    const step =
+        Math.sign(amount);
+
+
+    let remaining =
+        Math.abs(amount);
+
+
+    /*
+     * Divide em pequenos passos.
+     *
+     * Isso evita atravessar blocos
+     * quando a velocidade aumenta.
+     */
+
+    while(
+        remaining > 0
+    ){
+
+        const movement =
+            Math.min(
+                2,
+                remaining
+            );
+
+
+        const nextX =
+            player.x +
+            movement * step;
+
+
+        if(
+            !collidesAt(
+                nextX,
+                player.y,
+                player.width,
+                player.height
+            )
+        ){
+
+            player.x =
+                nextX;
+
+        }else{
+
+            player.vx = 0;
+
+            break;
+
+        }
+
+
+        remaining -= movement;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOVIMENTO VERTICAL
+========================================================= */
+
+function moveVertical(amount){
+
+    if(amount === 0){
+
+        return;
+
+    }
+
+
+    const step =
+        Math.sign(amount);
+
+
+    let remaining =
+        Math.abs(amount);
+
+
+    player.onGround = false;
+
+
+    while(
+        remaining > 0
+    ){
+
+        const movement =
+            Math.min(
+                2,
+                remaining
+            );
+
+
+        const nextY =
+            player.y +
+            movement * step;
+
+
+        if(
+            !collidesAt(
+                player.x,
+                nextY,
+                player.width,
+                player.height
+            )
+        ){
+
+            player.y =
+                nextY;
+
+        }else{
+
+            if(step > 0){
+
+                player.onGround =
+                    true;
+
+            }
+
+
+            player.vy = 0;
+
+            break;
+
+        }
+
+
+        remaining -= movement;
+
+    }
+
+}
+
+
+/* =========================================================
+   ATUALIZAR JOGADOR
 ========================================================= */
 
 function updatePlayer(){
 
-    const speed = 4;
+    /*
+     * MOVIMENTO
+     */
 
-
-    if(
+    const moveLeft =
         keys["a"] ||
-        keys["arrowleft"]
-    ){
+        keys["arrowleft"];
 
-        player.x -= speed;
-
-    }
-
-
-    if(
+    const moveRight =
         keys["d"] ||
-        keys["arrowright"]
-    ){
+        keys["arrowright"];
 
-        player.x += speed;
+
+    const acceleration =
+        0.8;
+
+
+    const maxSpeed =
+        5;
+
+
+    if(moveLeft){
+
+        player.vx -=
+            acceleration;
 
     }
 
 
-    if(
-        player.x <
-        -WORLD_SIZE
-    ){
+    if(moveRight){
 
-        player.x =
-            -WORLD_SIZE;
-
-    }
-
-
-    if(
-        player.x >
-        WORLD_SIZE
-    ){
-
-        player.x =
-            WORLD_SIZE;
+        player.vx +=
+            acceleration;
 
     }
 
 
     /*
-     * Por enquanto o jogador acompanha
-     * a superfície do terreno.
-     *
-     * A física de gravidade, pulo e colisão
-     * será adicionada na próxima etapa.
+     * Atrito.
      */
 
-    const groundBlock =
-        terrainHeight(
-            Math.floor(
-                player.x /
-                BLOCK_SIZE
+    if(
+        !moveLeft &&
+        !moveRight
+    ){
+
+        player.vx *= 0.75;
+
+    }
+
+
+    /*
+     * Limite de velocidade.
+     */
+
+    player.vx =
+        Math.max(
+            -maxSpeed,
+            Math.min(
+                maxSpeed,
+                player.vx
             )
         );
 
 
-    player.y =
-        groundBlock *
-        BLOCK_SIZE -
-        player.height;
+    moveHorizontal(
+        player.vx
+    );
 
+
+    /*
+     * Gravidade.
+     */
+
+    player.vy +=
+        0.5;
+
+
+    if(
+        player.vy > 12
+    ){
+
+        player.vy = 12;
+
+    }
+
+
+    moveVertical(
+        player.vy
+    );
+
+
+    /*
+     * Limites do mundo.
+     */
+
+    const minX =
+        -WORLD_SIZE *
+        TILE_SIZE;
+
+
+    const maxX =
+        WORLD_SIZE *
+        TILE_SIZE;
+
+
+    if(
+        player.x < minX
+    ){
+
+        player.x =
+            minX;
+
+        player.vx = 0;
+
+    }
+
+
+    if(
+        player.x > maxX
+    ){
+
+        player.x =
+            maxX;
+
+        player.vx = 0;
+
+    }
+
+
+    /*
+     * Fome lentamente.
+     */
+
+    player.hunger -=
+        0.001;
+
+
+    if(
+        player.hunger < 0
+    ){
+
+        player.hunger = 0;
+
+    }
+
+
+    /*
+     * Marca região.
+     */
 
     markCurrentChunkExplored();
 
@@ -3960,31 +3866,24 @@ function updatePlayer(){
 
 function drawSky(){
 
-    const width =
-        canvas.width;
-
-    const height =
-        canvas.height;
-
-
     const gradient =
         ctx.createLinearGradient(
             0,
             0,
             0,
-            height
+            canvas.height
         );
 
 
     gradient.addColorStop(
         0,
-        "#48aee0"
+        "#56b8e6"
     );
 
 
     gradient.addColorStop(
         1,
-        "#a8e4f6"
+        "#b9e7f5"
     );
 
 
@@ -3995,8 +3894,8 @@ function drawSky(){
     ctx.fillRect(
         0,
         0,
-        width,
-        height
+        canvas.width,
+        canvas.height
     );
 
 }
@@ -4006,69 +3905,85 @@ function drawSky(){
    NUVENS
 ========================================================= */
 
-function drawClouds(){
-
-    const width =
-        canvas.width;
-
+function drawClouds(cameraX){
 
     ctx.fillStyle =
-        "rgba(255,255,255,.75)";
+        "rgba(255,255,255,.72)";
+
+
+    const spacing =
+        500;
+
+
+    const start =
+        Math.floor(
+            cameraX /
+            spacing
+        ) - 2;
+
+
+    const end =
+        start +
+        Math.ceil(
+            canvas.width /
+            spacing
+        ) +
+        4;
 
 
     for(
-        let i = 0;
-        i < 8;
+        let i = start;
+        i <= end;
         i++
     ){
 
-        const speed =
-            0.15 +
-            i * 0.01;
+        const random =
+            seededRandom(
+                i,
+                1000
+            );
 
 
-        let cloudX =
-            (
-                i * 380 -
-                player.x * speed
-            ) %
-            (width + 500);
+        const worldX =
+            i *
+            spacing +
+            random *
+            250;
 
 
-        if(cloudX < -150){
-
-            cloudX +=
-                width + 500;
-
-        }
+        const screenX =
+            worldX -
+            cameraX *
+            0.25;
 
 
-        const cloudY =
+        const screenY =
             80 +
-            i * 35;
+            random *
+            130;
 
 
         ctx.fillRect(
-            cloudX,
-            cloudY,
-            120,
+            screenX,
+            screenY,
+            130,
             25
         );
 
 
         ctx.fillRect(
-            cloudX + 25,
-            cloudY - 20,
+            screenX + 25,
+            screenY - 18,
             55,
             25
         );
 
 
         ctx.fillRect(
-            cloudX + 70,
-            cloudY - 10,
-            55,
-            25
+            screenX + 75,
+            screenY - 10,
+            45,
+            20
         );
 
     }
@@ -4077,140 +3992,142 @@ function drawClouds(){
 
 
 /* =========================================================
-   DESENHAR UM BLOCO
+   DESENHAR ÁRVORE
+========================================================= */
+
+function drawTree(
+    worldX,
+    surface,
+    cameraX,
+    cameraY
+){
+
+    const height =
+        getTreeHeight(
+            worldX
+        );
+
+
+    const baseX =
+        worldX *
+        TILE_SIZE -
+        cameraX;
+
+
+    const baseY =
+        surface *
+        TILE_SIZE -
+        cameraY;
+
+
+    /*
+     * Tronco.
+     */
+
+    ctx.fillStyle =
+        "#754727";
+
+
+    ctx.fillRect(
+        baseX + 10,
+        baseY -
+            height *
+            TILE_SIZE,
+        12,
+        height *
+            TILE_SIZE
+    );
+
+
+    /*
+     * Copa.
+     */
+
+    ctx.fillStyle =
+        "#2f8139";
+
+
+    const top =
+        baseY -
+        height *
+        TILE_SIZE;
+
+
+    ctx.fillRect(
+        baseX - 15,
+        top,
+        62,
+        42
+    );
+
+
+    ctx.fillRect(
+        baseX - 5,
+        top - 20,
+        45,
+        25
+    );
+
+}
+
+
+/* =========================================================
+   DESENHAR BLOCO
 ========================================================= */
 
 function drawBlock(
     type,
+    x,
+    y,
     screenX,
     screenY
 ){
 
-    if(
-        !BLOCKS[type] ||
-        type === "air"
-    ){
+    if(!type){
 
         return;
 
     }
 
 
-    /*
-     * Água fica parcialmente transparente.
-     */
-
-    if(type === "water"){
-
-        ctx.fillStyle =
-            "rgba(52,143,209,.75)";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
+    ctx.fillStyle =
+        getBlockColor(
+            type
         );
 
 
-        ctx.fillStyle =
-            "rgba(255,255,255,.28)";
-
-        ctx.fillRect(
-            screenX + 4,
-            screenY + 5,
-            BLOCK_SIZE - 8,
-            3
-        );
-
-
-        return;
-
-    }
+    ctx.fillRect(
+        screenX,
+        screenY,
+        TILE_SIZE,
+        TILE_SIZE
+    );
 
 
     /*
-     * Grama.
+     * Detalhes.
      */
 
     if(type === "grass"){
 
         ctx.fillStyle =
-            "#795548";
+            "#75c95d";
+
 
         ctx.fillRect(
             screenX,
             screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
+            TILE_SIZE,
+            5
         );
-
-
-        ctx.fillStyle =
-            "#4c9b45";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            9
-        );
-
-
-        return;
 
     }
 
-
-    /*
-     * Terra.
-     */
-
-    if(type === "dirt"){
-
-        ctx.fillStyle =
-            "#795548";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
-        );
-
-
-        drawBlockTexture(
-            screenX,
-            screenY,
-            "#65463b",
-            3
-        );
-
-
-        return;
-
-    }
-
-
-    /*
-     * Pedra.
-     */
 
     if(type === "stone"){
 
         ctx.fillStyle =
-            "#777b80";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#62666b";
+            "rgba(255,255,255,.12)";
 
 
         ctx.fillRect(
@@ -4222,41 +4139,23 @@ function drawBlock(
 
 
         ctx.fillRect(
-            screenX + 19,
-            screenY + 18,
-            7,
+            screenX + 20,
+            screenY + 20,
+            5,
             5
         );
-
-
-        return;
 
     }
 
 
-    /*
-     * Areia.
-     */
-
     if(type === "sand"){
 
         ctx.fillStyle =
-            "#d8c078";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#c8ad67";
+            "rgba(120,90,40,.18)";
 
 
         ctx.fillRect(
-            screenX + 8,
+            screenX + 7,
             screenY + 10,
             3,
             3
@@ -4264,149 +4163,77 @@ function drawBlock(
 
 
         ctx.fillRect(
-            screenX + 21,
+            screenX + 22,
             screenY + 20,
             3,
             3
         );
 
-
-        return;
-
     }
 
-
-    /*
-     * Madeira.
-     */
 
     if(type === "wood"){
 
         ctx.fillStyle =
-            "#704522";
+            "#b17a45";
+
 
         ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#a36b38";
-
-        ctx.fillRect(
-            screenX + 9,
+            screenX + 13,
             screenY,
             5,
-            BLOCK_SIZE
+            TILE_SIZE
         );
-
-
-        ctx.fillStyle =
-            "#4e321c";
-
-        ctx.fillRect(
-            screenX + 21,
-            screenY,
-            3,
-            BLOCK_SIZE
-        );
-
-
-        return;
 
     }
 
 
-    /*
-     * Folhas.
-     */
-
     if(type === "leaves"){
 
         ctx.fillStyle =
-            "#2f7d32";
-
-        ctx.fillRect(
-            screenX,
-            screenY,
-            BLOCK_SIZE,
-            BLOCK_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#4d9d45";
+            "rgba(100,200,90,.35)";
 
 
         ctx.fillRect(
             screenX + 5,
             screenY + 5,
             8,
-            7
+            8
         );
-
-
-        ctx.fillRect(
-            screenX + 20,
-            screenY + 17,
-            7,
-            7
-        );
-
-
-        return;
 
     }
 
-}
 
+    if(type === "water"){
 
-/* =========================================================
-   TEXTURA
-========================================================= */
-
-function drawBlockTexture(
-    x,
-    y,
-    color,
-    count
-){
-
-    ctx.fillStyle =
-        color;
-
-
-    for(
-        let i = 0;
-        i < count;
-        i++
-    ){
-
-        const rx =
-            seededRandom(
-                Math.floor(x / BLOCK_SIZE) + i,
-                Math.floor(y / BLOCK_SIZE)
-            );
-
-
-        const ry =
-            seededRandom(
-                Math.floor(y / BLOCK_SIZE) + i,
-                Math.floor(x / BLOCK_SIZE)
-            );
+        ctx.fillStyle =
+            "rgba(255,255,255,.25)";
 
 
         ctx.fillRect(
-            x + rx * 22,
-            y + ry * 22,
-            3,
+            screenX,
+            screenY + 5,
+            TILE_SIZE,
             3
         );
 
     }
+
+
+    /*
+     * Grade de blocos muito discreta.
+     */
+
+    ctx.strokeStyle =
+        "rgba(0,0,0,.08)";
+
+
+    ctx.strokeRect(
+        screenX,
+        screenY,
+        TILE_SIZE,
+        TILE_SIZE
+    );
 
 }
 
@@ -4417,109 +4244,89 @@ function drawBlockTexture(
 
 function drawWorld(){
 
-    const width =
-        canvas.width;
-
-    const height =
-        canvas.height;
-
-
     drawSky();
-
-    drawClouds();
 
 
     const cameraX =
-        getCameraX();
+        player.x -
+        canvas.width / 2;
 
 
     const cameraY =
-        getCameraY();
+        player.y -
+        canvas.height * 0.55;
+
+
+    drawClouds(
+        cameraX
+    );
 
 
     /*
-     * Blocos visíveis.
+     * Faixa de blocos visíveis.
      */
 
-    const startBlockX =
+    const startX =
         Math.floor(
             cameraX /
-            BLOCK_SIZE
+            TILE_SIZE
         ) - 2;
 
 
-    const endBlockX =
-        Math.ceil(
+    const endX =
+        Math.floor(
             (
                 cameraX +
-                width
+                canvas.width
             ) /
-            BLOCK_SIZE
+            TILE_SIZE
         ) + 2;
 
 
-    const startBlockY =
+    const startY =
+        Math.max(
+            0,
+            Math.floor(
+                cameraY /
+                TILE_SIZE
+            ) - 2
+        );
+
+
+    const endY =
         Math.floor(
-            cameraY /
-            BLOCK_SIZE
-        ) - 2;
-
-
-    const endBlockY =
-        Math.ceil(
             (
                 cameraY +
-                height
+                canvas.height
             ) /
-            BLOCK_SIZE
+            TILE_SIZE
         ) + 2;
 
 
     /*
-     * Não precisamos desenhar
-     * milhões de blocos.
-     *
-     * Só os que estão na tela.
+     * Blocos.
      */
 
     for(
-        let blockX = startBlockX;
-        blockX <= endBlockX;
-        blockX++
+        let x = startX;
+        x <= endX;
+        x++
     ){
 
         for(
-            let blockY = startBlockY;
-            blockY <= endBlockY;
-            blockY++
+            let y = startY;
+            y <= endY;
+            y++
         ){
-
-            /*
-             * Limite vertical simples
-             * para evitar desenhar muito
-             * fora do mundo.
-             */
-
-            if(
-                blockY < -100 ||
-                blockY > 100
-            ){
-
-                continue;
-
-            }
-
 
             const type =
                 getBlock(
-                    blockX,
-                    blockY
+                    x,
+                    y
                 );
 
 
-            if(
-                type === "air"
-            ){
+            if(!type){
 
                 continue;
 
@@ -4527,22 +4334,63 @@ function drawWorld(){
 
 
             const screenX =
-                blockX *
-                BLOCK_SIZE -
+                x *
+                TILE_SIZE -
                 cameraX;
 
 
             const screenY =
-                blockY *
-                BLOCK_SIZE -
+                y *
+                TILE_SIZE -
                 cameraY;
 
 
             drawBlock(
                 type,
+                x,
+                y,
                 screenX,
                 screenY
             );
+
+        }
+
+
+        /*
+         * Árvores.
+         */
+
+        const surface =
+            getSurfaceY(x);
+
+
+        if(
+            hasTreeAt(x)
+        ){
+
+            const treeBiome =
+                getBiome(x);
+
+
+            /*
+             * Não cria árvores no deserto,
+             * litoral ou montanha.
+             */
+
+            if(
+                treeBiome.id !== "desert" &&
+                treeBiome.id !== "coast" &&
+                treeBiome.id !== "mountains"
+            ){
+
+                drawTree(
+                    x,
+                    surface,
+                    cameraX,
+                    cameraY
+                );
+
+            }
 
         }
 
@@ -4550,46 +4398,7 @@ function drawWorld(){
 
 
     /*
-     * Linhas discretas dos blocos.
-     */
-
-    ctx.strokeStyle =
-        "rgba(0,0,0,.08)";
-
-    ctx.lineWidth = 1;
-
-
-    for(
-        let blockX = startBlockX;
-        blockX <= endBlockX;
-        blockX++
-    ){
-
-        const screenX =
-            blockX *
-            BLOCK_SIZE -
-            cameraX;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            screenX,
-            0
-        );
-
-        ctx.lineTo(
-            screenX,
-            height
-        );
-
-        ctx.stroke();
-
-    }
-
-
-    /*
-     * JOGADOR
+     * Jogador.
      */
 
     const playerScreenX =
@@ -4609,26 +4418,12 @@ function drawWorld(){
     ctx.fillStyle =
         "#315cff";
 
+
     ctx.fillRect(
         playerScreenX,
-        playerScreenY,
+        playerScreenY + 14,
         player.width,
-        player.height
-    );
-
-
-    /*
-     * Roupa.
-     */
-
-    ctx.fillStyle =
-        "#172f99";
-
-    ctx.fillRect(
-        playerScreenX + 3,
-        playerScreenY + 18,
-        player.width - 6,
-        player.height - 18
+        player.height - 14
     );
 
 
@@ -4639,10 +4434,11 @@ function drawWorld(){
     ctx.fillStyle =
         "#f1c27d";
 
+
     ctx.fillRect(
-        playerScreenX + 3,
-        playerScreenY - 16,
-        player.width - 6,
+        playerScreenX + 2,
+        playerScreenY,
+        player.width - 4,
         16
     );
 
@@ -4652,12 +4448,13 @@ function drawWorld(){
      */
 
     ctx.fillStyle =
-        "#3b2415";
+        "#3b2518";
+
 
     ctx.fillRect(
-        playerScreenX + 3,
-        playerScreenY - 16,
-        player.width - 6,
+        playerScreenX + 2,
+        playerScreenY,
+        player.width - 4,
         5
     );
 
@@ -4669,16 +4466,18 @@ function drawWorld(){
     ctx.fillStyle =
         "#111";
 
+
     ctx.fillRect(
-        playerScreenX + 7,
-        playerScreenY - 9,
+        playerScreenX + 6,
+        playerScreenY + 8,
         3,
         3
     );
 
+
     ctx.fillRect(
-        playerScreenX + 15,
-        playerScreenY - 9,
+        playerScreenX + 14,
+        playerScreenY + 8,
         3,
         3
     );
@@ -4719,7 +4518,7 @@ function updateHUD(){
         .textContent =
             Math.floor(
                 player.x /
-                BLOCK_SIZE
+                TILE_SIZE
             );
 
 
@@ -4728,7 +4527,7 @@ function updateHUD(){
         .textContent =
             Math.floor(
                 player.y /
-                BLOCK_SIZE
+                TILE_SIZE
             );
 
 
@@ -4738,7 +4537,12 @@ function updateHUD(){
             getCurrentChunkKey();
 
 
-    updateSelectedBlockName();
+    document
+        .getElementById("blockValue")
+        .textContent =
+            getBlockName(
+                getSelectedBlock()
+            );
 
 }
 
@@ -4749,11 +4553,9 @@ function updateHUD(){
 
 async function startGame(){
 
-    worldScreen
-        .classList.add("hidden");
+    worldScreen.classList.add("hidden");
 
-    gameScreen
-        .classList.remove("hidden");
+    gameScreen.classList.remove("hidden");
 
 
     resizeCanvas();
@@ -4771,28 +4573,26 @@ async function startGame(){
 
 
     /*
-     * Se for uma conta antiga que ainda
-     * não tem inventário, cria o básico.
+     * Se o jogador estiver em uma posição
+     * inicial antiga, coloca no chão.
      */
 
     if(
-        !Array.isArray(
-            playerInventory
-        ) ||
-        playerInventory.length === 0
+        !Number.isFinite(player.y) ||
+        player.y === 0
     ){
 
-        playerInventory =
-            createDefaultInventory();
-
-        normalizeInventory();
+        player.y =
+            getSurfaceY(
+                Math.floor(
+                    player.x /
+                    TILE_SIZE
+                )
+            ) *
+            TILE_SIZE -
+            player.height;
 
     }
-
-
-    updateInventoryUI();
-
-    updateSelectedBlockName();
 
 
     markCurrentChunkExplored();
@@ -4809,10 +4609,36 @@ async function startGame(){
             currentPlayer.username;
 
 
+    /*
+     * Dá algumas terras somente
+     * se o inventário estiver vazio.
+     */
+
+    if(
+        playerInventory.length === 0
+    ){
+
+        addItem(
+            "dirt",
+            20
+        );
+
+        addItem(
+            "wood",
+            5
+        );
+
+        addItem(
+            "stone",
+            10
+        );
+
+    }
+
+
+    renderHotbar();
+
     updateHUD();
-
-
-    drawWorld();
 
 
     requestAnimationFrame(
@@ -4826,7 +4652,10 @@ async function startGame(){
    LOOP
 ========================================================= */
 
-function gameLoop(){
+let lastFrameTime = 0;
+
+
+function gameLoop(timestamp){
 
     if(!gameRunning){
 
@@ -4835,9 +4664,38 @@ function gameLoop(){
     }
 
 
+    if(!lastFrameTime){
+
+        lastFrameTime =
+            timestamp;
+
+    }
+
+
+    const delta =
+        Math.min(
+            2,
+            (
+                timestamp -
+                lastFrameTime
+            ) / 16.67
+        );
+
+
+    lastFrameTime =
+        timestamp;
+
+
     if(!gamePaused){
 
+        /*
+         * O movimento continua
+         * funcionando independentemente
+         * do tamanho da tela.
+         */
+
         updatePlayer();
+
 
         drawWorld();
 
@@ -4866,7 +4724,6 @@ function pauseGame(){
 
     gamePaused = true;
 
-
     pauseScreen
         .classList
         .remove("hidden");
@@ -4877,14 +4734,9 @@ function pauseGame(){
 }
 
 
-/* =========================================================
-   CONTINUAR
-========================================================= */
-
 function resumeGame(){
 
     gamePaused = false;
-
 
     pauseScreen
         .classList
@@ -4899,11 +4751,6 @@ function resumeGame(){
 
 async function backToMenu(){
 
-    setSaveStatus(
-        "Salvando..."
-    );
-
-
     await savePlayerWorld();
 
 
@@ -4911,11 +4758,12 @@ async function backToMenu(){
 
     gamePaused = false;
 
+    lastFrameTime = 0;
+
 
     pauseScreen
         .classList
         .add("hidden");
-
 
     gameScreen
         .classList
@@ -4975,32 +4823,14 @@ document.addEventListener(
 
 
 /* =========================================================
-   SALVAR ANTES DE FECHAR
-========================================================= */
-
-window.addEventListener(
-    "beforeunload",
-    () => {
-
-        if(currentPlayer){
-
-            savePlayerWorld();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SESSÃO EXISTENTE
+   SESSÃO
 ========================================================= */
 
 async function checkSession(){
 
     try{
 
-        const { data } =
+        const {data} =
             await supabaseClient
                 .auth
                 .getSession();
@@ -5077,8 +4907,7 @@ async function checkSession(){
 
 resizeCanvas();
 
-
-updateInventoryUI();
+renderHotbar();
 
 
 setTimeout(
