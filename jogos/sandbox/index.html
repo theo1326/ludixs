@@ -6,6 +6,9 @@
 
 <title>Ludix - Sandbox</title>
 
+<!-- Evita o 404 do favicon.ico -->
+<link rel="icon" href="data:,">
+
 <style>
 *{
     box-sizing:border-box;
@@ -393,7 +396,7 @@ button{
 }
 
 /* =========================
-   PAUSE
+   PAUSA
 ========================= */
 
 #pauseOverlay{
@@ -435,26 +438,8 @@ button{
     background:#3c82f6;
 }
 
-/* =========================
-   MOBILE WARNING
-========================= */
-
-#loading{
-    position:fixed;
-    inset:0;
-    z-index:500;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#0a0e13;
-    font-size:18px;
-}
-
-/* =========================
-   RESPONSIVO
-========================= */
-
 @media(max-width:700px){
+
     .logo{
         font-size:34px;
     }
@@ -473,6 +458,7 @@ button{
     #controlsHint{
         display:none;
     }
+
 }
 </style>
 </head>
@@ -498,6 +484,7 @@ button{
         </div>
 
         <div class="tabs">
+
             <button id="loginTab" class="active">
                 Entrar
             </button>
@@ -505,9 +492,11 @@ button{
             <button id="registerTab">
                 Criar conta
             </button>
+
         </div>
 
         <div class="form-group">
+
             <label for="usernameInput">
                 Nome de usuário
             </label>
@@ -519,9 +508,11 @@ button{
                 autocomplete="username"
                 placeholder="Seu nome"
             >
+
         </div>
 
         <div class="form-group">
+
             <label for="passwordInput">
                 Senha
             </label>
@@ -532,12 +523,14 @@ button{
                 autocomplete="current-password"
                 placeholder="Sua senha"
             >
+
         </div>
 
         <div
             id="confirmGroup"
             class="form-group hidden"
         >
+
             <label for="confirmPasswordInput">
                 Confirmar senha
             </label>
@@ -548,6 +541,7 @@ button{
                 autocomplete="new-password"
                 placeholder="Digite novamente"
             >
+
         </div>
 
         <button
@@ -608,7 +602,7 @@ button{
 </section>
 
 <!-- =========================
-     INFORMAÇÕES DO MUNDO
+     MUNDO
 ========================= -->
 
 <section id="worldScreen" class="screen hidden">
@@ -723,8 +717,7 @@ button{
     </div>
 
     <div id="controlsHint">
-        A/D ou ←/→ mover • Espaço pular • Clique quebrar/colocar •
-        1-9 selecionar • ESC pausar
+        A/D ou ←/→ mover • Espaço pular • Clique quebrar/colocar • 1-9 selecionar • ESC pausar
     </div>
 
     <div id="hotbar"></div>
@@ -772,7 +765,7 @@ const SUPABASE_URL =
     "https://lvsegfkvggwlcxhaibgu.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_hBXJE72D0W6D4dF6mDhJHg_smw2yH9";
+    "sb_publishable_hBXJE72D0W6D4dF6mDhJHg_smw2yH9h";
 
 const supabaseClient =
     window.supabase.createClient(
@@ -838,7 +831,7 @@ const ctx =
 
 
 /* ============================================================
-   ESTADO DA CONTA
+   CONTA
 ============================================================ */
 
 let currentPlayer = null;
@@ -856,16 +849,11 @@ const TILE_SIZE = 32;
 
 const CHUNK_SIZE = 32;
 
-const WORLD_CHUNK_WORLD_SIZE =
-    TILE_SIZE * CHUNK_SIZE;
-
 let worldSeed = 0;
 
 let exploredChunks = {};
 
 let modifiedBlocks = {};
-
-let loadedChunkData = {};
 
 
 /* ============================================================
@@ -875,25 +863,20 @@ let loadedChunkData = {};
 const player = {
 
     x:0,
-
     y:0,
 
     width:22,
-
     height:44,
 
     vx:0,
-
     vy:0,
 
     speed:4,
-
     jump:11,
 
     onGround:false,
 
     health:100,
-
     hunger:100
 
 };
@@ -904,12 +887,11 @@ const player = {
 ============================================================ */
 
 let cameraX = 0;
-
 let cameraY = 0;
 
 
 /* ============================================================
-   TECLAS
+   CONTROLES
 ============================================================ */
 
 const keys = {};
@@ -1080,7 +1062,6 @@ const BIOMES = [
 
     {
         name:"Planície",
-        base:"#68ad47",
         surface:"grass",
         underground:"dirt",
         tree:true
@@ -1088,7 +1069,6 @@ const BIOMES = [
 
     {
         name:"Floresta",
-        base:"#3f963e",
         surface:"grass",
         underground:"dirt",
         tree:true
@@ -1096,7 +1076,6 @@ const BIOMES = [
 
     {
         name:"Deserto",
-        base:"#d6bd72",
         surface:"sand",
         underground:"sand",
         tree:false
@@ -1104,7 +1083,6 @@ const BIOMES = [
 
     {
         name:"Tundra",
-        base:"#dcebf0",
         surface:"snow",
         underground:"stone",
         tree:false
@@ -1112,7 +1090,6 @@ const BIOMES = [
 
     {
         name:"Montanhas",
-        base:"#778087",
         surface:"stone",
         underground:"stone",
         tree:false
@@ -1120,7 +1097,6 @@ const BIOMES = [
 
     {
         name:"Pântano",
-        base:"#527c4b",
         surface:"mud",
         underground:"mud",
         tree:true
@@ -1128,7 +1104,6 @@ const BIOMES = [
 
     {
         name:"Savana",
-        base:"#a5a34e",
         surface:"grass",
         underground:"dirt",
         tree:true
@@ -1136,7 +1111,6 @@ const BIOMES = [
 
     {
         name:"Taiga",
-        base:"#4c804c",
         surface:"grass",
         underground:"dirt",
         tree:true
@@ -1144,7 +1118,6 @@ const BIOMES = [
 
     {
         name:"Praia",
-        base:"#dbc77d",
         surface:"sand",
         underground:"sand",
         tree:false
@@ -1152,7 +1125,6 @@ const BIOMES = [
 
     {
         name:"Floresta Sombria",
-        base:"#305b38",
         surface:"grass",
         underground:"dirt",
         tree:true
@@ -1188,10 +1160,8 @@ function normalizeUsername(username){
 
 function usernameToEmail(username){
 
-    const normalized =
-        normalizeUsername(username);
-
-    return normalized + "@ludixs.com";
+    return normalizeUsername(username)
+        + "@ludixs.com";
 
 }
 
@@ -1209,7 +1179,11 @@ function hashString(value){
 
     let hash = 2166136261;
 
-    for(let i=0;i<value.length;i++){
+    for(
+        let i=0;
+        i<value.length;
+        i++
+    ){
 
         hash ^= value.charCodeAt(i);
 
@@ -1249,13 +1223,21 @@ function noise1D(x){
         x0 + 1;
 
     const t =
-        x - x0;
+        x-x0;
 
     const a =
-        seededRandom(x0,0,91);
+        seededRandom(
+            x0,
+            0,
+            91
+        );
 
     const b =
-        seededRandom(x1,0,91);
+        seededRandom(
+            x1,
+            0,
+            91
+        );
 
     const smooth =
         t*t*(3-2*t);
@@ -1273,40 +1255,44 @@ function noise1D(x){
 function getBiome(blockX){
 
     const n =
-        noise1D(blockX / 350);
+        noise1D(
+            blockX/350
+        );
 
     const n2 =
-        noise1D(blockX / 900 + 100);
+        noise1D(
+            blockX/900+100
+        );
 
     const value =
-        n * 0.7 +
-        n2 * 0.3;
+        n*.7+n2*.3;
 
-    if(value < 0.10)
+
+    if(value<.10)
         return BIOMES[2];
 
-    if(value < 0.20)
+    if(value<.20)
         return BIOMES[5];
 
-    if(value < 0.30)
+    if(value<.30)
         return BIOMES[8];
 
-    if(value < 0.40)
+    if(value<.40)
         return BIOMES[6];
 
-    if(value < 0.50)
+    if(value<.50)
         return BIOMES[1];
 
-    if(value < 0.60)
+    if(value<.60)
         return BIOMES[7];
 
-    if(value < 0.70)
+    if(value<.70)
         return BIOMES[9];
 
-    if(value < 0.80)
+    if(value<.80)
         return BIOMES[0];
 
-    if(value < 0.90)
+    if(value<.90)
         return BIOMES[3];
 
     return BIOMES[4];
@@ -1324,44 +1310,56 @@ function getSurfaceBlockY(blockX){
         getBiome(blockX);
 
     const wave1 =
-        Math.sin(blockX / 80) * 4;
+        Math.sin(blockX/80)*4;
 
     const wave2 =
-        Math.sin(blockX / 25) * 2;
+        Math.sin(blockX/25)*2;
 
     const noise =
-        (noise1D(blockX / 12)-0.5)*6;
+        (noise1D(blockX/12)-.5)*6;
 
     let height =
-        12 +
-        wave1 +
-        wave2 +
+        12+
+        wave1+
+        wave2+
         noise;
 
-    if(biome.name === "Montanhas"){
+
+    if(biome.name==="Montanhas"){
 
         height +=
-            8 +
-            noise1D(blockX / 30)*15;
+            8+
+            noise1D(
+                blockX/30
+            )*15;
 
     }
 
-    if(biome.name === "Deserto"){
+
+    if(biome.name==="Deserto"){
 
         height +=
-            noise1D(blockX / 40)*3;
+            noise1D(
+                blockX/40
+            )*3;
 
     }
 
-    if(biome.name === "Pântano"){
+
+    if(biome.name==="Pântano"){
 
         height =
-            14 +
-            noise1D(blockX / 35)*2;
+            14+
+            noise1D(
+                blockX/35
+            )*2;
 
     }
 
-    return Math.floor(height);
+
+    return Math.floor(
+        height
+    );
 
 }
 
@@ -1370,11 +1368,12 @@ function getSurfacePixelY(worldX){
 
     const blockX =
         Math.floor(
-            worldX / TILE_SIZE
+            worldX/TILE_SIZE
         );
 
-    return getSurfaceBlockY(blockX)
-        * TILE_SIZE;
+    return getSurfaceBlockY(
+        blockX
+    )*TILE_SIZE;
 
 }
 
@@ -1387,11 +1386,11 @@ function getChunkX(worldX){
 
     const blockX =
         Math.floor(
-            worldX / TILE_SIZE
+            worldX/TILE_SIZE
         );
 
     return Math.floor(
-        blockX / CHUNK_SIZE
+        blockX/CHUNK_SIZE
     );
 
 }
@@ -1401,38 +1400,38 @@ function getChunkY(worldY){
 
     const blockY =
         Math.floor(
-            worldY / TILE_SIZE
+            worldY/TILE_SIZE
         );
 
     return Math.floor(
-        blockY / CHUNK_SIZE
+        blockY/CHUNK_SIZE
     );
 
 }
 
 
-function getChunkKey(chunkX,chunkY){
+function getChunkKey(
+    chunkX,
+    chunkY
+){
 
     return `${chunkX},${chunkY}`;
 
 }
 
 
-function getCurrentChunkKey(){
+function getBlockChunk(
+    blockX,
+    blockY
+){
 
     return getChunkKey(
-        getChunkX(player.x),
-        getChunkY(player.y)
-    );
-
-}
-
-
-function getBlockChunk(blockX,blockY){
-
-    return getChunkKey(
-        Math.floor(blockX / CHUNK_SIZE),
-        Math.floor(blockY / CHUNK_SIZE)
+        Math.floor(
+            blockX/CHUNK_SIZE
+        ),
+        Math.floor(
+            blockY/CHUNK_SIZE
+        )
     );
 
 }
@@ -1450,33 +1449,37 @@ function hasTreeAt(blockX){
     if(!biome.tree)
         return false;
 
-    const chance =
-        seededRandom(
-            blockX,
-            getSurfaceBlockY(blockX),
-            333
-        );
-
-    return chance > 0.86;
+    return seededRandom(
+        blockX,
+        getSurfaceBlockY(blockX),
+        333
+    )>.86;
 
 }
 
 
 function getTreeHeight(blockX){
 
-    return 3 +
+    return 3+
         Math.floor(
-            seededRandom(blockX,0,444)*3
+            seededRandom(
+                blockX,
+                0,
+                444
+            )*3
         );
 
 }
 
 
 /* ============================================================
-   GERAÇÃO DE BLOCO
+   GERAÇÃO
 ============================================================ */
 
-function generateBlock(blockX,blockY){
+function generateBlock(
+    blockX,
+    blockY
+){
 
     if(
         blockX < -WORLD_LIMIT ||
@@ -1497,14 +1500,12 @@ function generateBlock(blockX,blockY){
         getSurfaceBlockY(blockX);
 
 
-    /* ÁGUA */
-
     if(
-        blockY > surface &&
-        blockY <= 13 &&
+        blockY>surface &&
+        blockY<=13 &&
         (
-            biome.name === "Pântano" ||
-            biome.name === "Praia"
+            biome.name==="Pântano" ||
+            biome.name==="Praia"
         )
     ){
 
@@ -1513,67 +1514,59 @@ function generateBlock(blockX,blockY){
     }
 
 
-    if(blockY < surface)
+    if(blockY<surface)
         return "air";
 
 
     const depth =
-        blockY - surface;
+        blockY-surface;
 
 
-    /* SUPERFÍCIE */
-
-    if(depth === 0)
+    if(depth===0)
         return biome.surface;
 
 
-    /* SUBSOLO */
-
-    if(depth <= 3)
+    if(depth<=3)
         return biome.underground;
 
 
-    /* PEDRA */
+    const oreChance =
+        seededRandom(
+            blockX,
+            blockY,
+            700
+        );
 
-    if(depth > 3){
 
-        const oreChance =
-            seededRandom(
-                blockX,
-                blockY,
-                700
-            );
+    if(
+        oreChance>.992 &&
+        depth>8
+    ){
 
-        if(
-            oreChance > 0.992 &&
-            depth > 8
-        ){
-
-            return "gold";
-
-        }
-
-        if(
-            oreChance > 0.975 &&
-            depth > 5
-        ){
-
-            return "iron";
-
-        }
-
-        if(
-            oreChance > 0.94 &&
-            depth > 4
-        ){
-
-            return "coal";
-
-        }
-
-        return "stone";
+        return "gold";
 
     }
+
+
+    if(
+        oreChance>.975 &&
+        depth>5
+    ){
+
+        return "iron";
+
+    }
+
+
+    if(
+        oreChance>.94 &&
+        depth>4
+    ){
+
+        return "coal";
+
+    }
+
 
     return "stone";
 
@@ -1581,17 +1574,23 @@ function generateBlock(blockX,blockY){
 
 
 /* ============================================================
-   ALTERAÇÕES DE BLOCOS
+   BLOCOS MODIFICADOS
 ============================================================ */
 
-function blockKey(blockX,blockY){
+function blockKey(
+    blockX,
+    blockY
+){
 
     return `${blockX},${blockY}`;
 
 }
 
 
-function getBlock(blockX,blockY){
+function getBlock(
+    blockX,
+    blockY
+){
 
     const chunk =
         getBlockChunk(
@@ -1599,19 +1598,27 @@ function getBlock(blockX,blockY){
             blockY
         );
 
+
     if(
         modifiedBlocks[chunk] &&
         Object.prototype.hasOwnProperty.call(
             modifiedBlocks[chunk],
-            blockKey(blockX,blockY)
+            blockKey(
+                blockX,
+                blockY
+            )
         )
     ){
 
         return modifiedBlocks[chunk][
-            blockKey(blockX,blockY)
+            blockKey(
+                blockX,
+                blockY
+            )
         ];
 
     }
+
 
     return generateBlock(
         blockX,
@@ -1621,7 +1628,11 @@ function getBlock(blockX,blockY){
 }
 
 
-function setBlock(blockX,blockY,type){
+function setBlock(
+    blockX,
+    blockY,
+    type
+){
 
     const chunk =
         getBlockChunk(
@@ -1629,13 +1640,21 @@ function setBlock(blockX,blockY,type){
             blockY
         );
 
+
     if(!modifiedBlocks[chunk]){
+
         modifiedBlocks[chunk] = {};
+
     }
 
+
     modifiedBlocks[chunk][
-        blockKey(blockX,blockY)
+        blockKey(
+            blockX,
+            blockY
+        )
     ] = type;
+
 
     exploredChunks[chunk] = true;
 
@@ -1646,7 +1665,10 @@ function setBlock(blockX,blockY,type){
    COLISÃO
 ============================================================ */
 
-function isSolidAt(blockX,blockY){
+function isSolidAt(
+    blockX,
+    blockY
+){
 
     const block =
         getBlock(
@@ -1654,7 +1676,7 @@ function isSolidAt(blockX,blockY){
             blockY
         );
 
-    return BLOCKS[block]?.solid === true;
+    return BLOCKS[block]?.solid===true;
 
 }
 
@@ -1663,23 +1685,23 @@ function collidesAt(x,y){
 
     const left =
         Math.floor(
-            x / TILE_SIZE
+            x/TILE_SIZE
         );
 
     const right =
         Math.floor(
-            (x + player.width - 1) /
+            (x+player.width-1)/
             TILE_SIZE
         );
 
     const top =
         Math.floor(
-            y / TILE_SIZE
+            y/TILE_SIZE
         );
 
     const bottom =
         Math.floor(
-            (y + player.height - 1) /
+            (y+player.height-1)/
             TILE_SIZE
         );
 
@@ -1725,16 +1747,15 @@ function placePlayerAtSpawn(){
     const surface =
         getSurfaceBlockY(0);
 
-    player.x =
-        0;
+    player.x=0;
 
     player.y =
-        surface * TILE_SIZE -
-        player.height -
+        surface*TILE_SIZE-
+        player.height-
         1;
 
-    player.vx = 0;
-    player.vy = 0;
+    player.vx=0;
+    player.vy=0;
 
 }
 
@@ -1749,46 +1770,46 @@ function updatePlayer(){
         return;
 
 
-    let direction = 0;
+    let direction=0;
+
 
     if(
         keys["a"] ||
         keys["arrowleft"]
     ){
 
-        direction -= 1;
+        direction--;
 
     }
+
 
     if(
         keys["d"] ||
         keys["arrowright"]
     ){
 
-        direction += 1;
+        direction++;
 
     }
 
 
     const targetSpeed =
-        direction * player.speed;
+        direction*player.speed;
 
 
     player.vx +=
         (targetSpeed-player.vx)
-        * 0.18;
+        *.18;
 
 
     if(
-        Math.abs(player.vx) < 0.02
+        Math.abs(player.vx)<.02
     ){
 
-        player.vx = 0;
+        player.vx=0;
 
     }
 
-
-    /* PULO */
 
     if(
         (
@@ -1801,24 +1822,20 @@ function updatePlayer(){
         player.vy =
             -player.jump;
 
-        player.onGround =
-            false;
+        player.onGround=false;
 
     }
 
 
-    /* GRAVIDADE */
-
-    player.vy += 0.55;
-
-    if(player.vy > 15)
-        player.vy = 15;
+    player.vy+=.55;
 
 
-    /* MOVIMENTO HORIZONTAL */
+    if(player.vy>15)
+        player.vy=15;
+
 
     let nextX =
-        player.x +
+        player.x+
         player.vx;
 
 
@@ -1829,16 +1846,14 @@ function updatePlayer(){
         )
     ){
 
-        player.x = nextX;
+        player.x=nextX;
 
     }else{
 
-        player.vx = 0;
+        player.vx=0;
 
     }
 
-
-    /* LIMITE DO MUNDO */
 
     player.x =
         clamp(
@@ -1848,10 +1863,8 @@ function updatePlayer(){
         );
 
 
-    /* MOVIMENTO VERTICAL */
-
     let nextY =
-        player.y +
+        player.y+
         player.vy;
 
 
@@ -1862,40 +1875,37 @@ function updatePlayer(){
         )
     ){
 
-        player.y =
-            nextY;
+        player.y=nextY;
 
-        player.onGround =
-            false;
+        player.onGround=false;
 
     }else{
 
-        if(player.vy > 0){
+        if(player.vy>0){
 
             player.y =
                 Math.floor(
                     (
-                        player.y +
+                        player.y+
                         player.height
-                    ) / TILE_SIZE
-                ) * TILE_SIZE -
-                player.height -
-                0.01;
+                    )/
+                    TILE_SIZE
+                )*
+                TILE_SIZE-
+                player.height-
+                .01;
 
-            player.onGround =
-                true;
+            player.onGround=true;
 
         }
 
-        player.vy = 0;
+        player.vy=0;
 
     }
 
 
-    /* FOME */
+    player.hunger -= .001;
 
-    player.hunger -=
-        0.001;
 
     player.hunger =
         clamp(
@@ -1905,12 +1915,9 @@ function updatePlayer(){
         );
 
 
-    if(
-        player.hunger <= 0
-    ){
+    if(player.hunger<=0){
 
-        player.health -=
-            0.01;
+        player.health -= .01;
 
         player.health =
             clamp(
@@ -1934,36 +1941,46 @@ function updatePlayer(){
 function markCurrentChunkExplored(){
 
     const cx =
-        getChunkX(player.x);
+        getChunkX(
+            player.x
+        );
 
     const cy =
-        getChunkY(player.y);
+        getChunkY(
+            player.y
+        );
 
-    const key =
-        getChunkKey(cx,cy);
 
-    exploredChunks[key] = true;
+    exploredChunks[
+        getChunkKey(
+            cx,
+            cy
+        )
+    ] = true;
 
 }
 
 
 /* ============================================================
-   ALCANCE DO JOGADOR
+   ALCANCE
 ============================================================ */
 
-function canReachBlock(blockX,blockY){
+function canReachBlock(
+    blockX,
+    blockY
+){
 
     const px =
-        player.x / TILE_SIZE;
+        player.x/TILE_SIZE;
 
     const py =
-        player.y / TILE_SIZE;
+        player.y/TILE_SIZE;
 
     const bx =
-        blockX + 0.5;
+        blockX+.5;
 
     const by =
-        blockY + 0.5;
+        blockY+.5;
 
     const dx =
         bx-px;
@@ -1971,15 +1988,16 @@ function canReachBlock(blockX,blockY){
     const dy =
         by-py;
 
+
     return Math.sqrt(
         dx*dx+dy*dy
-    ) <= 6;
+    )<=6;
 
 }
 
 
 /* ============================================================
-   RAYCAST SIMPLES
+   VISÃO
 ============================================================ */
 
 function hasLineOfSight(
@@ -1997,25 +2015,32 @@ function hasLineOfSight(
 
     const distance =
         Math.sqrt(
-            dx*dx+dy*dy
+            dx*dx+
+            dy*dy
         );
+
 
     const steps =
         Math.ceil(
             distance*4
         );
 
-    for(let i=1;i<steps;i++){
+
+    for(
+        let i=1;
+        i<steps;
+        i++
+    ){
 
         const t =
             i/steps;
 
         const x =
-            startX +
+            startX+
             dx*t;
 
         const y =
-            startY +
+            startY+
             dy*t;
 
         const bx =
@@ -2023,6 +2048,7 @@ function hasLineOfSight(
 
         const by =
             Math.floor(y);
+
 
         if(
             isSolidAt(
@@ -2037,33 +2063,31 @@ function hasLineOfSight(
 
     }
 
+
     return true;
 
 }
 
 
 /* ============================================================
-   MOUSE → MUNDO
+   MOUSE
 ============================================================ */
 
-function screenToBlock(mouseX,mouseY){
-
-    const worldX =
-        mouseX +
-        cameraX;
-
-    const worldY =
-        mouseY +
-        cameraY;
+function screenToBlock(
+    mouseX,
+    mouseY
+){
 
     return {
 
         x:Math.floor(
-            worldX/TILE_SIZE
+            (mouseX+cameraX)/
+            TILE_SIZE
         ),
 
         y:Math.floor(
-            worldY/TILE_SIZE
+            (mouseY+cameraY)/
+            TILE_SIZE
         )
 
     };
@@ -2075,7 +2099,9 @@ function screenToBlock(mouseX,mouseY){
    QUEBRAR / COLOCAR
 ============================================================ */
 
-function handleCanvasClick(event){
+function handleCanvasClick(
+    event
+){
 
     if(gamePaused)
         return;
@@ -2084,23 +2110,25 @@ function handleCanvasClick(event){
     const rect =
         canvas.getBoundingClientRect();
 
+
     const mouseX =
         (
-            event.clientX -
+            event.clientX-
             rect.left
-        ) *
+        )*
         (
-            canvas.width /
+            canvas.width/
             rect.width
         );
 
+
     const mouseY =
         (
-            event.clientY -
+            event.clientY-
             rect.top
-        ) *
+        )*
         (
-            canvas.height /
+            canvas.height/
             rect.height
         );
 
@@ -2124,30 +2152,6 @@ function handleCanvasClick(event){
     }
 
 
-    const playerBlockX =
-        player.x/TILE_SIZE;
-
-    const playerBlockY =
-        (
-            player.y +
-            player.height/2
-        )/TILE_SIZE;
-
-
-    if(
-        !hasLineOfSight(
-            playerBlockX,
-            playerBlockY,
-            target.x+0.5,
-            target.y+0.5
-        )
-    ){
-
-        return;
-
-    }
-
-
     const current =
         getBlock(
             target.x,
@@ -2155,10 +2159,10 @@ function handleCanvasClick(event){
         );
 
 
-    if(current !== "air" &&
-       current !== "water"){
-
-        /* QUEBRAR */
+    if(
+        current!=="air" &&
+        current!=="water"
+    ){
 
         setBlock(
             target.x,
@@ -2166,27 +2170,24 @@ function handleCanvasClick(event){
             "air"
         );
 
+
         addItem(
             current,
             1
         );
 
+
     }else{
 
-        /* COLOCAR */
-
         const item =
-            hotbar[selectedSlot];
+            hotbar[
+                selectedSlot
+            ];
 
-        if(!item || item.count <= 0)
-            return;
-
-        const block =
-            item.id;
 
         if(
-            !BLOCKS[block] ||
-            !BLOCKS[block].solid
+            !item ||
+            item.count<=0
         ){
 
             return;
@@ -2194,7 +2195,15 @@ function handleCanvasClick(event){
         }
 
 
-        /* NÃO COLOCAR DENTRO DO JOGADOR */
+        if(
+            !BLOCKS[item.id] ||
+            !BLOCKS[item.id].solid
+        ){
+
+            return;
+
+        }
+
 
         const blockPX =
             target.x*TILE_SIZE;
@@ -2205,10 +2214,10 @@ function handleCanvasClick(event){
 
         const overlaps =
             !(
-                blockPX+TILE_SIZE <= player.x ||
-                blockPX >= player.x+player.width ||
-                blockPY+TILE_SIZE <= player.y ||
-                blockPY >= player.y+player.height
+                blockPX+TILE_SIZE<=player.x ||
+                blockPX>=player.x+player.width ||
+                blockPY+TILE_SIZE<=player.y ||
+                blockPY>=player.y+player.height
             );
 
 
@@ -2219,8 +2228,9 @@ function handleCanvasClick(event){
         setBlock(
             target.x,
             target.y,
-            block
+            item.id
         );
+
 
         item.count--;
 
@@ -2235,12 +2245,15 @@ function handleCanvasClick(event){
    INVENTÁRIO
 ============================================================ */
 
-function addItem(id,count){
+function addItem(
+    id,
+    count
+){
 
     let slot =
         hotbar.find(
             item =>
-                item.id === id
+                item.id===id
         );
 
 
@@ -2249,7 +2262,7 @@ function addItem(id,count){
         slot =
             hotbar.find(
                 item =>
-                    item.count <= 0
+                    item.count<=0
             );
 
     }
@@ -2257,7 +2270,7 @@ function addItem(id,count){
 
     if(slot){
 
-        slot.count += count;
+        slot.count+=count;
 
     }
 
@@ -2269,12 +2282,13 @@ function addItem(id,count){
 
 function updateHotbar(){
 
-    const hotbarElement =
+    const element =
         document.getElementById(
             "hotbar"
         );
 
-    hotbarElement.innerHTML = "";
+
+    element.innerHTML="";
 
 
     hotbar.forEach(
@@ -2285,16 +2299,17 @@ function updateHotbar(){
                     "div"
                 );
 
+
             slot.className =
-                "hot-slot" +
+                "hot-slot"+
                 (
-                    index === selectedSlot
+                    index===selectedSlot
                     ? " selected"
                     : ""
                 );
 
 
-            slot.innerHTML = `
+            slot.innerHTML=`
 
                 <span class="slot-number">
                     ${index+1}
@@ -2315,8 +2330,7 @@ function updateHotbar(){
                 "click",
                 ()=>{
 
-                    selectedSlot =
-                        index;
+                    selectedSlot=index;
 
                     updateHotbar();
 
@@ -2324,7 +2338,7 @@ function updateHotbar(){
             );
 
 
-            hotbarElement.appendChild(
+            element.appendChild(
                 slot
             );
 
@@ -2335,7 +2349,7 @@ function updateHotbar(){
 
 
 /* ============================================================
-   RENDER
+   DESENHO
 ============================================================ */
 
 function resizeCanvas(){
@@ -2354,48 +2368,46 @@ function drawSky(){
     const now =
         performance.now();
 
+
     const dayDuration =
         15*60*1000;
 
+
     const cycle =
         (
-            now %
-            (
-                dayDuration*2
-            )
-        ) /
-        (
-            dayDuration*2
-        );
+            now%
+            (dayDuration*2)
+        )/
+        (dayDuration*2);
 
 
-    let brightness =
+    const brightness =
         Math.sin(
             cycle*Math.PI*2
-        )*0.5+0.5;
+        )*.5+.5;
 
 
     const r =
         Math.floor(
-            20 +
-            brightness*90
+            20+brightness*90
         );
+
 
     const g =
         Math.floor(
-            30 +
-            brightness*130
+            30+brightness*130
         );
+
 
     const b =
         Math.floor(
-            50 +
-            brightness*170
+            50+brightness*170
         );
 
 
     ctx.fillStyle =
         `rgb(${r},${g},${b})`;
+
 
     ctx.fillRect(
         0,
@@ -2412,13 +2424,12 @@ function drawClouds(){
     const time =
         performance.now()/10000;
 
+
     ctx.save();
 
-    ctx.globalAlpha =
-        0.35;
+    ctx.globalAlpha=.35;
 
-    ctx.fillStyle =
-        "#ffffff";
+    ctx.fillStyle="#fff";
 
 
     for(
@@ -2429,23 +2440,21 @@ function drawClouds(){
 
         const x =
             (
-                i*420 -
-                (
-                    time*25
-                )
-            ) %
+                i*420-
+                time*25
+            )%
             (
                 canvas.width+500
             );
 
+
         const y =
-            80 +
-            (
-                i%4
-            )*70;
+            80+
+            (i%4)*70;
 
 
         ctx.beginPath();
+
 
         ctx.arc(
             x,
@@ -2455,6 +2464,7 @@ function drawClouds(){
             Math.PI*2
         );
 
+
         ctx.arc(
             x+35,
             y-12,
@@ -2463,6 +2473,7 @@ function drawClouds(){
             Math.PI*2
         );
 
+
         ctx.arc(
             x+75,
             y,
@@ -2470,6 +2481,7 @@ function drawClouds(){
             0,
             Math.PI*2
         );
+
 
         ctx.fill();
 
@@ -2486,28 +2498,33 @@ function drawWorld(){
     const startX =
         Math.floor(
             cameraX/TILE_SIZE
-        ) - 2;
+        )-2;
+
 
     const endX =
         Math.ceil(
             (
                 cameraX+
                 canvas.width
-            )/TILE_SIZE
-        ) + 2;
+            )/
+            TILE_SIZE
+        )+2;
+
 
     const startY =
         Math.floor(
             cameraY/TILE_SIZE
-        ) - 2;
+        )-2;
+
 
     const endY =
         Math.ceil(
             (
                 cameraY+
                 canvas.height
-            )/TILE_SIZE
-        ) + 2;
+            )/
+            TILE_SIZE
+        )+2;
 
 
     for(
@@ -2529,23 +2546,25 @@ function drawWorld(){
                 );
 
 
-            if(block === "air")
+            if(block==="air")
                 continue;
 
 
             const px =
-                x*TILE_SIZE -
+                x*TILE_SIZE-
                 cameraX;
 
+
             const py =
-                y*TILE_SIZE -
+                y*TILE_SIZE-
                 cameraY;
 
 
-            if(block === "water"){
+            if(block==="water"){
 
                 ctx.fillStyle =
                     "rgba(45,140,205,.72)";
+
 
                 ctx.fillRect(
                     px,
@@ -2553,6 +2572,7 @@ function drawWorld(){
                     TILE_SIZE,
                     TILE_SIZE
                 );
+
 
                 continue;
 
@@ -2562,8 +2582,10 @@ function drawWorld(){
             const info =
                 BLOCKS[block];
 
+
             ctx.fillStyle =
                 info.color;
+
 
             ctx.fillRect(
                 px,
@@ -2573,12 +2595,11 @@ function drawWorld(){
             );
 
 
-            /* TEXTURA */
-
-            if(block === "grass"){
+            if(block==="grass"){
 
                 ctx.fillStyle =
                     "#6ec553";
+
 
                 ctx.fillRect(
                     px,
@@ -2590,10 +2611,11 @@ function drawWorld(){
             }
 
 
-            if(block === "stone"){
+            if(block==="stone"){
 
                 ctx.fillStyle =
                     "rgba(255,255,255,.08)";
+
 
                 ctx.fillRect(
                     px+5,
@@ -2601,6 +2623,7 @@ function drawWorld(){
                     5,
                     4
                 );
+
 
                 ctx.fillRect(
                     px+20,
@@ -2612,22 +2635,26 @@ function drawWorld(){
             }
 
 
-            if(block === "wood"){
+            if(block==="wood"){
 
                 ctx.strokeStyle =
                     "rgba(50,25,10,.4)";
 
+
                 ctx.beginPath();
+
 
                 ctx.moveTo(
                     px+8,
                     py
                 );
 
+
                 ctx.lineTo(
                     px+8,
                     py+TILE_SIZE
                 );
+
 
                 ctx.stroke();
 
@@ -2653,23 +2680,23 @@ function drawWorld(){
         const surface =
             getSurfaceBlockY(x);
 
+
         const height =
             getTreeHeight(x);
 
 
         const baseX =
-            x*TILE_SIZE -
+            x*TILE_SIZE-
             cameraX;
 
+
         const baseY =
-            surface*TILE_SIZE -
+            surface*TILE_SIZE-
             cameraY;
 
 
-        /* TRONCO */
+        ctx.fillStyle="#704625";
 
-        ctx.fillStyle =
-            "#704625";
 
         ctx.fillRect(
             baseX+11,
@@ -2679,10 +2706,7 @@ function drawWorld(){
         );
 
 
-        /* COPA */
-
-        ctx.fillStyle =
-            "#2e7938";
+        ctx.fillStyle="#2e7938";
 
 
         for(
@@ -2692,11 +2716,8 @@ function drawWorld(){
         ){
 
             ctx.fillRect(
-                baseX +
-                i*14,
-                baseY -
-                height*TILE_SIZE -
-                20,
+                baseX+i*14,
+                baseY-height*TILE_SIZE-20,
                 35,
                 30
             );
@@ -2715,18 +2736,15 @@ function drawWorld(){
 function drawPlayer(){
 
     const px =
-        player.x -
-        cameraX;
+        player.x-cameraX;
+
 
     const py =
-        player.y -
-        cameraY;
+        player.y-cameraY;
 
 
-    /* CORPO */
+    ctx.fillStyle="#3c82f6";
 
-    ctx.fillStyle =
-        "#3c82f6";
 
     ctx.fillRect(
         px,
@@ -2736,10 +2754,8 @@ function drawPlayer(){
     );
 
 
-    /* CABEÇA */
+    ctx.fillStyle="#f0c29b";
 
-    ctx.fillStyle =
-        "#f0c29b";
 
     ctx.fillRect(
         px+3,
@@ -2749,10 +2765,8 @@ function drawPlayer(){
     );
 
 
-    /* OLHO */
+    ctx.fillStyle="#111";
 
-    ctx.fillStyle =
-        "#111";
 
     ctx.fillRect(
         px+7,
@@ -2760,6 +2774,7 @@ function drawPlayer(){
         3,
         3
     );
+
 
     ctx.fillRect(
         px+14,
@@ -2780,13 +2795,15 @@ function updateHUD(){
     document.getElementById(
         "hudUsername"
     ).textContent =
-        currentUsername || "Jogador";
+        currentUsername ||
+        "Jogador";
 
 
     const health =
         Math.round(
             player.health
         );
+
 
     const hunger =
         Math.round(
@@ -2858,13 +2875,13 @@ function gameLoop(){
 
 
         cameraX =
-            player.x -
+            player.x-
             canvas.width/2;
 
 
         cameraY =
-            player.y -
-            canvas.height*0.55;
+            player.y-
+            canvas.height*.55;
 
 
         drawSky();
@@ -2888,7 +2905,7 @@ function gameLoop(){
 
 
 /* ============================================================
-   SALVAMENTO DO INVENTÁRIO
+   INVENTÁRIO → SUPABASE
 ============================================================ */
 
 async function savePlayerInventory(){
@@ -2899,16 +2916,21 @@ async function savePlayerInventory(){
 
     const inventoryData =
         hotbar.map(
-            item => ({
+            item=>({
+
                 id:item.id,
+
                 name:item.name,
+
                 icon:item.icon,
+
                 count:Math.max(
                     0,
                     Math.floor(
                         Number(item.count)||0
                     )
                 )
+
             })
         );
 
@@ -2920,6 +2942,7 @@ async function savePlayerInventory(){
             .from("player_inventory")
             .upsert(
                 {
+
                     user_id:
                         currentPlayer.id,
 
@@ -2928,6 +2951,7 @@ async function savePlayerInventory(){
 
                     updated_at:
                         new Date().toISOString()
+
                 },
                 {
                     onConflict:"user_id"
@@ -2953,7 +2977,7 @@ async function savePlayerInventory(){
 
 
 /* ============================================================
-   SALVAMENTO DAS REGIÕES
+   CHUNKS → SUPABASE
 ============================================================ */
 
 async function saveExploredChunks(){
@@ -2968,22 +2992,24 @@ async function saveExploredChunks(){
         );
 
 
-    if(keys.length === 0)
+    if(keys.length===0)
         return true;
 
 
     const batch =
         keys.map(
-            key => {
+            key=>{
 
                 const parts =
                     key.split(",");
+
 
                 const chunkX =
                     parseInt(
                         parts[0],
                         10
                     );
+
 
                 const chunkY =
                     parseInt(
@@ -3003,16 +3029,16 @@ async function saveExploredChunks(){
                     chunk_y:
                         chunkY,
 
-                    explored:
-                        true,
-
                     data:{
                         seed:
                             worldSeed,
 
                         modifiedBlocks:
-                            modifiedBlocks[key] || {}
+                            modifiedBlocks[key]||
+                            {}
                     },
+
+                    explored:true,
 
                     updated_at:
                         new Date().toISOString()
@@ -3023,10 +3049,7 @@ async function saveExploredChunks(){
         );
 
 
-    /* Evita mandar milhares de regiões
-       de uma vez */
-
-    const batchSize = 50;
+    const batchSize=50;
 
 
     for(
@@ -3092,8 +3115,6 @@ async function savePlayerWorld(){
 
     try{
 
-        /* Garante que a sessão ainda existe */
-
         const {
             data:sessionData,
             error:sessionError
@@ -3113,17 +3134,16 @@ async function savePlayerWorld(){
                 sessionError
             );
 
+
             setSaveStatus(
                 "Sessão expirada"
             );
+
 
             return false;
 
         }
 
-
-        /* IMPORTANTE:
-           health e hunger são INTEGER no banco */
 
         const savedHealth =
             Math.max(
@@ -3133,7 +3153,7 @@ async function savePlayerWorld(){
                     Math.round(
                         Number(
                             player.health
-                        ) || 0
+                        )||0
                     )
                 )
             );
@@ -3147,22 +3167,18 @@ async function savePlayerWorld(){
                     Math.round(
                         Number(
                             player.hunger
-                        ) || 0
+                        )||0
                     )
                 )
             );
 
 
         const savedX =
-            Number(
-                player.x
-            ) || 0;
+            Number(player.x)||0;
 
 
         const savedY =
-            Number(
-                player.y
-            ) || 0;
+            Number(player.y)||0;
 
 
         const {
@@ -3201,9 +3217,11 @@ async function savePlayerWorld(){
                 error
             );
 
+
             setSaveStatus(
                 "Erro ao salvar mundo"
             );
+
 
             return false;
 
@@ -3254,9 +3272,11 @@ async function savePlayerWorld(){
             error
         );
 
+
         setSaveStatus(
             "Erro ao salvar"
         );
+
 
         return false;
 
@@ -3266,7 +3286,7 @@ async function savePlayerWorld(){
 
 
 /* ============================================================
-   STATUS DE SALVAMENTO
+   STATUS
 ============================================================ */
 
 function setSaveStatus(text){
@@ -3307,17 +3327,13 @@ async function createPlayerWorld(
                 world_size:
                     WORLD_LIMIT,
 
-                player_x:
-                    0,
+                player_x:0,
 
-                player_y:
-                    0,
+                player_y:0,
 
-                health:
-                    100,
+                health:100,
 
-                hunger:
-                    100
+                hunger:100
 
             });
 
@@ -3345,7 +3361,7 @@ async function createPlayerWorld(
                     userId,
 
                 inventory:
-                    hotbar,
+                    hotbar
 
             });
 
@@ -3403,9 +3419,11 @@ async function loadPlayerWorld(){
             worldError
         );
 
+
         setSaveStatus(
             "Erro ao carregar"
         );
+
 
         return false;
 
@@ -3421,15 +3439,19 @@ async function loadPlayerWorld(){
                     currentPlayer.id
                 );
 
+
             placePlayerAtSpawn();
 
-            exploredChunks = {};
+            exploredChunks={};
 
-            modifiedBlocks = {};
+            modifiedBlocks={};
+
 
             markCurrentChunkExplored();
 
+
             await savePlayerWorld();
+
 
             return true;
 
@@ -3440,9 +3462,11 @@ async function loadPlayerWorld(){
                 error
             );
 
+
             setSaveStatus(
                 "Erro ao criar mundo"
             );
+
 
             return false;
 
@@ -3460,20 +3484,20 @@ async function loadPlayerWorld(){
     player.x =
         Number(
             world.player_x
-        ) || 0;
+        )||0;
 
 
     player.y =
         Number(
             world.player_y
-        ) || 0;
+        )||0;
 
 
     player.health =
         clamp(
             Number(
                 world.health
-            ) || 100,
+            )||100,
             0,
             100
         );
@@ -3483,13 +3507,11 @@ async function loadPlayerWorld(){
         clamp(
             Number(
                 world.hunger
-            ) || 100,
+            )||100,
             0,
             100
         );
 
-
-    /* Inventário */
 
     const {
         data:inventoryData,
@@ -3530,7 +3552,7 @@ async function loadPlayerWorld(){
                         hotbar[index].count =
                             Number(
                                 saved.count
-                            ) || 0;
+                            )||0;
 
                     }
 
@@ -3540,11 +3562,9 @@ async function loadPlayerWorld(){
     }
 
 
-    /* Regiões */
+    exploredChunks={};
 
-    exploredChunks = {};
-
-    modifiedBlocks = {};
+    modifiedBlocks={};
 
 
     const {
@@ -3583,8 +3603,7 @@ async function loadPlayerWorld(){
 
                 if(chunk.explored){
 
-                    exploredChunks[key] =
-                        true;
+                    exploredChunks[key]=true;
 
                 }
 
@@ -3605,8 +3624,6 @@ async function loadPlayerWorld(){
     }
 
 
-    /* Segurança contra posição inválida */
-
     if(
         !Number.isFinite(player.x) ||
         !Number.isFinite(player.y)
@@ -3621,6 +3638,7 @@ async function loadPlayerWorld(){
 
     updateHotbar();
 
+
     setSaveStatus(
         "Mundo carregado ✓"
     );
@@ -3632,7 +3650,7 @@ async function loadPlayerWorld(){
 
 
 /* ============================================================
-   ENTRAR NO JOGO
+   INICIAR JOGO
 ============================================================ */
 
 async function startGame(){
@@ -3641,14 +3659,15 @@ async function startGame(){
         "hidden"
     );
 
+
     gameScreen.classList.remove(
         "hidden"
     );
 
 
-    gamePaused = false;
+    gamePaused=false;
 
-    gameRunning = true;
+    gameRunning=true;
 
 
     pauseOverlay.classList.add(
@@ -3673,8 +3692,6 @@ async function startGame(){
     }
 
 
-    /* Corrige jogador que nasceu dentro do chão */
-
     if(
         collidesAt(
             player.x,
@@ -3685,11 +3702,6 @@ async function startGame(){
         placePlayerAtSpawn();
 
     }
-
-
-    requestAnimationFrame(
-        gameLoop
-    );
 
 }
 
@@ -3731,7 +3743,7 @@ function togglePause(){
 
 async function returnToMenu(){
 
-    gamePaused = true;
+    gamePaused=true;
 
     pauseOverlay.classList.add(
         "hidden"
@@ -3741,11 +3753,13 @@ async function returnToMenu(){
     await savePlayerWorld();
 
 
-    gameRunning = false;
+    gameRunning=false;
+
 
     gameScreen.classList.add(
         "hidden"
     );
+
 
     menuScreen.classList.remove(
         "hidden"
@@ -3758,7 +3772,8 @@ async function returnToMenu(){
    AUTOSAVE
 ============================================================ */
 
-let autosaveTimer = null;
+let autosaveTimer=null;
+
 
 function startAutosave(){
 
@@ -3793,20 +3808,17 @@ function startAutosave(){
 
 
 /* ============================================================
-   CONTA — MODO
+   MODO CONTA
 ============================================================ */
 
 function setAccountMode(mode){
 
-    accountMode =
-        mode;
+    accountMode=mode;
+
+    accountMessage.textContent="";
 
 
-    accountMessage.textContent =
-        "";
-
-
-    if(mode === "login"){
+    if(mode==="login"){
 
         loginTab.classList.add(
             "active"
@@ -3822,9 +3834,6 @@ function setAccountMode(mode){
 
         accountAction.textContent =
             "Entrar";
-
-        passwordInput.autocomplete =
-            "current-password";
 
     }else{
 
@@ -3843,9 +3852,6 @@ function setAccountMode(mode){
         accountAction.textContent =
             "Criar conta";
 
-        passwordInput.autocomplete =
-            "new-password";
-
     }
 
 }
@@ -3862,6 +3868,7 @@ async function login(){
             usernameInput.value
         );
 
+
     const password =
         passwordInput.value;
 
@@ -3876,9 +3883,7 @@ async function login(){
     }
 
 
-    if(
-        password.length < 6
-    ){
+    if(password.length<6){
 
         accountMessage.textContent =
             "A senha precisa ter pelo menos 6 caracteres.";
@@ -3919,6 +3924,7 @@ async function login(){
             error
         );
 
+
         accountMessage.textContent =
             error.message ||
             "Não foi possível entrar.";
@@ -3930,6 +3936,7 @@ async function login(){
 
     currentPlayer =
         data.user;
+
 
     currentUsername =
         username;
@@ -3951,16 +3958,16 @@ async function register(){
             usernameInput.value
         );
 
+
     const password =
         passwordInput.value;
+
 
     const confirm =
         confirmPasswordInput.value;
 
 
-    if(
-        username.length < 3
-    ){
+    if(username.length<3){
 
         accountMessage.textContent =
             "O nome precisa ter pelo menos 3 caracteres.";
@@ -3970,9 +3977,7 @@ async function register(){
     }
 
 
-    if(
-        password.length < 6
-    ){
+    if(password.length<6){
 
         accountMessage.textContent =
             "A senha precisa ter pelo menos 6 caracteres.";
@@ -3982,9 +3987,7 @@ async function register(){
     }
 
 
-    if(
-        password !== confirm
-    ){
+    if(password!==confirm){
 
         accountMessage.textContent =
             "As senhas não são iguais.";
@@ -4017,8 +4020,7 @@ async function register(){
 
                 options:{
                     data:{
-                        username:
-                            username
+                        username
                     }
                 }
 
@@ -4031,6 +4033,7 @@ async function register(){
             "ERRO CADASTRO:",
             error
         );
+
 
         accountMessage.textContent =
             error.message ||
@@ -4054,6 +4057,7 @@ async function register(){
     currentPlayer =
         data.user;
 
+
     currentUsername =
         username;
 
@@ -4069,18 +4073,17 @@ async function register(){
 
 async function finishLogin(){
 
-    accountMessage.textContent =
-        "";
+    accountMessage.textContent="";
 
 
     menuUser.textContent =
-        "👤 " +
-        currentUsername;
+        "👤 "+currentUsername;
 
 
     accountScreen.classList.add(
         "hidden"
     );
+
 
     menuScreen.classList.remove(
         "hidden"
@@ -4088,6 +4091,7 @@ async function finishLogin(){
 
 
     await loadPlayerWorld();
+
 
     startAutosave();
 
@@ -4110,9 +4114,9 @@ async function logout(){
     }
 
 
-    gameRunning = false;
+    gameRunning=false;
 
-    gamePaused = false;
+    gamePaused=false;
 
 
     await supabaseClient
@@ -4120,48 +4124,50 @@ async function logout(){
         .signOut();
 
 
-    currentPlayer = null;
+    currentPlayer=null;
 
-    currentUsername = "";
+    currentUsername="";
+
 
     accountScreen.classList.remove(
         "hidden"
     );
 
+
     menuScreen.classList.add(
         "hidden"
     );
+
 
     worldScreen.classList.add(
         "hidden"
     );
 
+
     gameScreen.classList.add(
         "hidden"
     );
 
-    usernameInput.value = "";
 
-    passwordInput.value = "";
+    usernameInput.value="";
 
-    confirmPasswordInput.value = "";
+    passwordInput.value="";
 
-    accountMessage.textContent =
-        "";
+    confirmPasswordInput.value="";
+
+    accountMessage.textContent="";
 
 }
 
 
 /* ============================================================
-   EVENTOS DE CONTA
+   EVENTOS
 ============================================================ */
 
 loginTab.addEventListener(
     "click",
     ()=>{
-        setAccountMode(
-            "login"
-        );
+        setAccountMode("login");
     }
 );
 
@@ -4169,9 +4175,7 @@ loginTab.addEventListener(
 registerTab.addEventListener(
     "click",
     ()=>{
-        setAccountMode(
-            "register"
-        );
+        setAccountMode("register");
     }
 );
 
@@ -4180,9 +4184,7 @@ accountAction.addEventListener(
     "click",
     ()=>{
 
-        if(
-            accountMode === "login"
-        ){
+        if(accountMode==="login"){
 
             login();
 
@@ -4200,9 +4202,7 @@ passwordInput.addEventListener(
     "keydown",
     event=>{
 
-        if(
-            event.key === "Enter"
-        ){
+        if(event.key==="Enter"){
 
             accountAction.click();
 
@@ -4211,10 +4211,6 @@ passwordInput.addEventListener(
     }
 );
 
-
-/* ============================================================
-   MENU
-============================================================ */
 
 document.getElementById(
     "playButton"
@@ -4274,7 +4270,7 @@ document.getElementById(
     "worldPlayButton"
 ).addEventListener(
     "click",
-    async ()=>{
+    async()=>{
 
         await startGame();
 
@@ -4290,10 +4286,6 @@ document.getElementById(
 );
 
 
-/* ============================================================
-   PAUSA
-============================================================ */
-
 document.getElementById(
     "resumeButton"
 ).addEventListener(
@@ -4308,7 +4300,7 @@ document.getElementById(
     "savePauseButton"
 ).addEventListener(
     "click",
-    async ()=>{
+    async()=>{
 
         await savePlayerWorld();
 
@@ -4351,13 +4343,11 @@ window.addEventListener(
         }
 
 
-        keys[key] = true;
+        keys[key]=true;
 
-
-        /* ESC */
 
         if(
-            key === "escape" &&
+            key==="escape" &&
             gameRunning
         ){
 
@@ -4368,11 +4358,9 @@ window.addEventListener(
         }
 
 
-        /* SLOTS */
-
         if(
-            key >= "1" &&
-            key <= "9"
+            key>="1" &&
+            key<="9"
         ){
 
             selectedSlot =
@@ -4390,10 +4378,9 @@ window.addEventListener(
     "keyup",
     event=>{
 
-        const key =
-            event.key.toLowerCase();
-
-        keys[key] = false;
+        keys[
+            event.key.toLowerCase()
+        ]=false;
 
     }
 );
@@ -4420,34 +4407,6 @@ window.addEventListener(
 
 
 /* ============================================================
-   SALVAR ANTES DE SAIR
-============================================================ */
-
-window.addEventListener(
-    "beforeunload",
-    ()=>{
-        /*
-         * O navegador pode encerrar o JavaScript
-         * antes de uma Promise terminar.
-         *
-         * O autosave de 15 segundos é a proteção principal.
-         */
-        if(
-            currentPlayer &&
-            gameRunning
-        ){
-
-            setSaveStatus(
-                "Salve antes de fechar"
-            );
-
-        }
-
-    }
-);
-
-
-/* ============================================================
    VISIBILIDADE
 ============================================================ */
 
@@ -4456,7 +4415,7 @@ document.addEventListener(
     ()=>{
 
         if(
-            document.visibilityState === "hidden" &&
+            document.visibilityState==="hidden" &&
             currentPlayer &&
             gameRunning
         ){
@@ -4479,9 +4438,7 @@ async function initialize(){
 
     updateHotbar();
 
-    setAccountMode(
-        "login"
-    );
+    setAccountMode("login");
 
 
     try{
@@ -4541,6 +4498,7 @@ async function initialize(){
             "ERRO NA INICIALIZAÇÃO:",
             error
         );
+
 
         accountScreen.classList.remove(
             "hidden"
