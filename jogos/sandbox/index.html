@@ -1,313 +1,368 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Jogo de sobrevivência e exploração do Ludix">
-<title>Ludix — Mundo de Sobrevivência</title>
+
+<title>Ludix - Sandbox</title>
+
+<meta name="description" content="Ludix Sandbox - Mundo de sobrevivência">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-html,
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #101418;
-    color: white;
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#10151b;
+    color:white;
 }
 
-button,
-input {
-    font: inherit;
+button,input{
+    font-family:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-#app {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-/* =========================
-   TELAS
-========================= */
-
-.screen {
-    position: absolute;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.screen.active {
-    display: flex;
+.hidden{
+    display:none !important;
 }
 
 /* =========================
    TELA DE CONTA
 ========================= */
 
-#accountScreen {
+#accountScreen{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     background:
-        radial-gradient(circle at center, rgba(70, 110, 70, 0.25), transparent 45%),
-        linear-gradient(#101820, #17251d);
+        radial-gradient(circle at top,#1f4055,#10151b 60%);
 }
 
-.account-box {
-    width: min(430px, calc(100% - 30px));
-    padding: 30px;
-    border: 1px solid #405348;
-    border-radius: 18px;
-    background: rgba(20, 27, 23, 0.96);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+.accountBox{
+    width:min(420px,92%);
+    background:rgba(20,28,35,.97);
+    border:1px solid #40515e;
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
 }
 
-.logo {
-    text-align: center;
-    font-size: 42px;
-    font-weight: bold;
-    margin-bottom: 8px;
+.logo{
+    text-align:center;
+    font-size:36px;
+    font-weight:bold;
+    margin-bottom:8px;
 }
 
-.subtitle {
-    text-align: center;
-    color: #aebbb1;
-    margin-bottom: 25px;
+.logo span{
+    color:#55cfff;
 }
 
-.account-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
+.subtitle{
+    text-align:center;
+    color:#aebbc4;
+    margin-bottom:25px;
 }
 
-.account-tabs button {
-    flex: 1;
-    padding: 12px;
-    border: 0;
-    border-radius: 9px;
-    background: #27332b;
-    color: white;
+.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
 }
 
-.account-tabs button.active {
-    background: #4f8f52;
+.tab{
+    flex:1;
+    border:0;
+    border-radius:9px;
+    padding:12px;
+    background:#202b34;
+    color:#aaa;
+    font-weight:bold;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.tab.active{
+    background:#2479a8;
+    color:white;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 7px;
-    color: #d7e0d9;
+.form{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
 }
 
-.form-group input {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #46554a;
-    border-radius: 9px;
-    outline: none;
-    background: #111713;
-    color: white;
+.form label{
+    font-size:14px;
+    color:#cbd5db;
 }
 
-.form-group input:focus {
-    border-color: #6caf70;
+.form input{
+    width:100%;
+    padding:13px;
+    border-radius:9px;
+    border:1px solid #40515e;
+    background:#111820;
+    color:white;
+    outline:none;
 }
 
-.main-button {
-    width: 100%;
-    padding: 14px;
-    border: 0;
-    border-radius: 10px;
-    background: #5ba85f;
-    color: white;
-    font-weight: bold;
-    margin-top: 5px;
+.form input:focus{
+    border-color:#42b9ef;
 }
 
-.main-button:hover {
-    background: #6abb6f;
+.mainButton{
+    border:0;
+    border-radius:10px;
+    padding:14px;
+    background:#29a6e0;
+    color:white;
+    font-weight:bold;
+    font-size:16px;
+    margin-top:8px;
 }
 
-.account-message {
-    min-height: 22px;
-    margin-top: 14px;
-    text-align: center;
-    color: #cbd7ce;
-    font-size: 14px;
+.mainButton:hover{
+    background:#36b5ed;
+}
+
+.message{
+    min-height:22px;
+    text-align:center;
+    margin-top:12px;
+    color:#ffd166;
+    font-size:14px;
 }
 
 /* =========================
-   MENU PRINCIPAL
+   MENU
 ========================= */
 
-#menuScreen {
+#menuScreen{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
     background:
-        linear-gradient(rgba(10, 16, 12, 0.5), rgba(10, 16, 12, 0.9)),
-        radial-gradient(circle at 50% 20%, #456b46, #101510 65%);
+        linear-gradient(#162d38,#10151b);
 }
 
-.menu-box {
-    width: min(650px, calc(100% - 30px));
-    text-align: center;
+.menuBox{
+    width:min(600px,92%);
+    text-align:center;
+    background:rgba(19,27,34,.96);
+    border:1px solid #3c4d58;
+    border-radius:18px;
+    padding:35px;
 }
 
-.menu-title {
-    font-size: clamp(42px, 8vw, 82px);
-    margin-bottom: 5px;
+.menuBox h1{
+    font-size:42px;
+    margin-bottom:10px;
 }
 
-.menu-subtitle {
-    color: #b8c5ba;
-    margin-bottom: 35px;
+.menuBox p{
+    color:#aebbc4;
+    margin-bottom:25px;
 }
 
-.menu-buttons {
-    display: grid;
-    gap: 12px;
-    width: min(360px, 100%);
-    margin: auto;
+.menuButton{
+    width:100%;
+    border:0;
+    border-radius:10px;
+    padding:15px;
+    margin-top:10px;
+    font-size:17px;
+    font-weight:bold;
+    background:#238bc0;
+    color:white;
 }
 
-.menu-buttons button {
-    padding: 15px;
-    border: 0;
-    border-radius: 10px;
-    background: rgba(39, 53, 43, 0.95);
-    color: white;
-    font-size: 17px;
+.menuButton:hover{
+    background:#2ba1dc;
 }
 
-.menu-buttons button:hover {
-    background: #4f8f52;
+.logoutButton{
+    background:#5b3030;
+}
+
+.logoutButton:hover{
+    background:#793d3d;
 }
 
 /* =========================
-   CRIAÇÃO DO MUNDO
+   INFO DO MUNDO
 ========================= */
 
-#worldScreen {
-    background: #101611;
+#worldScreen{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#101820;
 }
 
-.world-box {
-    width: min(500px, calc(100% - 30px));
-    padding: 30px;
-    background: #1a231d;
-    border: 1px solid #435347;
-    border-radius: 16px;
+.worldBox{
+    width:min(650px,94%);
+    background:#19232b;
+    border:1px solid #42535e;
+    border-radius:18px;
+    padding:30px;
 }
 
-.world-box h2 {
-    margin-bottom: 8px;
+.worldBox h2{
+    margin-bottom:20px;
 }
 
-.world-box p {
-    color: #abb7ae;
-    margin-bottom: 20px;
+.info{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
 }
 
-.world-info {
-    padding: 15px;
-    border-radius: 10px;
-    background: #111711;
-    margin-bottom: 20px;
-    line-height: 1.7;
+.infoCard{
+    background:#111920;
+    border-radius:10px;
+    padding:15px;
 }
 
-.world-box button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 9px;
-    border: 0;
-    border-radius: 9px;
-    background: #4f8f52;
-    color: white;
-    font-weight: bold;
+.infoCard strong{
+    display:block;
+    margin-bottom:5px;
+    color:#54c8f5;
+}
+
+.startGame{
+    width:100%;
+    margin-top:20px;
+    padding:15px;
+    border:0;
+    border-radius:10px;
+    background:#38a956;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
 }
 
 /* =========================
    JOGO
 ========================= */
 
-#gameScreen {
-    background: #79b8e8;
+#gameScreen{
+    position:fixed;
+    inset:0;
+    background:#75c9ef;
 }
 
-#gameCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
+#gameCanvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    image-rendering:pixelated;
 }
 
-#hud {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    padding: 10px 13px;
-    border-radius: 9px;
-    background: rgba(0, 0, 0, 0.55);
-    pointer-events: none;
-    line-height: 1.5;
+#hud{
+    position:absolute;
+    left:12px;
+    top:12px;
+    z-index:10;
+    background:rgba(0,0,0,.55);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:10px;
+    padding:10px 14px;
+    line-height:1.6;
+    min-width:210px;
 }
 
-#loadingMessage {
-    position: absolute;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 20;
-    text-align: center;
+#pauseButton{
+    position:absolute;
+    right:12px;
+    top:12px;
+    z-index:10;
+    border:0;
+    border-radius:9px;
+    padding:10px 16px;
+    background:rgba(0,0,0,.6);
+    color:white;
+    font-weight:bold;
 }
 
-#loadingMessage.active {
-    display: flex;
-}
-
-.loading-box {
-    padding: 30px;
-}
-
-.loading-box h2 {
-    margin-bottom: 10px;
-}
-
-.loading-box p {
-    color: #c4cec7;
+#loading{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#10151b;
+    font-size:22px;
 }
 
 /* =========================
-   RESPONSIVO
+   PAUSE
 ========================= */
 
-@media (max-width: 500px) {
-    .account-box,
-    .world-box {
-        padding: 22px;
+#pauseScreen{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.72);
+}
+
+.pauseBox{
+    width:min(400px,90%);
+    background:#19232b;
+    border:1px solid #455762;
+    border-radius:16px;
+    padding:30px;
+    text-align:center;
+}
+
+.pauseBox h2{
+    margin-bottom:20px;
+}
+
+.pauseBox button{
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    border:0;
+    border-radius:9px;
+    background:#278fc1;
+    color:white;
+    font-weight:bold;
+}
+
+@media(max-width:600px){
+    .info{
+        grid-template-columns:1fr;
     }
 
-    .logo {
-        font-size: 34px;
+    .menuBox h1{
+        font-size:32px;
+    }
+
+    .accountBox{
+        padding:22px;
     }
 }
 </style>
@@ -315,842 +370,1597 @@ button {
 
 <body>
 
-<div id="app">
-
-    <!-- =========================
-         CONTA
-    ========================== -->
-
-    <section id="accountScreen" class="screen active">
-
-        <div class="account-box">
-
-            <div class="logo">🌲 Ludix</div>
-
-            <div class="subtitle">
-                Mundo de sobrevivência e exploração
-            </div>
-
-            <div class="account-tabs">
-
-                <button
-                    id="loginTab"
-                    class="active"
-                    type="button">
-                    Entrar
-                </button>
-
-                <button
-                    id="registerTab"
-                    type="button">
-                    Criar conta
-                </button>
-
-            </div>
-
-            <form id="accountForm">
-
-                <div class="form-group">
-
-                    <label for="username">
-                        Nome de usuário
-                    </label>
-
-                    <input
-                        id="username"
-                        type="text"
-                        maxlength="24"
-                        autocomplete="username"
-                        required>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="password">
-                        Senha
-                    </label>
-
-                    <input
-                        id="password"
-                        type="password"
-                        minlength="6"
-                        autocomplete="current-password"
-                        required>
-
-                </div>
-
-                <div
-                    id="confirmGroup"
-                    class="form-group"
-                    style="display:none;">
-
-                    <label for="confirmPassword">
-                        Confirmar senha
-                    </label>
-
-                    <input
-                        id="confirmPassword"
-                        type="password"
-                        minlength="6"
-                        autocomplete="new-password">
-
-                </div>
-
-                <button
-                    id="accountButton"
-                    class="main-button"
-                    type="submit">
-                    Entrar
-                </button>
-
-            </form>
-
-            <div
-                id="accountMessage"
-                class="account-message">
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         MENU PRINCIPAL
-    ========================== -->
-
-    <section id="menuScreen" class="screen">
-
-        <div class="menu-box">
-
-            <div class="menu-title">
-                Ludix
-            </div>
-
-            <div class="menu-subtitle">
-                Explore. Construa. Sobreviva.
-            </div>
-
-            <div class="menu-buttons">
-
-                <button
-                    id="playButton"
-                    type="button">
-                    🌍 Jogar
-                </button>
-
-                <button
-                    id="logoutButton"
-                    type="button">
-                    🚪 Sair da conta
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         MUNDO
-    ========================== -->
-
-    <section id="worldScreen" class="screen">
-
-        <div class="world-box">
-
-            <h2>🌍 Seu mundo</h2>
-
-            <p>
-                Prepare-se para entrar em um mundo
-                gerado proceduralmente.
-            </p>
-
-            <div class="world-info">
-
-                <div>
-                    👤 Jogador:
-                    <strong id="worldPlayerName">---</strong>
-                </div>
-
-                <div>
-                    🌎 Tamanho:
-                    <strong>1.000.000 blocos para cada lado</strong>
-                </div>
-
-                <div>
-                    🎲 Geração:
-                    <strong>Aleatória por regiões</strong>
-                </div>
-
-                <div>
-                    💾 Salvamento:
-                    <strong>Conta do jogador</strong>
-                </div>
-
-            </div>
-
-            <button
-                id="enterWorldButton"
-                type="button">
-                Entrar no mundo
-            </button>
-
-            <button
-                id="backMenuButton"
-                type="button">
-                Voltar
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         JOGO
-    ========================== -->
-
-    <section id="gameScreen" class="screen">
-
-        <canvas id="gameCanvas"></canvas>
-
-        <div id="hud">
-
-            👤 <span id="hudPlayer">---</span><br>
-
-            ❤️ Vida: <span id="hudHealth">100</span><br>
-
-            🍖 Fome: <span id="hudHunger">100</span><br>
-
-            📍 X: <span id="hudX">0</span>
-            Y: <span id="hudY">0</span>
-
-        </div>
-
-        <div id="loadingMessage">
-
-            <div class="loading-box">
-
-                <h2>🌎 Gerando mundo...</h2>
-
-                <p>
-                    Criando uma nova região para você explorar.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
+<!-- =========================
+     LOADING
+========================= -->
+
+<div id="loading">
+    Carregando Ludix Sandbox...
 </div>
 
+<!-- =========================
+     CONTA
+========================= -->
+
+<section id="accountScreen" class="hidden">
+
+    <div class="accountBox">
+
+        <div class="logo">
+            🎮 <span>ludix</span>
+        </div>
+
+        <div class="subtitle">
+            Sandbox
+        </div>
+
+        <div class="tabs">
+
+            <button
+                id="loginTab"
+                class="tab active"
+                onclick="showLogin()">
+                Entrar
+            </button>
+
+            <button
+                id="registerTab"
+                class="tab"
+                onclick="showRegister()">
+                Criar conta
+            </button>
+
+        </div>
+
+        <!-- LOGIN -->
+
+        <div id="loginForm" class="form">
+
+            <label>Nome de usuário</label>
+
+            <input
+                id="loginUsername"
+                type="text"
+                maxlength="30"
+                autocomplete="username"
+                placeholder="Digite seu nome">
+
+            <label>Senha</label>
+
+            <input
+                id="loginPassword"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Digite sua senha">
+
+            <button
+                class="mainButton"
+                onclick="loginUser()">
+                ENTRAR
+            </button>
+
+        </div>
+
+        <!-- CADASTRO -->
+
+        <div id="registerForm" class="form hidden">
+
+            <label>Nome de usuário</label>
+
+            <input
+                id="registerUsername"
+                type="text"
+                maxlength="30"
+                autocomplete="username"
+                placeholder="Escolha seu nome">
+
+            <label>Senha</label>
+
+            <input
+                id="registerPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Mínimo de 6 caracteres">
+
+            <label>Confirmar senha</label>
+
+            <input
+                id="registerPasswordConfirm"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Digite a senha novamente">
+
+            <button
+                class="mainButton"
+                onclick="registerUser()">
+                CRIAR CONTA
+            </button>
+
+        </div>
+
+        <div
+            id="accountMessage"
+            class="message">
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     MENU
+========================= -->
+
+<section id="menuScreen" class="hidden">
+
+    <div class="menuBox">
+
+        <h1>🌍 Ludix Sandbox</h1>
+
+        <p>
+            Bem-vindo, <strong id="menuUsername"></strong>
+        </p>
+
+        <button
+            class="menuButton"
+            onclick="openWorld()">
+            🌍 JOGAR
+        </button>
+
+        <button
+            class="menuButton logoutButton"
+            onclick="logoutUser()">
+            SAIR DA CONTA
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     MUNDO
+========================= -->
+
+<section id="worldScreen" class="hidden">
+
+    <div class="worldBox">
+
+        <h2>🌎 Seu mundo</h2>
+
+        <div class="info">
+
+            <div class="infoCard">
+                <strong>Tamanho</strong>
+                1.000.000 blocos para cada lado
+            </div>
+
+            <div class="infoCard">
+                <strong>Geração</strong>
+                Aleatória por regiões
+            </div>
+
+            <div class="infoCard">
+                <strong>Jogador</strong>
+                <span id="worldUsername"></span>
+            </div>
+
+            <div class="infoCard">
+                <strong>Salvamento</strong>
+                Conta do jogador
+            </div>
+
+        </div>
+
+        <button
+            class="startGame"
+            onclick="startGame()">
+            🌱 ENTRAR NO MUNDO
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     JOGO
+========================= -->
+
+<section id="gameScreen" class="hidden">
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hud">
+
+        👤 <span id="hudUsername"></span><br>
+
+        ❤️ Vida:
+        <span id="healthValue">100</span><br>
+
+        🍖 Fome:
+        <span id="hungerValue">100</span><br>
+
+        📍 X:
+        <span id="xValue">0</span><br>
+
+        📍 Y:
+        <span id="yValue">0</span>
+
+    </div>
+
+    <button
+        id="pauseButton"
+        onclick="pauseGame()">
+        ⏸ PAUSAR
+    </button>
+
+</section>
+
+<!-- =========================
+     PAUSA
+========================= -->
+
+<section id="pauseScreen" class="hidden">
+
+    <div class="pauseBox">
+
+        <h2>⏸ Jogo pausado</h2>
+
+        <button onclick="resumeGame()">
+            ▶ CONTINUAR
+        </button>
+
+        <button onclick="backToMenu()">
+            🏠 MENU
+        </button>
+
+    </div>
+
+</section>
 
 <script>
-"use strict";
 
-/* =========================================
-   ELEMENTOS
-========================================= */
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-const screens = {
-    account: document.getElementById("accountScreen"),
-    menu: document.getElementById("menuScreen"),
-    world: document.getElementById("worldScreen"),
-    game: document.getElementById("gameScreen")
-};
+const SUPABASE_URL =
+    "https://lvsegfkvggwlcxhaibgu.supabase.co";
 
-const loginTab = document.getElementById("loginTab");
-const registerTab = document.getElementById("registerTab");
+const SUPABASE_KEY =
+    "sb_publishable_hBXJE72D0W6D4dF6mDhJHg_smw2yH9h";
 
-const accountForm = document.getElementById("accountForm");
-const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
-const confirmPasswordInput = document.getElementById("confirmPassword");
-
-const confirmGroup = document.getElementById("confirmGroup");
-const accountButton = document.getElementById("accountButton");
-const accountMessage = document.getElementById("accountMessage");
-
-const playButton = document.getElementById("playButton");
-const logoutButton = document.getElementById("logoutButton");
-
-const worldPlayerName = document.getElementById("worldPlayerName");
-const enterWorldButton = document.getElementById("enterWorldButton");
-const backMenuButton = document.getElementById("backMenuButton");
-
-const hudPlayer = document.getElementById("hudPlayer");
-const hudHealth = document.getElementById("hudHealth");
-const hudHunger = document.getElementById("hudHunger");
-const hudX = document.getElementById("hudX");
-const hudY = document.getElementById("hudY");
-
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-const loadingMessage = document.getElementById("loadingMessage");
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
-/* =========================================
-   ESTADO
-========================================= */
-
-let accountMode = "login";
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
 
 let currentPlayer = null;
 
 let gameRunning = false;
+let gamePaused = false;
 
-const player = {
-    x: 0,
-    y: 0,
-    health: 100,
-    hunger: 100
+const WORLD_SIZE = 1000000;
+const CHUNK_SIZE = 32;
+
+let worldSeed = 0;
+
+let player = {
+    x:0,
+    y:0,
+    vx:0,
+    vy:0,
+    width:24,
+    height:40,
+    health:100,
+    hunger:100
 };
 
+const keys = {};
 
-/* =========================================
-   TROCA DE TELA
-========================================= */
 
-function showScreen(screen) {
+/* =========================================================
+   ELEMENTOS
+========================================================= */
 
-    Object.values(screens).forEach(element => {
-        element.classList.remove("active");
-    });
+const accountScreen =
+    document.getElementById("accountScreen");
 
-    screen.classList.add("active");
+const menuScreen =
+    document.getElementById("menuScreen");
+
+const worldScreen =
+    document.getElementById("worldScreen");
+
+const gameScreen =
+    document.getElementById("gameScreen");
+
+const pauseScreen =
+    document.getElementById("pauseScreen");
+
+const loading =
+    document.getElementById("loading");
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* =========================================================
+   MENSAGEM
+========================================================= */
+
+function showMessage(message){
+    document.getElementById("accountMessage").textContent =
+        message;
 }
 
 
-/* =========================================
-   MODO LOGIN / CADASTRO
-========================================= */
+/* =========================================================
+   ABRIR LOGIN
+========================================================= */
 
-function setAccountMode(mode) {
+function showLogin(){
 
-    accountMode = mode;
+    document
+        .getElementById("loginTab")
+        .classList.add("active");
 
-    if (mode === "login") {
+    document
+        .getElementById("registerTab")
+        .classList.remove("active");
 
-        loginTab.classList.add("active");
-        registerTab.classList.remove("active");
+    document
+        .getElementById("loginForm")
+        .classList.remove("hidden");
 
-        confirmGroup.style.display = "none";
+    document
+        .getElementById("registerForm")
+        .classList.add("hidden");
 
-        confirmPasswordInput.required = false;
-
-        accountButton.textContent = "Entrar";
-
-    } else {
-
-        loginTab.classList.remove("active");
-        registerTab.classList.add("active");
-
-        confirmGroup.style.display = "block";
-
-        confirmPasswordInput.required = true;
-
-        accountButton.textContent = "Criar conta";
-    }
-
-    accountMessage.textContent = "";
-
-    passwordInput.value = "";
-    confirmPasswordInput.value = "";
+    showMessage("");
 }
 
 
-loginTab.addEventListener("click", () => {
-    setAccountMode("login");
-});
+/* =========================================================
+   ABRIR CADASTRO
+========================================================= */
+
+function showRegister(){
+
+    document
+        .getElementById("loginTab")
+        .classList.remove("active");
+
+    document
+        .getElementById("registerTab")
+        .classList.add("active");
+
+    document
+        .getElementById("loginForm")
+        .classList.add("hidden");
+
+    document
+        .getElementById("registerForm")
+        .classList.remove("hidden");
+
+    showMessage("");
+}
 
 
-registerTab.addEventListener("click", () => {
-    setAccountMode("register");
-});
+/* =========================================================
+   NORMALIZAR NOME
+========================================================= */
 
+function normalizeUsername(username){
 
-/* =========================================
-   VALIDAÇÃO
-========================================= */
-
-function cleanUsername(value) {
-
-    return value
+    return username
         .trim()
-        .replace(/\s+/g, " ");
+        .toLowerCase();
+
 }
 
 
-function validUsername(name) {
+/* =========================================================
+   E-MAIL TÉCNICO
+========================================================= */
 
-    return /^[A-Za-z0-9À-ÿ _-]{3,24}$/.test(name);
+function usernameToEmail(username){
+
+    const normalized =
+        normalizeUsername(username);
+
+    return normalized +
+        "@accounts.ludix.local";
+
 }
 
 
-/* =========================================
-   CONTA
-========================================= */
+/* =========================================================
+   CRIAR CONTA
+========================================================= */
 
-accountForm.addEventListener("submit", event => {
+async function registerUser(){
 
-    event.preventDefault();
+    const username =
+        document
+            .getElementById("registerUsername")
+            .value
+            .trim();
 
-    const username = cleanUsername(usernameInput.value);
-    const password = passwordInput.value;
+    const password =
+        document
+            .getElementById("registerPassword")
+            .value;
 
-    if (!validUsername(username)) {
+    const confirmPassword =
+        document
+            .getElementById("registerPasswordConfirm")
+            .value;
 
-        accountMessage.textContent =
-            "O nome deve ter entre 3 e 24 caracteres.";
+
+    if(username.length < 3){
+
+        showMessage(
+            "O nome precisa ter pelo menos 3 caracteres."
+        );
 
         return;
     }
 
-    if (password.length < 6) {
 
-        accountMessage.textContent =
-            "A senha precisa ter pelo menos 6 caracteres.";
+    if(!/^[a-zA-Z0-9_]+$/.test(username)){
+
+        showMessage(
+            "Use somente letras, números e _ no nome."
+        );
 
         return;
     }
 
-    if (accountMode === "register") {
 
-        const confirmation =
-            confirmPasswordInput.value;
+    if(password.length < 6){
 
-        if (password !== confirmation) {
+        showMessage(
+            "A senha precisa ter pelo menos 6 caracteres."
+        );
 
-            accountMessage.textContent =
-                "As senhas não são iguais.";
+        return;
+    }
+
+
+    if(password !== confirmPassword){
+
+        showMessage(
+            "As senhas não são iguais."
+        );
+
+        return;
+    }
+
+
+    showMessage("Criando sua conta...");
+
+
+    const email =
+        usernameToEmail(username);
+
+
+    try{
+
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+
+                email:email,
+
+                password:password,
+
+                options:{
+                    data:{
+                        username:username
+                    }
+                }
+
+            });
+
+
+        if(error){
+
+            console.error(error);
+
+            if(
+                error.message
+                    .toLowerCase()
+                    .includes("already")
+            ){
+
+                showMessage(
+                    "Esse nome de usuário já está em uso."
+                );
+
+            }else{
+
+                showMessage(
+                    "Erro ao criar conta: " +
+                    error.message
+                );
+
+            }
 
             return;
         }
 
-        /*
-         * IMPORTANTE:
-         *
-         * Esta primeira versão NÃO salva a senha
-         * no navegador.
-         *
-         * Na próxima etapa vamos conectar este
-         * formulário ao sistema de autenticação
-         * online.
-         */
+
+        if(!data.user){
+
+            showMessage(
+                "Não foi possível criar a conta."
+            );
+
+            return;
+        }
+
 
         currentPlayer = {
-            username: username
+
+            id:data.user.id,
+
+            username:username
+
         };
 
-        accountMessage.textContent =
-            "Conta preparada. Vamos conectar o salvamento online.";
+
+        await createPlayerWorld(
+            data.user.id
+        );
+
+
+        showMessage(
+            "Conta criada com sucesso!"
+        );
+
 
         setTimeout(() => {
-            openMainMenu();
-        }, 700);
 
-        return;
+            openMenu();
+
+        },700);
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "Ocorreu um erro ao criar a conta."
+        );
+
     }
 
-
-    /*
-     * Login provisório.
-     *
-     * O login real será feito pelo servidor
-     * quando adicionarmos o Supabase.
-     */
-
-    currentPlayer = {
-        username: username
-    };
-
-    accountMessage.textContent =
-        "Login preparado. Vamos conectar sua conta online.";
-
-    setTimeout(() => {
-        openMainMenu();
-    }, 700);
-});
-
-
-/* =========================================
-   MENU
-========================================= */
-
-function openMainMenu() {
-
-    if (!currentPlayer) {
-        showScreen(screens.account);
-        return;
-    }
-
-    showScreen(screens.menu);
 }
 
 
-playButton.addEventListener("click", () => {
+/* =========================================================
+   LOGIN
+========================================================= */
 
-    worldPlayerName.textContent =
-        currentPlayer.username;
+async function loginUser(){
 
-    showScreen(screens.world);
-});
+    const username =
+        document
+            .getElementById("loginUsername")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("loginPassword")
+            .value;
 
 
-logoutButton.addEventListener("click", () => {
+    if(!username || !password){
+
+        showMessage(
+            "Digite seu nome e sua senha."
+        );
+
+        return;
+    }
+
+
+    showMessage("Entrando...");
+
+
+    const email =
+        usernameToEmail(username);
+
+
+    try{
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+
+                email:email,
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            console.error(error);
+
+            showMessage(
+                "Nome ou senha incorretos."
+            );
+
+            return;
+        }
+
+
+        if(!data.user){
+
+            showMessage(
+                "Não foi possível entrar."
+            );
+
+            return;
+        }
+
+
+        currentPlayer = {
+
+            id:data.user.id,
+
+            username:
+                data.user.user_metadata?.username ||
+                username
+
+        };
+
+
+        await loadPlayerWorld(
+            data.user.id
+        );
+
+
+        openMenu();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "Erro ao entrar na conta."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CRIAR MUNDO DO JOGADOR
+========================================================= */
+
+async function createPlayerWorld(userId){
+
+    try{
+
+        const existing =
+            await supabaseClient
+                .from("worlds")
+                .select("*")
+                .eq("user_id",userId)
+                .maybeSingle();
+
+
+        if(existing.data){
+
+            return existing.data;
+
+        }
+
+
+        worldSeed =
+            Math.floor(
+                Math.random() * 2147483647
+            );
+
+
+        const { data, error } =
+            await supabaseClient
+                .from("worlds")
+                .insert({
+
+                    user_id:userId,
+
+                    seed:worldSeed,
+
+                    world_size:WORLD_SIZE,
+
+                    player_x:0,
+
+                    player_y:0,
+
+                    health:100,
+
+                    hunger:100
+
+                })
+                .select()
+                .single();
+
+
+        if(error){
+
+            console.error(
+                "Erro ao criar mundo:",
+                error
+            );
+
+            return null;
+        }
+
+
+        player.x =
+            data.player_x;
+
+        player.y =
+            data.player_y;
+
+        player.health =
+            data.health;
+
+        player.hunger =
+            data.hunger;
+
+
+        return data;
+
+
+    }catch(error){
+
+        console.error(error);
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR MUNDO
+========================================================= */
+
+async function loadPlayerWorld(userId){
+
+    const { data, error } =
+        await supabaseClient
+            .from("worlds")
+            .select("*")
+            .eq("user_id",userId)
+            .maybeSingle();
+
+
+    if(error){
+
+        console.error(
+            "Erro carregando mundo:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    if(!data){
+
+        await createPlayerWorld(userId);
+
+        return;
+
+    }
+
+
+    worldSeed =
+        Number(data.seed);
+
+    player.x =
+        Number(data.player_x);
+
+    player.y =
+        Number(data.player_y);
+
+    player.health =
+        Number(data.health);
+
+    player.hunger =
+        Number(data.hunger);
+
+}
+
+
+/* =========================================================
+   SALVAR MUNDO
+========================================================= */
+
+async function savePlayerWorld(){
+
+    if(!currentPlayer){
+
+        return;
+
+    }
+
+
+    try{
+
+        await supabaseClient
+            .from("worlds")
+            .update({
+
+                player_x:player.x,
+
+                player_y:player.y,
+
+                health:player.health,
+
+                hunger:player.hunger,
+
+                updated_at:
+                    new Date().toISOString()
+
+            })
+            .eq(
+                "user_id",
+                currentPlayer.id
+            );
+
+
+    }catch(error){
+
+        console.error(
+            "Erro salvando mundo:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function openMenu(){
+
+    accountScreen
+        .classList.add("hidden");
+
+    worldScreen
+        .classList.add("hidden");
+
+    gameScreen
+        .classList.add("hidden");
+
+    pauseScreen
+        .classList.add("hidden");
+
+    menuScreen
+        .classList.remove("hidden");
+
+
+    document
+        .getElementById("menuUsername")
+        .textContent =
+            currentPlayer.username;
+
+}
+
+
+/* =========================================================
+   ABRIR MUNDO
+========================================================= */
+
+function openWorld(){
+
+    menuScreen
+        .classList.add("hidden");
+
+    worldScreen
+        .classList.remove("hidden");
+
+
+    document
+        .getElementById("worldUsername")
+        .textContent =
+            currentPlayer.username;
+
+}
+
+
+/* =========================================================
+   SAIR
+========================================================= */
+
+async function logoutUser(){
+
+    await savePlayerWorld();
+
+    await supabaseClient.auth.signOut();
 
     currentPlayer = null;
 
-    usernameInput.value = "";
-    passwordInput.value = "";
-    confirmPasswordInput.value = "";
+    gameRunning = false;
 
-    accountMessage.textContent = "";
+    menuScreen
+        .classList.add("hidden");
 
-    setAccountMode("login");
+    worldScreen
+        .classList.add("hidden");
 
-    showScreen(screens.account);
-});
+    gameScreen
+        .classList.add("hidden");
 
+    pauseScreen
+        .classList.add("hidden");
 
-backMenuButton.addEventListener("click", () => {
+    accountScreen
+        .classList.remove("hidden");
 
-    showScreen(screens.menu);
-});
+    showLogin();
 
-
-/* =========================================
-   CANVAS
-========================================= */
-
-function resizeCanvas() {
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
 }
 
 
-window.addEventListener("resize", resizeCanvas);
+/* =========================================================
+   CANVAS
+========================================================= */
+
+function resizeCanvas(){
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+
+}
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* =========================================================
+   RANDOM SEED
+========================================================= */
+
+function seededRandom(x,y){
+
+    let value =
+        Math.sin(
+            x * 12.9898 +
+            y * 78.233 +
+            worldSeed
+        ) *
+        43758.5453;
+
+    return value -
+        Math.floor(value);
+
+}
+
+
+/* =========================================================
+   TERRENO
+========================================================= */
+
+function terrainHeight(worldX){
+
+    const n =
+        seededRandom(
+            Math.floor(worldX / 32),
+            0
+        );
+
+    return 420 +
+        Math.floor(n * 80);
+
+}
+
+
+/* =========================================================
+   INICIAR JOGO
+========================================================= */
+
+async function startGame(){
+
+    worldScreen
+        .classList.add("hidden");
+
+    gameScreen
+        .classList.remove("hidden");
+
+
+    resizeCanvas();
+
+
+    if(!worldSeed){
+
+        worldSeed =
+            Math.floor(
+                Math.random() * 2147483647
+            );
+
+    }
+
+
+    gameRunning = true;
+
+    gamePaused = false;
+
+
+    document
+        .getElementById("hudUsername")
+        .textContent =
+            currentPlayer.username;
+
+
+    updateHUD();
+
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+    document
+        .getElementById("healthValue")
+        .textContent =
+            Math.max(
+                0,
+                Math.floor(player.health)
+            );
+
+    document
+        .getElementById("hungerValue")
+        .textContent =
+            Math.max(
+                0,
+                Math.floor(player.hunger)
+            );
+
+    document
+        .getElementById("xValue")
+        .textContent =
+            Math.floor(player.x);
+
+    document
+        .getElementById("yValue")
+        .textContent =
+            Math.floor(player.y);
+
+}
+
+
+/* =========================================================
+   TECLADO
+========================================================= */
+
+window.addEventListener(
+    "keydown",
+    event => {
+
+        keys[event.key.toLowerCase()] = true;
+
+
+        if(
+            event.key === "Escape"
+        ){
+
+            if(gameRunning){
+
+                if(gamePaused){
+
+                    resumeGame();
+
+                }else{
+
+                    pauseGame();
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    event => {
+
+        keys[event.key.toLowerCase()] = false;
+
+    }
+);
+
+
+/* =========================================================
+   MOVIMENTO
+========================================================= */
+
+function updatePlayer(){
+
+    const speed = 4;
+
+
+    if(
+        keys["a"] ||
+        keys["arrowleft"]
+    ){
+
+        player.x -= speed;
+
+    }
+
+
+    if(
+        keys["d"] ||
+        keys["arrowright"]
+    ){
+
+        player.x += speed;
+
+    }
+
+
+    if(player.x < -WORLD_SIZE){
+
+        player.x =
+            -WORLD_SIZE;
+
+    }
+
+
+    if(player.x > WORLD_SIZE){
+
+        player.x =
+            WORLD_SIZE;
+
+    }
+
+
+    const ground =
+        terrainHeight(player.x);
+
+
+    player.y =
+        ground -
+        player.height;
+
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   DESENHAR
+========================================================= */
+
+function drawWorld(){
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+
+    /* CÉU */
+
+    ctx.fillStyle =
+        "#75c9ef";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* NUVENS */
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.75)";
+
+
+    for(
+        let i = 0;
+        i < 7;
+        i++
+    ){
+
+        const cloudX =
+            (
+                i * 350 -
+                player.x * 0.15
+            ) %
+            (width + 500);
+
+
+        const normalizedX =
+            cloudX < -100
+                ? cloudX + width + 500
+                : cloudX;
+
+
+        ctx.fillRect(
+            normalizedX,
+            100 + i * 35,
+            100,
+            25
+        );
+
+        ctx.fillRect(
+            normalizedX + 25,
+            80 + i * 35,
+            55,
+            25
+        );
+
+    }
+
+
+    /* CÂMERA */
+
+    const cameraX =
+        player.x -
+        width / 2;
+
+
+    /* TERRENO */
+
+    const blockSize = 32;
+
+
+    for(
+        let screenX = 0;
+        screenX < width + blockSize;
+        screenX += blockSize
+    ){
+
+        const worldX =
+            cameraX +
+            screenX;
+
+
+        const ground =
+            terrainHeight(worldX);
+
+
+        const screenGround =
+            ground -
+            player.y +
+            height * 0.55;
+
+
+        /* GRAMA */
+
+        ctx.fillStyle =
+            "#4c9b45";
+
+        ctx.fillRect(
+            screenX,
+            screenGround,
+            blockSize,
+            blockSize
+        );
+
+
+        /* TERRA */
+
+        ctx.fillStyle =
+            "#795548";
+
+        ctx.fillRect(
+            screenX,
+            screenGround + blockSize,
+            blockSize,
+            height
+        );
+
+
+        /* PEDRAS */
+
+        if(
+            seededRandom(
+                Math.floor(worldX / blockSize),
+                2
+            ) > .85
+        ){
+
+            ctx.fillStyle =
+                "#777";
+
+            ctx.fillRect(
+                screenX + 7,
+                screenGround + 45,
+                8,
+                8
+            );
+
+        }
+
+    }
+
+
+    /* JOGADOR */
+
+    const playerScreenX =
+        width / 2 -
+        player.width / 2;
+
+
+    const playerScreenY =
+        height * 0.55 -
+        player.height;
+
+
+    ctx.fillStyle =
+        "#315cff";
+
+    ctx.fillRect(
+        playerScreenX,
+        playerScreenY,
+        player.width,
+        player.height
+    );
+
+
+    /* CABEÇA */
+
+    ctx.fillStyle =
+        "#f1c27d";
+
+    ctx.fillRect(
+        playerScreenX + 3,
+        playerScreenY - 16,
+        player.width - 6,
+        16
+    );
+
+}
+
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function gameLoop(){
+
+    if(!gameRunning){
+
+        return;
+
+    }
+
+
+    if(!gamePaused){
+
+        updatePlayer();
+
+        drawWorld();
+
+    }
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =========================================================
+   PAUSAR
+========================================================= */
+
+function pauseGame(){
+
+    if(!gameRunning){
+
+        return;
+
+    }
+
+    gamePaused = true;
+
+    pauseScreen
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================================
+   CONTINUAR
+========================================================= */
+
+function resumeGame(){
+
+    gamePaused = false;
+
+    pauseScreen
+        .classList
+        .add("hidden");
+
+}
+
+
+/* =========================================================
+   VOLTAR AO MENU
+========================================================= */
+
+async function backToMenu(){
+
+    await savePlayerWorld();
+
+    gameRunning = false;
+
+    gamePaused = false;
+
+    pauseScreen
+        .classList
+        .add("hidden");
+
+    gameScreen
+        .classList
+        .add("hidden");
+
+    openMenu();
+
+}
+
+
+/* =========================================================
+   SALVAMENTO AUTOMÁTICO
+========================================================= */
+
+setInterval(
+    () => {
+
+        if(
+            currentPlayer &&
+            gameRunning &&
+            !gamePaused
+        ){
+
+            savePlayerWorld();
+
+        }
+
+    },
+    10000
+);
+
+
+/* =========================================================
+   VERIFICAR SESSÃO EXISTENTE
+========================================================= */
+
+async function checkSession(){
+
+    try{
+
+        const { data } =
+            await supabaseClient
+                .auth
+                .getSession();
+
+
+        if(
+            data &&
+            data.session &&
+            data.session.user
+        ){
+
+            const user =
+                data.session.user;
+
+
+            const username =
+                user.user_metadata?.username;
+
+
+            if(username){
+
+                currentPlayer = {
+
+                    id:user.id,
+
+                    username:username
+
+                };
+
+
+                await loadPlayerWorld(
+                    user.id
+                );
+
+
+                openMenu();
+
+                return;
+
+            }
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Erro verificando sessão:",
+            error
+        );
+
+    }
+
+
+    accountScreen
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
 
 resizeCanvas();
 
 
-/* =========================================
-   GERAÇÃO PROCEDURAL BÁSICA
-========================================= */
+setTimeout(
+    async () => {
 
-const WORLD_SIZE = 1000000;
+        loading
+            .classList
+            .add("hidden");
 
-const CHUNK_SIZE = 32;
+        await checkSession();
 
-
-/*
- * Seed inicial.
- *
- * Na versão final:
- * - cada mundo terá sua própria seed;
- * - a seed ficará salva na conta;
- * - chunks já explorados serão salvos;
- * - regiões novas serão geradas automaticamente.
- */
-
-let worldSeed = Math.floor(
-    Math.random() * 2147483647
+    },
+    500
 );
-
-
-function seededRandom(x, y) {
-
-    let value =
-        Math.sin(
-            x * 127.1 +
-            y * 311.7 +
-            worldSeed
-        ) * 43758.5453123;
-
-    return value - Math.floor(value);
-}
-
-
-/* =========================================
-   TERRENO VISUAL INICIAL
-========================================= */
-
-function drawWorld() {
-
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    /*
-     * Céu
-     */
-
-    const sky = ctx.createLinearGradient(
-        0,
-        0,
-        0,
-        canvas.height
-    );
-
-    sky.addColorStop(0, "#62a8dc");
-    sky.addColorStop(1, "#c4e4f4");
-
-    ctx.fillStyle = sky;
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    /*
-     * Solo inicial.
-     */
-
-    const groundY =
-        canvas.height * 0.62;
-
-    ctx.fillStyle = "#5b963f";
-
-    ctx.fillRect(
-        0,
-        groundY,
-        canvas.width,
-        50
-    );
-
-
-    ctx.fillStyle = "#795332";
-
-    ctx.fillRect(
-        0,
-        groundY + 50,
-        canvas.width,
-        canvas.height - groundY - 50
-    );
-
-
-    /*
-     * Blocos.
-     */
-
-    const blockSize = 32;
-
-    const startX =
-        Math.floor(player.x / blockSize) - 15;
-
-    const endX =
-        startX + 32;
-
-    for (let worldX = startX; worldX <= endX; worldX++) {
-
-        const screenX =
-            canvas.width / 2 +
-            (worldX * blockSize) -
-            (player.x * blockSize);
-
-        const variation =
-            seededRandom(worldX, 0);
-
-        const height =
-            Math.floor(variation * 3);
-
-        for (let y = 0; y < 8 + height; y++) {
-
-            const screenY =
-                groundY +
-                y * blockSize;
-
-            ctx.fillStyle =
-                y === 0
-                    ? "#63a443"
-                    : "#795332";
-
-            ctx.fillRect(
-                screenX,
-                screenY,
-                blockSize,
-                blockSize
-            );
-
-            ctx.strokeStyle =
-                "rgba(0,0,0,0.12)";
-
-            ctx.strokeRect(
-                screenX,
-                screenY,
-                blockSize,
-                blockSize
-            );
-        }
-    }
-
-
-    /*
-     * Jogador.
-     */
-
-    const playerSize = 28;
-
-    ctx.fillStyle = "#d8a06a";
-
-    ctx.fillRect(
-        canvas.width / 2 - playerSize / 2,
-        groundY - playerSize,
-        playerSize,
-        playerSize
-    );
-
-    ctx.fillStyle = "#3c72c9";
-
-    ctx.fillRect(
-        canvas.width / 2 - playerSize / 2,
-        groundY - playerSize / 2,
-        playerSize,
-        playerSize / 2
-    );
-
-
-    updateHUD();
-}
-
-
-/* =========================================
-   HUD
-========================================= */
-
-function updateHUD() {
-
-    if (!currentPlayer) {
-        return;
-    }
-
-    hudPlayer.textContent =
-        currentPlayer.username;
-
-    hudHealth.textContent =
-        Math.max(0, Math.floor(player.health));
-
-    hudHunger.textContent =
-        Math.max(0, Math.floor(player.hunger));
-
-    hudX.textContent =
-        Math.floor(player.x);
-
-    hudY.textContent =
-        Math.floor(player.y);
-}
-
-
-/* =========================================
-   CONTROLES
-========================================= */
-
-const keys = new Set();
-
-window.addEventListener("keydown", event => {
-
-    keys.add(event.key.toLowerCase());
-
-});
-
-
-window.addEventListener("keyup", event => {
-
-    keys.delete(event.key.toLowerCase());
-
-});
-
-
-function updatePlayer() {
-
-    if (!gameRunning) {
-        return;
-    }
-
-    const speed = 0.15;
-
-    if (
-        keys.has("a") ||
-        keys.has("arrowleft")
-    ) {
-        player.x -= speed;
-    }
-
-    if (
-        keys.has("d") ||
-        keys.has("arrowright")
-    ) {
-        player.x += speed;
-    }
-
-    /*
-     * Limite do mundo:
-     *
-     * -1.000.000 até +1.000.000
-     */
-
-    player.x =
-        Math.max(
-            -WORLD_SIZE,
-            Math.min(WORLD_SIZE, player.x)
-        );
-
-    drawWorld();
-
-    requestAnimationFrame(updatePlayer);
-}
-
-
-/* =========================================
-   ENTRAR NO MUNDO
-========================================= */
-
-enterWorldButton.addEventListener("click", () => {
-
-    loadingMessage.classList.add("active");
-
-    setTimeout(() => {
-
-        player.x = 0;
-        player.y = 0;
-        player.health = 100;
-        player.hunger = 100;
-
-        gameRunning = true;
-
-        showScreen(screens.game);
-
-        loadingMessage.classList.remove("active");
-
-        drawWorld();
-
-        requestAnimationFrame(updatePlayer);
-
-    }, 800);
-
-});
-
-
-/* =========================================
-   INICIALIZAÇÃO
-========================================= */
-
-setAccountMode("login");
 
 </script>
 
 </body>
 </html>
-```
