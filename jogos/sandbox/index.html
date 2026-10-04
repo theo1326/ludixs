@@ -41,6 +41,19 @@ button{
     height:100%;
 }
 
+#loading{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#10151c;
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+}
+
 #accountScreen{
     display:flex;
     align-items:center;
@@ -1242,6 +1255,72 @@ function noise1D(x){
 
 
 /* ============================================================
+   RESIZE DO CANVAS
+============================================================ */
+
+function resizeCanvas(){
+
+    const width =
+        Math.max(
+            1,
+            Math.floor(
+                window.innerWidth
+            )
+        );
+
+    const height =
+        Math.max(
+            1,
+            Math.floor(
+                window.innerHeight
+            )
+        );
+
+
+    const devicePixelRatio =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    canvas.width =
+        Math.floor(
+            width*
+            devicePixelRatio
+        );
+
+
+    canvas.height =
+        Math.floor(
+            height*
+            devicePixelRatio
+        );
+
+
+    canvas.style.width =
+        width+
+        "px";
+
+
+    canvas.style.height =
+        height+
+        "px";
+
+
+    ctx.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+    );
+
+}
+
+
+/* ============================================================
    RUÍOS E MARES
 ============================================================ */
 
@@ -1703,14 +1782,6 @@ function generateBlock(blockX,blockY){
         );
 
 
-    /*
-       MARES E RIOS
-
-       A água fica no nível do mar
-       quando o terreno estiver abaixo
-       dele.
-    */
-
     const waterRegion=
         isSeaAt(blockX) ||
         isRiverAt(blockX) ||
@@ -1729,17 +1800,9 @@ function generateBlock(blockX,blockY){
     }
 
 
-    /*
-       Ar acima do terreno.
-    */
-
     if(blockY<surface)
         return "air";
 
-
-    /*
-       CAVERNAS
-    */
 
     if(
         isCaveAt(
@@ -1765,11 +1828,6 @@ function generateBlock(blockX,blockY){
     if(depth<=3)
         return biome.underground;
 
-
-    /*
-       Minérios mais raros conforme
-       aumenta a profundidade.
-    */
 
     const oreChance=
         seededRandom(
@@ -2094,10 +2152,6 @@ function updatePlayer(){
     }
 
 
-    /*
-       Movimento horizontal
-    */
-
     const nextX=
         player.x+
         player.vx;
@@ -2127,11 +2181,6 @@ function updatePlayer(){
         );
 
 
-    /*
-       Pulo somente quando a tecla
-       foi realmente pressionada.
-    */
-
     if(
         (
             keys[" "] ||
@@ -2151,10 +2200,6 @@ function updatePlayer(){
     }
 
 
-    /*
-       Gravidade
-    */
-
     player.vy+=.55;
 
     if(player.vy>15)
@@ -2165,10 +2210,6 @@ function updatePlayer(){
         player.y+
         player.vy;
 
-
-    /*
-       Subindo
-    */
 
     if(player.vy<0){
 
@@ -2189,14 +2230,7 @@ function updatePlayer(){
 
         }
 
-    }
-
-
-    /*
-       Descendo
-    */
-
-    else{
+    }else{
 
         const groundY=
             getGroundY();
@@ -2249,10 +2283,6 @@ function updatePlayer(){
 
     }
 
-
-    /*
-       Fome
-    */
 
     player.hunger-=.001;
 
@@ -2500,10 +2530,6 @@ function handleCanvasClick(event){
 
     }
 
-
-    /*
-       Linha de visão.
-    */
 
     const playerCenterX=
         (
@@ -2781,11 +2807,6 @@ function updateWeather(){
         performance.now();
 
 
-    /*
-       Inicia uma nova mudança climática
-       quando chegar a hora.
-    */
-
     if(
         now>=weather.nextChange
     ){
@@ -2829,12 +2850,6 @@ function updateWeather(){
     }
 
 
-    /*
-       Se a chuva estiver acabando,
-       garante que as nuvens comecem
-       a se afastar.
-    */
-
     if(
         weather.raining &&
         now>=weather.rainEnd
@@ -2853,10 +2868,6 @@ function updateWeather(){
 
     }
 
-
-    /*
-       Transição suave das nuvens.
-    */
 
     weather.cloudCover+=
         (
@@ -2938,11 +2949,6 @@ function drawSky(){
         170;
 
 
-    /*
-       Chuva escurece o céu
-       gradualmente.
-    */
-
     const rainDark=
         weather.cloudCover*
         48;
@@ -2985,10 +2991,6 @@ function drawSky(){
         canvas.height
     );
 
-
-    /*
-       Névoa escura durante chuva forte.
-    */
 
     if(weather.cloudCover>.35){
 
@@ -3080,10 +3082,6 @@ function drawClouds(){
         now/10000;
 
 
-    /*
-       Nuvens normais.
-    */
-
     for(
         let i=0;
         i<8;
@@ -3122,7 +3120,8 @@ function drawClouds(){
             (i%3)*.12,
             "#ffffff",
             .22*
-            (1-
+            (
+                1-
                 weather.cloudCover*
                 .8
             )
@@ -3130,14 +3129,6 @@ function drawClouds(){
 
     }
 
-
-    /*
-       Nuvens negras de tempestade.
-
-       Elas aparecem gradualmente no começo
-       da chuva e vão se afastando devagar
-       quando ela termina.
-    */
 
     if(weather.cloudCover>.01){
 
@@ -3383,10 +3374,6 @@ function drawWorld(){
                     TILE_SIZE
                 );
 
-
-                /*
-                   Pequenas ondas na superfície.
-                */
 
                 if(
                     y===SEA_LEVEL
@@ -3639,10 +3626,6 @@ function drawWorld(){
     }
 
 
-    /* ========================================================
-       ÁRVORES
-    ======================================================== */
-
     for(
         let x=startX;
         x<=endX;
@@ -3677,10 +3660,6 @@ function drawWorld(){
             cameraY;
 
 
-        /*
-           Tronco.
-        */
-
         ctx.fillStyle=
             biome.name==="Taiga"
             ?
@@ -3699,10 +3678,6 @@ function drawWorld(){
             TILE_SIZE
         );
 
-
-        /*
-           Copa por bioma.
-        */
 
         let leafColor=
             "#2e7938";
@@ -3829,10 +3804,6 @@ function drawWorld(){
 
     }
 
-
-    /* ========================================================
-       CACTOS
-    ======================================================== */
 
     for(
         let x=startX;
@@ -4036,7 +4007,7 @@ function updateHUD(){
     document.getElementById(
         "chunkText"
     ).textContent=
-        `${getChunkX(player.x)}, ${getChunkY(player.y)}`;
+        `${getChunkX(player.x)}, ${getChunkY(player.x)}`;
 
 }
 
