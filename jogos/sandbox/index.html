@@ -912,6 +912,12 @@ let gamePaused = false;
 
 let gameRunning = false;
 
+let mouseBlock={
+    x:0,
+    y:0,
+    active:false
+};
+
 
 /* ============================================================
    INVENTÁRIO
@@ -923,63 +929,63 @@ const hotbar = [
         id:"grass",
         name:"Grama",
         icon:"🌱",
-        count:30
+        count:0
     },
 
     {
         id:"dirt",
         name:"Terra",
         icon:"🟫",
-        count:30
+        count:0
     },
 
     {
         id:"stone",
         name:"Pedra",
         icon:"🪨",
-        count:20
+        count:0
     },
 
     {
         id:"wood",
         name:"Madeira",
         icon:"🪵",
-        count:20
+        count:0
     },
 
     {
         id:"leaves",
         name:"Folhas",
         icon:"🍃",
-        count:20
+        count:0
     },
 
     {
         id:"sand",
         name:"Areia",
         icon:"🟨",
-        count:20
+        count:0
     },
 
     {
         id:"coal",
         name:"Carvão",
         icon:"⚫",
-        count:10
+        count:0
     },
 
     {
         id:"iron",
         name:"Ferro",
         icon:"🔩",
-        count:10
+        count:0
     },
 
     {
         id:"gold",
         name:"Ouro",
         icon:"🟡",
-        count:5
+        count:0
     }
 
 ];
@@ -1314,23 +1320,12 @@ function resizeCanvas(){
             )
         );
 
-    const devicePixelRatio=
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
-
-    canvas.width=
-        Math.floor(
-            width*
-            devicePixelRatio
-        );
-
-    canvas.height=
-        Math.floor(
-            height*
-            devicePixelRatio
-        );
+    /* O jogo usa coordenadas em pixels CSS.
+       Manter o canvas nessa mesma escala evita que
+       o clique do mouse aponte para outro bloco em
+       telas com escala/DPI diferente. */
+    canvas.width=width;
+    canvas.height=height;
 
     canvas.style.width=
         width+
@@ -1341,10 +1336,10 @@ function resizeCanvas(){
         "px";
 
     ctx.setTransform(
-        devicePixelRatio,
+        1,
         0,
         0,
-        devicePixelRatio,
+        1,
         0,
         0
     );
@@ -3386,25 +3381,12 @@ function handleCanvasClick(
 
 
     const mouseX=
-        (
-            event.clientX-
-            rect.left
-        )*
-        (
-            canvas.width/
-            rect.width
-        );
-
+        event.clientX-
+        rect.left;
 
     const mouseY=
-        (
-            event.clientY-
-            rect.top
-        )*
-        (
-            canvas.height/
-            rect.height
-        );
+        event.clientY-
+        rect.top;
 
 
     const target=
@@ -3479,6 +3461,10 @@ function handleCanvasClick(
             current,
             1
         );
+
+        /* A alteração fica registrada no chunk e será
+           persistida pelo autosave. */
+        markCurrentChunkExplored();
 
     }else{
 
@@ -3819,10 +3805,8 @@ function drawSky(){
     const now=
         performance.now();
 
-
     const dayDuration=
         15*60*1000;
-
 
     const cycle=
         (
@@ -3831,103 +3815,192 @@ function drawSky(){
         )/
         (dayDuration*2);
 
-
-    const brightness=
+    const daylight=
         Math.sin(
-            cycle*
-            Math.PI*
-            2
+            cycle*Math.PI*2
         )*.5+.5;
 
 
     let r=
-        20+
-        brightness*
-        90;
+        12+
+        daylight*92;
 
     let g=
-        30+
-        brightness*
-        130;
+        22+
+        daylight*130;
 
     let b=
-        50+
-        brightness*
-        170;
+        42+
+        daylight*178;
 
 
     const rainDark=
-        weather.cloudCover*
-        48;
-
+        weather.cloudCover*48;
 
     r-=rainDark*.75;
-
     g-=rainDark*.82;
-
     b-=rainDark*.90;
 
 
-    r=clamp(
-        Math.floor(r),
-        5,
-        255
+    r=clamp(Math.floor(r),5,255);
+    g=clamp(Math.floor(g),7,255);
+    b=clamp(Math.floor(b),12,255);
+
+
+    const gradient=
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            window.innerHeight
+        );
+
+    gradient.addColorStop(
+        0,
+        `rgb(${r},${g},${b})`
     );
 
-    g=clamp(
-        Math.floor(g),
-        7,
-        255
+    gradient.addColorStop(
+        .62,
+        `rgb(${clamp(r+18,0,255)},${clamp(g+12,0,255)},${clamp(b+5,0,255)})`
     );
 
-    b=clamp(
-        Math.floor(b),
-        12,
-        255
+    gradient.addColorStop(
+        1,
+        `rgb(${clamp(r*.58,0,255)},${clamp(g*.58,0,255)},${clamp(b*.55,0,255)})`
     );
 
-
-    ctx.fillStyle=
-        `rgb(${r},${g},${b})`;
-
+    ctx.fillStyle=gradient;
 
     ctx.fillRect(
         0,
         0,
-        canvas.width,
-        canvas.height
+        window.innerWidth,
+        window.innerHeight
     );
 
 
-    if(
-        weather.cloudCover>.35
-    ){
+    /* Sol */
+    const sunAngle=
+        cycle*Math.PI*2;
 
-        const alpha=
-            weather.cloudCover*
-            .20;
+    const sunX=
+        window.innerWidth*.5+
+        Math.cos(sunAngle-Math.PI/2)*
+        window.innerWidth*.42;
 
+    const sunY=
+        window.innerHeight*.62-
+        Math.sin(sunAngle-Math.PI/2)*
+        window.innerHeight*.48;
+
+    if(daylight>.08){
+
+        ctx.save();
+
+        ctx.globalAlpha=
+            clamp(
+                daylight*1.25,
+                0,
+                1
+            );
+
+        ctx.shadowColor=
+            "rgba(255,220,110,.65)";
+
+        ctx.shadowBlur=35;
+
+        ctx.fillStyle="#ffe58a";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            sunX,
+            sunY,
+            28+
+            daylight*12,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+
+    }
+
+
+    /* Lua */
+    const moonX=
+        window.innerWidth*.5+
+        Math.cos(sunAngle+Math.PI-Math.PI/2)*
+        window.innerWidth*.42;
+
+    const moonY=
+        window.innerHeight*.62-
+        Math.sin(sunAngle+Math.PI-Math.PI/2)*
+        window.innerHeight*.48;
+
+    if(daylight<.55){
+
+        ctx.save();
+
+        ctx.globalAlpha=
+            clamp(
+                (0.55-daylight)*2,
+                0,
+                .9
+            );
+
+        ctx.fillStyle="#e8f1ff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            moonX,
+            moonY,
+            21,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
 
         ctx.fillStyle=
-            `rgba(20,28,38,${alpha})`;
+            `rgba(90,105,135,.35)`;
 
+        ctx.beginPath();
+
+        ctx.arc(
+            moonX+7,
+            moonY-4,
+            17,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+
+    }
+
+
+    if(weather.cloudCover>.35){
+
+        ctx.fillStyle=
+            `rgba(20,28,38,${weather.cloudCover*.20})`;
 
         ctx.fillRect(
             0,
             0,
-            canvas.width,
-            canvas.height
+            window.innerWidth,
+            window.innerHeight
         );
 
     }
 
 }
-
-
-/* ============================================================
-   NUVENS
-============================================================ */
-
 function drawCloudShape(
     x,
     y,
@@ -4015,7 +4088,7 @@ function drawClouds(){
                 normalTime*25
             )%
             (
-                canvas.width+500
+                window.innerWidth+500
             );
 
 
@@ -4175,7 +4248,7 @@ function drawRain(){
                 now*
                 .18
             )%
-            canvas.width;
+            window.innerWidth;
 
 
         const y=
@@ -4185,7 +4258,7 @@ function drawRain(){
                 now*
                 .62
             )%
-            canvas.height;
+            window.innerHeight;
 
 
         ctx.beginPath();
@@ -4222,43 +4295,106 @@ function drawRain(){
 
 function drawWorld(){
 
+    const viewWidth=window.innerWidth;
+    const viewHeight=window.innerHeight;
+
     const startX=
         Math.floor(
-            cameraX/
-            TILE_SIZE
+            cameraX/TILE_SIZE
         )-2;
-
 
     const endX=
         Math.ceil(
-            (
-                cameraX+
-                canvas.width
-            )/
+            (cameraX+viewWidth)/
             TILE_SIZE
         )+2;
-
 
     const startY=
         Math.floor(
-            cameraY/
-            TILE_SIZE
+            cameraY/TILE_SIZE
         )-2;
-
 
     const endY=
         Math.ceil(
-            (
-                cameraY+
-                canvas.height
-            )/
+            (cameraY+viewHeight)/
             TILE_SIZE
         )+2;
 
 
-    /*
-       BLOCOS
-    */
+    /* =========================================================
+       PROFUNDIDADE — montanhas distantes e névoa
+    ========================================================= */
+
+    const horizon=
+        Math.max(
+            80,
+            viewHeight*.38
+        );
+
+    ctx.save();
+
+    ctx.globalAlpha=.16;
+    ctx.fillStyle="#172d46";
+
+    ctx.beginPath();
+    ctx.moveTo(0, horizon+100);
+
+    for(let x=0;x<=viewWidth+80;x+=80){
+
+        const wave=
+            Math.sin(
+                (x+cameraX*.12)/170
+            )*55+
+            Math.sin(
+                (x+cameraX*.07)/83
+            )*28;
+
+        ctx.lineTo(
+            x,
+            horizon-wave
+        );
+
+    }
+
+    ctx.lineTo(viewWidth,viewHeight);
+    ctx.lineTo(0,viewHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.globalAlpha=.10;
+    ctx.fillStyle="#0b1c2d";
+
+    ctx.beginPath();
+    ctx.moveTo(0,horizon+160);
+
+    for(let x=0;x<=viewWidth+80;x+=65){
+
+        const wave=
+            Math.sin(
+                (x+cameraX*.18)/125
+            )*42+
+            Math.sin(
+                (x+cameraX*.09)/55
+            )*19;
+
+        ctx.lineTo(
+            x,
+            horizon+55-wave
+        );
+
+    }
+
+    ctx.lineTo(viewWidth,viewHeight);
+    ctx.lineTo(0,viewHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+
+
+    /* =========================================================
+       BLOCOS — textura, bordas e iluminação
+    ========================================================= */
 
     for(
         let y=startY;
@@ -4273,40 +4409,35 @@ function drawWorld(){
         ){
 
             const block=
-                getBlock(
-                    x,
-                    y
-                );
+                getBlock(x,y);
 
-
-            if(
-                block==="air"
-            ){
-
+            if(block==="air")
                 continue;
 
-            }
-
-
             const px=
-                x*
-                TILE_SIZE-
-                cameraX;
-
+                x*TILE_SIZE-cameraX;
 
             const py=
-                y*
-                TILE_SIZE-
-                cameraY;
-
+                y*TILE_SIZE-cameraY;
 
             if(
-                block==="water"
-            ){
+                px>TILE_SIZE+viewWidth ||
+                py>TILE_SIZE+viewHeight ||
+                px<-TILE_SIZE ||
+                py<-TILE_SIZE
+            )
+                continue;
+
+
+            if(block==="water"){
+
+                const wave=
+                    Math.sin(
+                        (x*1.7+performance.now()/700)
+                    )*1.5;
 
                 ctx.fillStyle=
-                    "rgba(45,140,205,.72)";
-
+                    "rgba(34,137,205,.78)";
 
                 ctx.fillRect(
                     px,
@@ -4315,62 +4446,44 @@ function drawWorld(){
                     TILE_SIZE
                 );
 
+                ctx.fillStyle=
+                    "rgba(125,220,255,.20)";
 
-                /*
-                   Brilho superficial
-                */
+                ctx.fillRect(
+                    px,
+                    py+5+wave,
+                    TILE_SIZE,
+                    3
+                );
 
-                if(
-                    y===SEA_LEVEL ||
-                    y===SEA_LEVEL+1
-                ){
+                ctx.fillStyle=
+                    "rgba(10,74,145,.16)";
 
-                    ctx.strokeStyle=
-                        "rgba(190,235,255,.45)";
+                ctx.fillRect(
+                    px,
+                    py+TILE_SIZE-6,
+                    TILE_SIZE,
+                    6
+                );
 
-                    ctx.lineWidth=1;
+                ctx.strokeStyle=
+                    "rgba(210,245,255,.28)";
 
+                ctx.lineWidth=1;
 
-                    ctx.beginPath();
-
-
-                    ctx.moveTo(
-                        px+3,
-                        py+8
-                    );
-
-
-                    ctx.lineTo(
-                        px+13,
-                        py+8
-                    );
-
-
-                    ctx.moveTo(
-                        px+19,
-                        py+15
-                    );
-
-
-                    ctx.lineTo(
-                        px+29,
-                        py+15
-                    );
-
-
-                    ctx.stroke();
-
-                }
-
+                ctx.beginPath();
+                ctx.moveTo(px+4,py+13);
+                ctx.lineTo(px+13,py+13);
+                ctx.moveTo(px+20,py+21);
+                ctx.lineTo(px+29,py+21);
+                ctx.stroke();
 
                 continue;
-
             }
 
 
             const info=
                 BLOCKS[block];
-
 
             if(!info)
                 continue;
@@ -4378,7 +4491,6 @@ function drawWorld(){
 
             ctx.fillStyle=
                 info.color;
-
 
             ctx.fillRect(
                 px,
@@ -4388,63 +4500,237 @@ function drawWorld(){
             );
 
 
-            /*
+            /* sombra inferior */
+            ctx.fillStyle=
+                "rgba(0,0,0,.10)";
+
+            ctx.fillRect(
+                px,
+                py+TILE_SIZE-4,
+                TILE_SIZE,
+                4
+            );
+
+
+            /* borda sutil */
+            ctx.strokeStyle=
+                "rgba(0,0,0,.12)";
+
+            ctx.lineWidth=1;
+
+            ctx.strokeRect(
+                px+.5,
+                py+.5,
+                TILE_SIZE-1,
+                TILE_SIZE-1
+            );
+
+
+            /* =================================================
                GRAMA
-            */
+            ================================================= */
 
-            if(
-                block==="grass"
-            ){
+            if(block==="grass"){
 
-                ctx.fillStyle=
-                    "#6ec553";
+                ctx.fillStyle="#75d158";
+                ctx.fillRect(px,py,TILE_SIZE,7);
 
+                ctx.fillStyle="#4b9e3b";
+                ctx.fillRect(px,py+7,TILE_SIZE,3);
 
-                ctx.fillRect(
-                    px,
-                    py,
-                    TILE_SIZE,
-                    6
-                );
+                for(let i=0;i<5;i++){
 
+                    const sx=
+                        px+3+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                910+i
+                            )*26
+                        );
 
-                /*
-                   Pequena variação de textura.
-                */
+                    const sy=
+                        py+11+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                920+i
+                            )*17
+                        );
 
-                ctx.fillStyle=
-                    "rgba(35,90,30,.20)";
+                    ctx.fillStyle=
+                        i%2===0
+                        ? "rgba(45,110,38,.28)"
+                        : "rgba(140,205,78,.22)";
 
+                    ctx.fillRect(
+                        sx,
+                        sy,
+                        2,
+                        3
+                    );
 
-                ctx.fillRect(
-                    px+5,
-                    py+15,
-                    3,
-                    4
-                );
-
-
-                ctx.fillRect(
-                    px+22,
-                    py+22,
-                    3,
-                    3
-                );
+                }
 
             }
 
 
-            /*
-               NEVE
-            */
+            /* =================================================
+               TERRA / LAMA
+            ================================================= */
 
             if(
-                block==="snow"
+                block==="dirt" ||
+                block==="mud"
             ){
 
-                ctx.fillStyle=
-                    "rgba(255,255,255,.55)";
+                for(let i=0;i<7;i++){
 
+                    const sx=
+                        px+2+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                930+i
+                            )*27
+                        );
+
+                    const sy=
+                        py+3+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                940+i
+                            )*26
+                        );
+
+                    ctx.fillStyle=
+                        block==="mud"
+                        ? (
+                            i%2
+                            ? "rgba(42,30,24,.28)"
+                            : "rgba(120,95,70,.20)"
+                        )
+                        : (
+                            i%2
+                            ? "rgba(75,42,24,.25)"
+                            : "rgba(190,120,68,.16)"
+                        );
+
+                    ctx.fillRect(
+                        sx,
+                        sy,
+                        2+(i%2),
+                        2+(i%2)
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               PEDRA
+            ================================================= */
+
+            if(block==="stone"){
+
+                for(let i=0;i<8;i++){
+
+                    const sx=
+                        px+2+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                950+i
+                            )*27
+                        );
+
+                    const sy=
+                        py+2+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                960+i
+                            )*27
+                        );
+
+                    ctx.fillStyle=
+                        i%3===0
+                        ? "rgba(255,255,255,.13)"
+                        : "rgba(30,35,40,.18)";
+
+                    ctx.fillRect(
+                        sx,
+                        sy,
+                        3+(i%2),
+                        2+(i%3===0?1:0)
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               AREIA
+            ================================================= */
+
+            if(block==="sand"){
+
+                for(let i=0;i<9;i++){
+
+                    const sx=
+                        px+2+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                970+i
+                            )*28
+                        );
+
+                    const sy=
+                        py+2+
+                        Math.floor(
+                            seededRandom(
+                                x,
+                                y,
+                                980+i
+                            )*28
+                        );
+
+                    ctx.fillStyle=
+                        i%2
+                        ? "rgba(135,105,46,.20)"
+                        : "rgba(255,240,170,.22)";
+
+                    ctx.fillRect(
+                        sx,
+                        sy,
+                        2,
+                        2
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               NEVE
+            ================================================= */
+
+            if(block==="snow"){
+
+                ctx.fillStyle=
+                    "rgba(255,255,255,.72)";
 
                 ctx.fillRect(
                     px,
@@ -4453,313 +4739,250 @@ function drawWorld(){
                     7
                 );
 
-
                 ctx.fillStyle=
-                    "rgba(180,210,225,.18)";
-
+                    "rgba(155,190,215,.18)";
 
                 ctx.fillRect(
-                    px+6,
-                    py+18,
-                    7,
+                    px,
+                    py+7,
+                    TILE_SIZE,
                     3
                 );
 
+                for(let i=0;i<5;i++){
+
+                    const sx=
+                        px+3+
+                        Math.floor(
+                            seededRandom(x,y,990+i)*27
+                        );
+
+                    const sy=
+                        py+12+
+                        Math.floor(
+                            seededRandom(x,y,1000+i)*16
+                        );
+
+                    ctx.fillStyle=
+                        "rgba(120,160,185,.20)";
+
+                    ctx.fillRect(sx,sy,3,2);
+
+                }
+
+            }
+
+
+            /* =================================================
+               MADEIRA
+            ================================================= */
+
+            if(block==="wood"){
+
+                ctx.fillStyle=
+                    "rgba(52,27,13,.32)";
+
+                ctx.fillRect(
+                    px+5,
+                    py,
+                    4,
+                    TILE_SIZE
+                );
 
                 ctx.fillRect(
                     px+21,
-                    py+25,
-                    5,
-                    3
-                );
-
-            }
-
-
-            /*
-               AREIA
-            */
-
-            if(
-                block==="sand"
-            ){
-
-                ctx.fillStyle=
-                    "rgba(150,120,55,.18)";
-
-
-                ctx.fillRect(
-                    px+5,
-                    py+8,
+                    py,
                     3,
-                    3
+                    TILE_SIZE
                 );
-
-
-                ctx.fillRect(
-                    px+20,
-                    py+20,
-                    4,
-                    3
-                );
-
-            }
-
-
-            /*
-               PEDRA
-            */
-
-            if(
-                block==="stone"
-            ){
-
-                ctx.fillStyle=
-                    "rgba(255,255,255,.08)";
-
-
-                ctx.fillRect(
-                    px+5,
-                    py+7,
-                    5,
-                    4
-                );
-
-
-                ctx.fillRect(
-                    px+20,
-                    py+18,
-                    4,
-                    5
-                );
-
-
-                ctx.fillRect(
-                    px+12,
-                    py+26,
-                    3,
-                    3
-                );
-
-            }
-
-
-            /*
-               CARVÃO
-            */
-
-            if(
-                block==="coal"
-            ){
-
-                ctx.fillStyle=
-                    "#16191c";
-
-
-                ctx.fillRect(
-                    px+6,
-                    py+7,
-                    7,
-                    6
-                );
-
-
-                ctx.fillRect(
-                    px+19,
-                    py+19,
-                    6,
-                    7
-                );
-
-
-                ctx.fillRect(
-                    px+11,
-                    py+23,
-                    4,
-                    4
-                );
-
-            }
-
-
-            /*
-               FERRO
-            */
-
-            if(
-                block==="iron"
-            ){
-
-                ctx.fillStyle=
-                    "#d1c6b2";
-
-
-                ctx.fillRect(
-                    px+5,
-                    py+6,
-                    7,
-                    7
-                );
-
-
-                ctx.fillRect(
-                    px+19,
-                    py+18,
-                    6,
-                    6
-                );
-
-
-                ctx.fillRect(
-                    px+12,
-                    py+22,
-                    4,
-                    4
-                );
-
-            }
-
-
-            /*
-               OURO
-            */
-
-            if(
-                block==="gold"
-            ){
-
-                ctx.fillStyle=
-                    "#ffe76a";
-
-
-                ctx.fillRect(
-                    px+6,
-                    py+6,
-                    7,
-                    7
-                );
-
-
-                ctx.fillRect(
-                    px+19,
-                    py+19,
-                    7,
-                    7
-                );
-
-
-                ctx.fillRect(
-                    px+12,
-                    py+14,
-                    5,
-                    5
-                );
-
-            }
-
-
-            /*
-               MADEIRA
-            */
-
-            if(
-                block==="wood"
-            ){
 
                 ctx.strokeStyle=
-                    "rgba(50,25,10,.4)";
-
+                    "rgba(220,155,85,.25)";
 
                 ctx.beginPath();
 
-
                 ctx.moveTo(
-                    px+8,
-                    py
+                    px+13,
+                    py+2
                 );
-
 
                 ctx.lineTo(
-                    px+8,
-                    py+
-                    TILE_SIZE
+                    px+13,
+                    py+29
                 );
 
+                ctx.stroke();
 
-                ctx.moveTo(
-                    px+21,
-                    py
+                ctx.strokeStyle=
+                    "rgba(255,215,140,.22)";
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    px+16,
+                    py+16,
+                    6,
+                    0,
+                    Math.PI*2
                 );
-
-
-                ctx.lineTo(
-                    px+21,
-                    py+
-                    TILE_SIZE
-                );
-
 
                 ctx.stroke();
 
             }
 
 
-            /*
+            /* =================================================
                FOLHAS
-            */
+            ================================================= */
+
+            if(block==="leaves"){
+
+                for(let i=0;i<8;i++){
+
+                    const sx=
+                        px+1+
+                        Math.floor(
+                            seededRandom(x,y,1010+i)*29
+                        );
+
+                    const sy=
+                        py+1+
+                        Math.floor(
+                            seededRandom(x,y,1020+i)*29
+                        );
+
+                    ctx.fillStyle=
+                        i%3===0
+                        ? "rgba(175,235,100,.30)"
+                        : "rgba(20,95,42,.22)";
+
+                    ctx.fillRect(
+                        sx,
+                        sy,
+                        4,
+                        4
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               MINÉRIOS — veios maiores e brilhantes
+            ================================================= */
 
             if(
-                block==="leaves"
+                block==="coal" ||
+                block==="iron" ||
+                block==="gold"
             ){
 
+                const palette={
+                    coal:{
+                        dark:"#14171a",
+                        light:"#596068"
+                    },
+                    iron:{
+                        dark:"#7e786f",
+                        light:"#e8dfcf"
+                    },
+                    gold:{
+                        dark:"#a47716",
+                        light:"#ffe875"
+                    }
+                }[block];
+
                 ctx.fillStyle=
-                    "rgba(150,220,100,.18)";
+                    palette.dark;
 
+                const oreSpots=[
+                    [5,7,7,6],
+                    [18,5,6,7],
+                    [11,17,8,7],
+                    [21,21,6,6]
+                ];
 
-                ctx.fillRect(
-                    px+5,
-                    py+6,
-                    7,
-                    7
+                oreSpots.forEach(
+                    (spot,index)=>{
+
+                        if(
+                            seededRandom(
+                                x,
+                                y,
+                                1030+index
+                            )>.20
+                        ){
+
+                            ctx.fillRect(
+                                px+spot[0],
+                                py+spot[1],
+                                spot[2],
+                                spot[3]
+                            );
+
+                        }
+
+                    }
                 );
 
+                ctx.fillStyle=
+                    palette.light;
+
+                ctx.fillRect(
+                    px+7,
+                    py+8,
+                    3,
+                    3
+                );
 
                 ctx.fillRect(
                     px+20,
-                    py+18,
-                    6,
-                    6
+                    py+6,
+                    3,
+                    3
                 );
 
             }
 
 
-            /*
-               LAMA
-            */
+            /* =================================================
+               CACTO
+            ================================================= */
 
-            if(
-                block==="mud"
-            ){
+            if(block==="cactus"){
 
-                ctx.fillStyle=
-                    "rgba(30,20,15,.18)";
-
-
+                ctx.fillStyle="#4cac50";
                 ctx.fillRect(
-                    px+4,
-                    py+7,
-                    7,
-                    5
+                    px+8,
+                    py,
+                    16,
+                    TILE_SIZE
                 );
 
-
+                ctx.fillStyle="#226b35";
                 ctx.fillRect(
-                    px+20,
-                    py+20,
-                    6,
-                    5
+                    px+9,
+                    py,
+                    3,
+                    TILE_SIZE
                 );
+
+                ctx.fillStyle="#8bd46a";
+
+                for(let i=0;i<5;i++){
+
+                    const sy=
+                        py+4+i*5;
+
+                    ctx.fillRect(
+                        px+13,
+                        sy,
+                        5,
+                        1
+                    );
+
+                }
 
             }
 
@@ -4768,374 +4991,225 @@ function drawWorld(){
     }
 
 
-    /*
-       ÁRVORES
-    */
+    /* =========================================================
+       ÁRVORES — silhuetas detalhadas por bioma
+    ========================================================= */
 
     for(
-        let x=startX;
-        x<=endX;
+        let x=startX-1;
+        x<=endX+1;
         x++
     ){
 
-        if(
-            !hasTreeAt(x)
-        ){
-
+        if(!hasTreeAt(x))
             continue;
-
-        }
-
-
-        const biome=
-            getBiome(x);
-
 
         const surface=
             getSurfaceBlockY(x);
-
 
         const height=
             getTreeHeight(x);
 
+        const biome=
+            getBiome(x);
 
         const baseX=
-            x*
-            TILE_SIZE-
-            cameraX;
-
+            x*TILE_SIZE-cameraX;
 
         const baseY=
-            surface*
-            TILE_SIZE-
-            cameraY;
+            surface*TILE_SIZE-cameraY;
 
+        const trunkHeight=
+            height*TILE_SIZE;
 
-        /*
-           TRONCO
-        */
+        let trunkColor="#74451f";
+        let leafColor="#2f8c42";
+        let leafLight="#65bd4b";
 
-        let trunkColor=
-            "#704625";
+        if(biome.name==="Taiga"){
+            trunkColor="#68452f";
+            leafColor="#245d3d";
+            leafLight="#3f8b58";
+        }
 
+        if(biome.name==="Pântano"){
+            trunkColor="#503a28";
+            leafColor="#286c39";
+            leafLight="#4c9a45";
+        }
 
-        if(
-            biome.name==="Taiga"
-        ){
+        if(biome.name==="Savana"){
+            trunkColor="#8a5a2c";
+            leafColor="#568d35";
+            leafLight="#8ab64d";
+        }
 
-            trunkColor=
-                "#68452d";
-
+        if(biome.name==="Floresta Sombria"){
+            trunkColor="#422c22";
+            leafColor="#1e4d32";
+            leafLight="#3c7650";
         }
 
 
-        if(
-            biome.name==="Savana"
-        ){
+        /* sombra da copa */
 
-            trunkColor=
-                "#765035";
+        ctx.fillStyle="rgba(0,0,0,.12)";
 
-        }
+        ctx.beginPath();
+
+        ctx.ellipse(
+            baseX+16,
+            baseY-5,
+            35,
+            8,
+            0,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
 
 
-        if(
-            biome.name==="Pântano"
-        ){
+        /* tronco */
 
-            trunkColor=
-                "#55402d";
-
-        }
-
-
-        ctx.fillStyle=
-            trunkColor;
-
+        ctx.fillStyle=trunkColor;
 
         ctx.fillRect(
             baseX+11,
-            baseY-
-            height*
-            TILE_SIZE,
-            10,
-            height*
-            TILE_SIZE
+            baseY-trunkHeight,
+            11,
+            trunkHeight
         );
 
-
-        /*
-           TRONCO COM TEXTURA
-        */
-
-        ctx.fillStyle=
-            "rgba(35,20,10,.25)";
-
+        ctx.fillStyle="rgba(255,205,120,.18)";
 
         ctx.fillRect(
             baseX+13,
-            baseY-
-            height*
-            TILE_SIZE,
+            baseY-trunkHeight,
             3,
-            height*
-            TILE_SIZE
+            trunkHeight
         );
 
 
-        /*
-           COR DA FOLHAGEM
-        */
+        /* copa */
 
-        let leafColor=
-            "#2e7938";
+        const crownY=
+            baseY-
+            trunkHeight+
+            18;
 
-
-        if(
-            biome.name==="Floresta"
-        ){
-
-            leafColor=
-                "#28753a";
-
-        }
-
-
-        if(
-            biome.name==="Floresta Sombria"
-        ){
-
-            leafColor=
-                "#183f28";
-
-        }
-
-
-        if(
-            biome.name==="Pântano"
-        ){
-
-            leafColor=
-                "#315d31";
-
-        }
-
+        ctx.fillStyle=leafColor;
 
         if(
             biome.name==="Taiga"
         ){
 
-            leafColor=
-                "#225b35";
-
-        }
-
-
-        if(
-            biome.name==="Savana"
-        ){
-
-            leafColor=
-                "#4f7e32";
-
-        }
-
-
-        ctx.fillStyle=
-            leafColor;
-
-
-        /*
-           TAIGA
-        */
-
-        if(
-            biome.name==="Taiga"
-        ){
-
-            for(
-                let i=0;
-                i<4;
-                i++
-            ){
+            for(let layer=0;layer<4;layer++){
 
                 const width=
-                    48-
-                    i*8;
+                    55-layer*10;
 
+                const y=
+                    crownY+
+                    layer*14;
 
-                ctx.fillRect(
-                    baseX+
-                    16-
-                    width/2,
-                    baseY-
-                    height*
-                    TILE_SIZE+
-                    i*15,
-                    width,
-                    23
+                ctx.beginPath();
+                ctx.moveTo(baseX+16,y-25);
+                ctx.lineTo(
+                    baseX+16-width/2,
+                    y+16
                 );
+                ctx.lineTo(
+                    baseX+16+width/2,
+                    y+16
+                );
+                ctx.closePath();
+                ctx.fill();
 
             }
 
-        }
-
-
-        /*
-           SAVANA
-        */
-
-        else if(
+        }else if(
             biome.name==="Savana"
         ){
 
-            ctx.fillRect(
-                baseX-20,
-                baseY-
-                height*
-                TILE_SIZE-
-                18,
-                62,
-                25
+            ctx.beginPath();
+
+            ctx.ellipse(
+                baseX+16,
+                crownY,
+                39,
+                24,
+                0,
+                0,
+                Math.PI*2
             );
 
+            ctx.fill();
 
-            ctx.fillRect(
-                baseX+14,
-                baseY-
-                height*
-                TILE_SIZE-
-                8,
-                43,
-                22
-            );
+        }else{
 
-        }
+            const blobs=[
+                [-22,0,23],
+                [0,-17,28],
+                [24,1,24],
+                [4,14,29],
+                [-5,-2,28]
+            ];
 
+            blobs.forEach(
+                blob=>{
 
-        /*
-           PÂNTANO
-        */
+                    ctx.beginPath();
 
-        else if(
-            biome.name==="Pântano"
-        ){
+                    ctx.arc(
+                        baseX+16+blob[0],
+                        crownY+blob[1],
+                        blob[2],
+                        0,
+                        Math.PI*2
+                    );
 
-            ctx.fillRect(
-                baseX-15,
-                baseY-
-                height*
-                TILE_SIZE-
-                20,
-                50,
-                30
-            );
+                    ctx.fill();
 
-
-            ctx.fillRect(
-                baseX-3,
-                baseY-
-                height*
-                TILE_SIZE-
-                30,
-                42,
-                24
-            );
-
-
-            /*
-               Galho lateral
-            */
-
-            ctx.fillRect(
-                baseX+17,
-                baseY-
-                height*
-                TILE_SIZE+
-                28,
-                28,
-                6
+                }
             );
 
         }
 
+        ctx.fillStyle=leafLight;
 
-        /*
-           FLORESTA SOMBRIA
-        */
+        ctx.beginPath();
 
-        else if(
-            biome.name==="Floresta Sombria"
-        ){
+        ctx.arc(
+            baseX+7,
+            crownY-10,
+            10,
+            0,
+            Math.PI*2
+        );
 
-            ctx.fillRect(
-                baseX-22,
-                baseY-
-                height*
-                TILE_SIZE-
-                20,
-                72,
-                35
-            );
+        ctx.fill();
 
+        ctx.fillStyle="rgba(170,235,110,.18)";
 
-            ctx.fillRect(
-                baseX-10,
-                baseY-
-                height*
-                TILE_SIZE-
-                37,
-                62,
-                30
-            );
+        ctx.beginPath();
 
+        ctx.arc(
+            baseX+24,
+            crownY-17,
+            7,
+            0,
+            Math.PI*2
+        );
 
-            ctx.fillRect(
-                baseX+4,
-                baseY-
-                height*
-                TILE_SIZE-
-                51,
-                42,
-                28
-            );
-
-        }
-
-
-        /*
-           FLORESTAS NORMAIS / PLANÍCIE
-        */
-
-        else{
-
-            for(
-                let i=-1;
-                i<=1;
-                i++
-            ){
-
-                ctx.fillRect(
-                    baseX+
-                    i*14,
-                    baseY-
-                    height*
-                    TILE_SIZE-
-                    20,
-                    35,
-                    30
-                );
-
-            }
-
-        }
+        ctx.fill();
 
     }
 
 
-    /*
-       CACTOS
-    */
+    /* =========================================================
+       CACTOS GRANDES
+    ========================================================= */
 
     for(
         let x=startX;
@@ -5143,113 +5217,97 @@ function drawWorld(){
         x++
     ){
 
-        if(
-            !hasCactusAt(x)
-        ){
-
+        if(!hasCactusAt(x))
             continue;
-
-        }
-
 
         const surface=
             getSurfaceBlockY(x);
-
 
         const height=
             getCactusHeight(x);
 
-
         const baseX=
-            x*
-            TILE_SIZE-
-            cameraX;
-
+            x*TILE_SIZE-cameraX;
 
         const baseY=
-            surface*
-            TILE_SIZE-
-            cameraY;
+            surface*TILE_SIZE-cameraY;
 
+        const h=
+            height*TILE_SIZE;
 
-        ctx.fillStyle=
-            "#27873d";
-
+        ctx.fillStyle="#3b9d48";
 
         ctx.fillRect(
-            baseX+11,
-            baseY-
-            height*
-            TILE_SIZE,
-            10,
-            height*
-            TILE_SIZE
+            baseX+9,
+            baseY-h,
+            14,
+            h
         );
 
-
-        ctx.fillStyle=
-            "#1d6731";
-
+        ctx.fillStyle="#1e6937";
 
         ctx.fillRect(
-            baseX+13,
-            baseY-
-            height*
-            TILE_SIZE,
+            baseX+10,
+            baseY-h,
             3,
-            height*
-            TILE_SIZE
+            h
         );
 
+        ctx.fillStyle="#78c85c";
 
-        if(
-            height>=2
-        ){
-
-            ctx.fillStyle=
-                "#27873d";
-
+        for(let i=0;i<height*3;i++){
 
             ctx.fillRect(
-                baseX+3,
-                baseY-
-                height*
-                TILE_SIZE+
-                22,
-                8,
-                20
+                baseX+14,
+                baseY-h+7+i*9,
+                5,
+                1
             );
 
         }
 
-
-        if(
-            height>=3 &&
-            seededRandom(
-                x,
-                height,
-                557
-            )>.5
-        ){
+        if(height>=2){
 
             ctx.fillRect(
-                baseX+21,
-                baseY-
-                height*
-                TILE_SIZE+
-                40,
+                baseX+2,
+                baseY-h+24,
+                8,
+                19
+            );
+
+            ctx.fillRect(
+                baseX+1,
+                baseY-h+22,
+                10,
+                5
+            );
+
+        }
+
+        if(height>=3){
+
+            ctx.fillRect(
+                baseX+23,
+                baseY-h+43,
                 8,
                 18
             );
 
+            ctx.fillRect(
+                baseX+22,
+                baseY-h+40,
+                10,
+                5
+            );
+
         }
 
     }
 
 
-    /*
-       GRAMA / VEGETAÇÃO
-    */
+    /* =========================================================
+       DETALHES DE SOLO — grama, flores e cogumelos
+    ========================================================= */
 
     for(
         let x=startX;
@@ -5257,215 +5315,224 @@ function drawWorld(){
         x++
     ){
 
-        if(
-            !hasGrassDetailAt(x)
-        ){
+        const surface=
+            getSurfaceBlockY(x);
 
-            continue;
+        const px=
+            x*TILE_SIZE-cameraX;
+
+        const py=
+            surface*TILE_SIZE-cameraY;
+
+
+        if(hasGrassDetailAt(x)){
+
+            ctx.strokeStyle="#3f923d";
+            ctx.lineWidth=2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(px+8,py);
+            ctx.lineTo(px+6,py-9);
+
+            ctx.moveTo(px+14,py);
+            ctx.lineTo(px+17,py-11);
+
+            ctx.stroke();
 
         }
 
 
-        const surface=
-            getSurfaceBlockY(x);
+        if(hasFlowerAt(x)){
+
+            ctx.strokeStyle="#4b963d";
+            ctx.lineWidth=1;
+
+            ctx.beginPath();
+            ctx.moveTo(px+16,py);
+            ctx.lineTo(px+16,py-10);
+            ctx.stroke();
+
+            ctx.fillStyle=
+                seededRandom(x,surface,603)>.5
+                ? "#ffd85a"
+                : "#f16b85";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                px+16,
+                py-13,
+                4,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+            ctx.fillStyle="#fff0a0";
+
+            ctx.fillRect(
+                px+15,
+                py-14,
+                2,
+                2
+            );
+
+        }
 
 
-        const px=
-            x*
-            TILE_SIZE-
-            cameraX;
+        if(hasMushroomAt(x)){
 
+            ctx.fillStyle="#d9554a";
 
-        const py=
-            surface*
-            TILE_SIZE-
-            cameraY;
+            ctx.beginPath();
 
+            ctx.arc(
+                px+16,
+                py-8,
+                8,
+                Math.PI,
+                Math.PI*2
+            );
 
-        ctx.strokeStyle=
-            "#3e8e38";
+            ctx.fill();
 
+            ctx.fillStyle="#eee2d1";
 
-        ctx.lineWidth=2;
+            ctx.fillRect(
+                px+14,
+                py-5,
+                5,
+                7
+            );
 
+            ctx.fillStyle="rgba(255,255,255,.75)";
 
-        ctx.beginPath();
+            ctx.fillRect(px+12,py-9,2,2);
+            ctx.fillRect(px+17,py-11,2,2);
 
-
-        ctx.moveTo(
-            px+9,
-            py
-        );
-
-
-        ctx.lineTo(
-            px+7,
-            py-9
-        );
-
-
-        ctx.moveTo(
-            px+13,
-            py
-        );
-
-
-        ctx.lineTo(
-            px+16,
-            py-10
-        );
-
-
-        ctx.stroke();
+        }
 
     }
 
 
-    /*
-       FLORES
-    */
+    /* =========================================================
+       SOMBRA DE PROFUNDIDADE / ESCURIDÃO SUBTERRÂNEA
+    ========================================================= */
 
     for(
-        let x=startX;
-        x<=endX;
-        x++
+        let y=startY;
+        y<=endY;
+        y++
     ){
 
-        if(
-            !hasFlowerAt(x)
-        ){
-
+        if(y<SEA_LEVEL+3)
             continue;
 
-        }
+        const darkness=
+            clamp(
+                (y-SEA_LEVEL-3)*.018,
+                0,
+                .34
+            );
 
-
-        const surface=
-            getSurfaceBlockY(x);
-
-
-        const px=
-            x*
-            TILE_SIZE-
-            cameraX;
-
-
-        const py=
-            surface*
-            TILE_SIZE-
-            cameraY;
-
-
-        ctx.strokeStyle=
-            "#438c38";
-
-        ctx.lineWidth=1;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            px+16,
-            py
-        );
-
-        ctx.lineTo(
-            px+16,
-            py-10
-        );
-
-        ctx.stroke();
-
+        if(darkness<=0)
+            continue;
 
         ctx.fillStyle=
-            seededRandom(
-                x,
-                surface,
-                603
-            )>.5
-            ?
-            "#f2d64b"
-            :
-            "#e95b73";
-
+            `rgba(8,12,18,${darkness})`;
 
         ctx.fillRect(
-            px+13,
-            py-13,
-            7,
-            7
+            0,
+            y*TILE_SIZE-cameraY,
+            viewWidth,
+            TILE_SIZE
         );
 
     }
 
 
-    /*
-       COGUMELOS
-    */
+    /* =========================================================
+       BRILHO AMBIENTAL — noite/dia
+    ========================================================= */
 
-    for(
-        let x=startX;
-        x<=endX;
-        x++
-    ){
+    const now=
+        performance.now();
 
-        if(
-            !hasMushroomAt(x)
-        ){
+    const dayDuration=
+        15*60*1000;
 
-            continue;
+    const cycle=
+        (
+            now%
+            (dayDuration*2)
+        )/
+        (dayDuration*2);
 
-        }
+    const daylight=
+        Math.sin(
+            cycle*Math.PI*2
+        )*.5+.5;
+
+    if(daylight<.34){
+
+        const night=
+            clamp(
+                (.34-daylight)/.34,
+                0,
+                1
+            );
+
+        ctx.fillStyle=
+            `rgba(4,9,24,${night*.24})`;
+
+        ctx.fillRect(
+            0,
+            0,
+            viewWidth,
+            viewHeight
+        );
+
+    }
 
 
-        const surface=
-            getSurfaceBlockY(x);
+    /* Destaque do bloco apontado pelo mouse.
+       Ajuda a enxergar exatamente o bloco que será quebrado. */
+    if(mouseBlock.active){
 
-
-        const px=
-            x*
-            TILE_SIZE-
+        const bx=
+            mouseBlock.x*TILE_SIZE-
             cameraX;
 
-
-        const py=
-            surface*
-            TILE_SIZE-
+        const by=
+            mouseBlock.y*TILE_SIZE-
             cameraY;
 
+        if(
+            canReachBlock(
+                mouseBlock.x,
+                mouseBlock.y
+            )
+        ){
 
-        ctx.fillStyle=
-            "#e05a45";
+            ctx.strokeStyle=
+                "rgba(255,255,255,.82)";
 
+            ctx.lineWidth=2;
 
-        ctx.fillRect(
-            px+10,
-            py-10,
-            12,
-            7
-        );
+            ctx.strokeRect(
+                bx+1,
+                by+1,
+                TILE_SIZE-2,
+                TILE_SIZE-2
+            );
 
-
-        ctx.fillStyle=
-            "#d7d7d7";
-
-
-        ctx.fillRect(
-            px+15,
-            py-4,
-            3,
-            5
-        );
+        }
 
     }
 
 }
-
-
-/* ============================================================
-   JOGADOR
-============================================================ */
-
 function drawPlayer(){
 
     const px=
@@ -5477,21 +5544,100 @@ function drawPlayer(){
         cameraY;
 
 
-    ctx.fillStyle=
-        "#3c82f6";
+    /* sombra no chão */
+    ctx.fillStyle="rgba(0,0,0,.22)";
 
+    ctx.beginPath();
+
+    ctx.ellipse(
+        px+player.width/2,
+        py+player.height+3,
+        14,
+        4,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* pernas */
+    ctx.fillStyle="#253d78";
 
     ctx.fillRect(
-        px,
-        py,
-        player.width,
-        player.height
+        px+3,
+        py+31,
+        7,
+        13
+    );
+
+    ctx.fillRect(
+        px+12,
+        py+31,
+        7,
+        13
     );
 
 
-    ctx.fillStyle=
-        "#f0c29b";
+    /* botas */
+    ctx.fillStyle="#151a25";
 
+    ctx.fillRect(
+        px+2,
+        py+40,
+        9,
+        5
+    );
+
+    ctx.fillRect(
+        px+11,
+        py+40,
+        10,
+        5
+    );
+
+
+    /* corpo */
+    ctx.fillStyle="#3d83e8";
+
+    ctx.fillRect(
+        px+2,
+        py+18,
+        player.width-4,
+        16
+    );
+
+    ctx.fillStyle="#6eafff";
+
+    ctx.fillRect(
+        px+4,
+        py+20,
+        4,
+        11
+    );
+
+
+    /* braços */
+    ctx.fillStyle="#f0bd92";
+
+    ctx.fillRect(
+        px-2,
+        py+20,
+        5,
+        12
+    );
+
+    ctx.fillRect(
+        px+19,
+        py+20,
+        5,
+        12
+    );
+
+
+    /* cabeça */
+    ctx.fillStyle="#f1c39b";
 
     ctx.fillRect(
         px+3,
@@ -5501,32 +5647,71 @@ function drawPlayer(){
     );
 
 
-    ctx.fillStyle=
-        "#111";
+    /* cabelo */
+    ctx.fillStyle="#4b2c20";
 
+    ctx.fillRect(
+        px+3,
+        py+3,
+        player.width-6,
+        5
+    );
+
+    ctx.fillRect(
+        px+3,
+        py+6,
+        4,
+        5
+    );
+
+
+    /* olhos */
+    ctx.fillStyle="#10151c";
 
     ctx.fillRect(
         px+7,
-        py+9,
+        py+11,
         3,
         3
     );
-
 
     ctx.fillRect(
         px+14,
-        py+9,
+        py+11,
         3,
         3
     );
 
+
+    /* brilho dos olhos */
+    ctx.fillStyle="#ffffff";
+
+    ctx.fillRect(
+        px+8,
+        py+11,
+        1,
+        1
+    );
+
+    ctx.fillRect(
+        px+15,
+        py+11,
+        1,
+        1
+    );
+
+
+    /* boca */
+    ctx.fillStyle="rgba(110,55,45,.55)";
+
+    ctx.fillRect(
+        px+9,
+        py+16,
+        5,
+        1
+    );
+
 }
-
-
-/* ============================================================
-   HUD
-============================================================ */
-
 function updateHUD(){
 
     document.getElementById(
@@ -6108,7 +6293,14 @@ async function createPlayerWorld(
                     userId,
 
                 inventory:
-                    hotbar
+                    hotbar.map(
+                        item=>({
+                            id:item.id,
+                            name:item.name,
+                            icon:item.icon,
+                            count:0
+                        })
+                    )
 
             });
 
@@ -7280,6 +7472,45 @@ window.addEventListener(
 /* ============================================================
    MOUSE
 ============================================================ */
+
+canvas.addEventListener(
+    "mousemove",
+    event=>{
+
+        const rect=
+            canvas.getBoundingClientRect();
+
+        mouseBlock.x=
+            Math.floor(
+                (
+                    event.clientX-
+                    rect.left+
+                    cameraX
+                )/
+                TILE_SIZE
+            );
+
+        mouseBlock.y=
+            Math.floor(
+                (
+                    event.clientY-
+                    rect.top+
+                    cameraY
+                )/
+                TILE_SIZE
+            );
+
+        mouseBlock.active=true;
+
+    }
+);
+
+canvas.addEventListener(
+    "mouseleave",
+    ()=>{
+        mouseBlock.active=false;
+    }
+);
 
 canvas.addEventListener(
     "mousedown",
