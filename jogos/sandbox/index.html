@@ -881,7 +881,7 @@ const player = {
     vy:0,
 
     speed:4,
-    jump:11,
+    jump:8.2,
 
     onGround:true,
 
@@ -920,75 +920,290 @@ let mouseBlock={
 
 
 /* ============================================================
+   FÍSICA DA ÁGUA
+============================================================ */
+
+const waterLevels = {};
+
+let lastWaterSimulation = 0;
+
+const WATER_SIMULATION_INTERVAL = 260;
+const WATER_MAX_FLOW_DISTANCE = 4;
+const WATER_SIMULATION_RADIUS = 18;
+const WATER_MAX_MOVES_PER_TICK = 28;
+
+function waterKey(x,y){
+    return `${x},${y}`;
+}
+
+function getWaterLevel(x,y){
+
+    const key=waterKey(x,y);
+
+    if(
+        Object.prototype.hasOwnProperty.call(
+            waterLevels,
+            key
+        )
+    ){
+        return waterLevels[key];
+    }
+
+    return 0;
+}
+
+function setWaterLevel(x,y,level){
+
+    const key=waterKey(x,y);
+
+    if(level<=0){
+        delete waterLevels[key];
+        return;
+    }
+
+    waterLevels[key]=level;
+}
+
+function clearWaterLevel(x,y){
+    delete waterLevels[waterKey(x,y)];
+}
+
+function tryFlowWater(fromX,fromY,toX,toY,newLevel){
+
+    if(
+        Math.abs(toX-playerBlockX())>WATER_SIMULATION_RADIUS ||
+        Math.abs(toY-playerBlockY())>WATER_SIMULATION_RADIUS
+    ){
+        return false;
+    }
+
+    if(getBlock(toX,toY)!=="air"){
+        return false;
+    }
+
+    if(newLevel>WATER_MAX_FLOW_DISTANCE){
+        return false;
+    }
+
+    setBlock(toX,toY,"water");
+    setWaterLevel(toX,toY,newLevel);
+
+    return true;
+}
+
+function playerBlockX(){
+    return Math.floor(
+        (player.x+player.width/2)/TILE_SIZE
+    );
+}
+
+function playerBlockY(){
+    return Math.floor(
+        (player.y+player.height/2)/TILE_SIZE
+    );
+}
+
+function updateWaterPhysics(){
+
+    const now=performance.now();
+
+    if(
+        now-lastWaterSimulation<WATER_SIMULATION_INTERVAL
+    ){
+        return;
+    }
+
+    lastWaterSimulation=now;
+
+    const centerX=playerBlockX();
+    const centerY=playerBlockY();
+
+    const sources=[];
+
+    for(
+        let y=centerY-WATER_SIMULATION_RADIUS;
+        y<=centerY+WATER_SIMULATION_RADIUS;
+        y++
+    ){
+
+        for(
+            let x=centerX-WATER_SIMULATION_RADIUS;
+            x<=centerX+WATER_SIMULATION_RADIUS;
+            x++
+        ){
+
+            if(getBlock(x,y)==="water"){
+
+                sources.push({
+                    x,
+                    y,
+                    level:getWaterLevel(x,y)
+                });
+
+            }
+
+        }
+
+    }
+
+    let moves=0;
+
+    for(const water of sources){
+
+        if(moves>=WATER_MAX_MOVES_PER_TICK)
+            break;
+
+        const belowY=water.y+1;
+
+        if(
+            getBlock(water.x,belowY)==="air"
+        ){
+
+            if(
+                tryFlowWater(
+                    water.x,
+                    water.y,
+                    water.x,
+                    belowY,
+                    Math.min(
+                        WATER_MAX_FLOW_DISTANCE,
+                        water.level+1
+                    )
+                )
+            ){
+                moves++;
+                continue;
+            }
+
+        }
+
+        if(water.level>=WATER_MAX_FLOW_DISTANCE)
+            continue;
+
+        const directions=
+            Math.random()<.5
+            ? [-1,1]
+            : [1,-1];
+
+        for(const dir of directions){
+
+            if(moves>=WATER_MAX_MOVES_PER_TICK)
+                break;
+
+            const tx=water.x+dir;
+            const ty=water.y;
+
+            if(
+                getBlock(tx,ty)==="air" &&
+                getBlock(tx,ty+1)!=="air"
+            ){
+
+                if(
+                    tryFlowWater(
+                        water.x,
+                        water.y,
+                        tx,
+                        ty,
+                        water.level+1
+                    )
+                ){
+                    moves++;
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
    INVENTÁRIO
 ============================================================ */
 
-const hotbar = [
+const ALL_INVENTORY_ITEMS = [
 
     {
         id:"grass",
         name:"Grama",
-        icon:"🌱",
-        count:0
+        icon:"🌱"
     },
 
     {
         id:"dirt",
         name:"Terra",
-        icon:"🟫",
-        count:0
+        icon:"🟫"
     },
 
     {
         id:"stone",
         name:"Pedra",
-        icon:"🪨",
-        count:0
+        icon:"🪨"
     },
 
     {
         id:"wood",
         name:"Madeira",
-        icon:"🪵",
-        count:0
+        icon:"🪵"
     },
 
     {
         id:"leaves",
         name:"Folhas",
-        icon:"🍃",
-        count:0
+        icon:"🍃"
     },
 
     {
         id:"sand",
         name:"Areia",
-        icon:"🟨",
-        count:0
+        icon:"🟨"
     },
 
     {
         id:"coal",
         name:"Carvão",
-        icon:"⚫",
-        count:0
+        icon:"⚫"
     },
 
     {
         id:"iron",
         name:"Ferro",
-        icon:"🔩",
-        count:0
+        icon:"🔩"
     },
 
     {
         id:"gold",
         name:"Ouro",
-        icon:"🟡",
-        count:0
+        icon:"🟡"
     }
 
 ];
+
+/*
+   A hotbar agora representa somente os itens que o jogador
+   realmente possui. O jogador começa com ela vazia.
+*/
+let hotbar = [];
+
+function resetInventory(){
+
+    hotbar = [];
+
+    selectedSlot = 0;
+
+    updateHotbar();
+
+}
+
+function getInventoryDefinition(id){
+
+    return ALL_INVENTORY_ITEMS.find(
+        item=>item.id===id
+    );
+
+}
 
 
 /* ============================================================
@@ -2778,6 +2993,22 @@ function setBlock(
         )
     ]=type;
 
+    if(type!=="water"){
+        clearWaterLevel(
+            blockX,
+            blockY
+        );
+    }else if(!Object.prototype.hasOwnProperty.call(
+        waterLevels,
+        waterKey(blockX,blockY)
+    )){
+        setWaterLevel(
+            blockX,
+            blockY,
+            1
+        );
+    }
+
 
     exploredChunks[chunk]=true;
 
@@ -3456,6 +3687,11 @@ function handleCanvasClick(
             "air"
         );
 
+        clearWaterLevel(
+            target.x,
+            target.y
+        );
+
 
         addItem(
             current,
@@ -3552,31 +3788,34 @@ function addItem(
     count
 ){
 
+    if(!Number.isFinite(count) || count<=0)
+        return;
+
     let slot=
         hotbar.find(
-            item=>
-                item.id===id
+            item=>item.id===id
         );
-
 
     if(!slot){
 
-        slot=
-            hotbar.find(
-                item=>
-                    item.count<=0
-            );
+        const definition=
+            getInventoryDefinition(id);
+
+        if(!definition)
+            return;
+
+        slot={
+            id:definition.id,
+            name:definition.name,
+            icon:definition.icon,
+            count:0
+        };
+
+        hotbar.push(slot);
 
     }
 
-
-    if(slot){
-
-        slot.count+=
-            count;
-
-    }
-
+    slot.count+=Math.floor(count);
 
     updateHotbar();
 
@@ -3585,14 +3824,25 @@ function addItem(
 
 function updateHotbar(){
 
+    /* Remove qualquer item vazio para que a interface mostre
+       somente aquilo que foi realmente coletado. */
+    hotbar=hotbar.filter(
+        item=>
+            Number(item.count)>0
+    );
+
+    if(hotbar.length===0){
+        selectedSlot=0;
+    }else if(selectedSlot>=hotbar.length){
+        selectedSlot=hotbar.length-1;
+    }
+
     const element=
         document.getElementById(
             "hotbar"
         );
 
-
     element.innerHTML="";
-
 
     hotbar.forEach(
         (item,index)=>{
@@ -3601,7 +3851,6 @@ function updateHotbar(){
                 document.createElement(
                     "div"
                 );
-
 
             slot.className=
                 "hot-slot"+
@@ -3612,7 +3861,6 @@ function updateHotbar(){
                     :
                     ""
                 );
-
 
             slot.innerHTML=`
 
@@ -3630,7 +3878,6 @@ function updateHotbar(){
 
             `;
 
-
             slot.addEventListener(
                 "click",
                 ()=>{
@@ -3641,7 +3888,6 @@ function updateHotbar(){
 
                 }
             );
-
 
             element.appendChild(
                 slot
@@ -3673,11 +3919,13 @@ function initializeWeather(){
 
     weather.targetRainIntensity=0;
 
+    /* Primeira chuva só pode chegar depois de um período
+       relativamente longo e imprevisível. */
     weather.nextChange=
         now+
-        25000+
+        60000+
         Math.random()*
-        30000;
+        120000;
 
     weather.rainEnd=0;
 
@@ -3713,9 +3961,9 @@ function updateWeather(){
 
             weather.rainEnd=
                 now+
-                35000+
+                60000+
                 Math.random()*
-                50000;
+                90000;
 
         }else{
 
@@ -3727,9 +3975,9 @@ function updateWeather(){
 
             weather.clearEnd=
                 now+
-                18000+
+                45000+
                 Math.random()*
-                22000;
+                75000;
 
         }
 
@@ -3757,9 +4005,9 @@ function updateWeather(){
 
         weather.nextChange=
             now+
-            18000+
+            45000+
             Math.random()*
-            22000;
+            75000;
 
     }
 
@@ -4431,13 +4679,31 @@ function drawWorld(){
 
             if(block==="water"){
 
-                const wave=
+                const waterLevel=
+                    getWaterLevel(x,y);
+
+                const flowOffset=
                     Math.sin(
-                        (x*1.7+performance.now()/700)
-                    )*1.5;
+                        x*.9+
+                        y*.35+
+                        performance.now()/520
+                    )*1.8;
+
+                const surfaceWave=
+                    Math.sin(
+                        x*1.7+
+                        performance.now()/650
+                    )*1.8;
+
+                const depthShade=
+                    Math.min(
+                        .24+
+                        waterLevel*.045,
+                        .42
+                    );
 
                 ctx.fillStyle=
-                    "rgba(34,137,205,.78)";
+                    "rgba(34,137,205,.80)";
 
                 ctx.fillRect(
                     px,
@@ -4447,35 +4713,47 @@ function drawWorld(){
                 );
 
                 ctx.fillStyle=
-                    "rgba(125,220,255,.20)";
+                    `rgba(125,220,255,${.22+Math.max(0,4-waterLevel)*.025})`;
 
                 ctx.fillRect(
                     px,
-                    py+5+wave,
+                    py+4+surfaceWave+flowOffset*.15,
                     TILE_SIZE,
-                    3
+                    4
                 );
 
                 ctx.fillStyle=
-                    "rgba(10,74,145,.16)";
+                    `rgba(10,74,145,${depthShade})`;
 
                 ctx.fillRect(
                     px,
-                    py+TILE_SIZE-6,
+                    py+TILE_SIZE-7,
                     TILE_SIZE,
-                    6
+                    7
                 );
 
                 ctx.strokeStyle=
-                    "rgba(210,245,255,.28)";
+                    "rgba(210,245,255,.34)";
 
                 ctx.lineWidth=1;
 
                 ctx.beginPath();
-                ctx.moveTo(px+4,py+13);
-                ctx.lineTo(px+13,py+13);
-                ctx.moveTo(px+20,py+21);
-                ctx.lineTo(px+29,py+21);
+                ctx.moveTo(
+                    px+3+flowOffset,
+                    py+13+surfaceWave*.25
+                );
+                ctx.lineTo(
+                    px+13+flowOffset,
+                    py+13+surfaceWave*.25
+                );
+                ctx.moveTo(
+                    px+19-flowOffset*.5,
+                    py+22
+                );
+                ctx.lineTo(
+                    px+29-flowOffset*.5,
+                    py+22
+                );
                 ctx.stroke();
 
                 continue;
@@ -5797,6 +6075,8 @@ function gameLoop(){
 
             updateWeather();
 
+            updateWaterPhysics();
+
             updatePlayer();
 
         }
@@ -5843,29 +6123,31 @@ async function savePlayerInventory(){
     if(!currentPlayer)
         return false;
 
-
     const inventoryData=
-        hotbar.map(
-            item=>({
+        hotbar
+            .filter(
+                item=>Number(item.count)>0
+            )
+            .map(
+                item=>({
 
-                id:item.id,
+                    id:item.id,
 
-                name:item.name,
+                    name:item.name,
 
-                icon:item.icon,
+                    icon:item.icon,
 
-                count:Math.max(
-                    0,
-                    Math.floor(
-                        Number(
-                            item.count
-                        )||0
+                    count:Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                item.count
+                            )||0
+                        )
                     )
-                )
 
-            })
-        );
-
+                })
+            );
 
     const {error}=
         await supabaseClient
@@ -5887,7 +6169,6 @@ async function savePlayerInventory(){
                 }
             );
 
-
     if(error){
 
         console.error(
@@ -5898,7 +6179,6 @@ async function savePlayerInventory(){
         return false;
 
     }
-
 
     return true;
 
@@ -6239,6 +6519,9 @@ async function createPlayerWorld(
     userId
 ){
 
+    hotbar=[];
+    selectedSlot=0;
+
     const seed=
         randomSeed();
 
@@ -6292,15 +6575,7 @@ async function createPlayerWorld(
                 user_id:
                     userId,
 
-                inventory:
-                    hotbar.map(
-                        item=>({
-                            id:item.id,
-                            name:item.name,
-                            icon:item.icon,
-                            count:0
-                        })
-                    )
+                inventory:[]
 
             });
 
@@ -6335,6 +6610,9 @@ async function loadPlayerWorld(){
     setSaveStatus(
         "Carregando..."
     );
+
+    hotbar=[];
+    selectedSlot=0;
 
 
     const {
@@ -6491,22 +6769,45 @@ async function loadPlayerWorld(){
         )
     ){
 
+        /* Compatível com o formato antigo e com o novo formato. */
+        hotbar=[];
+
         inventoryData.inventory.forEach(
-            (saved,index)=>{
+            saved=>{
+
+                if(!saved || !saved.id)
+                    return;
+
+                const definition=
+                    getInventoryDefinition(
+                        saved.id
+                    );
+
+                const count=
+                    Math.floor(
+                        Number(saved.count)||0
+                    );
 
                 if(
-                    hotbar[index]
+                    definition &&
+                    count>0
                 ){
 
-                    hotbar[index].count=
-                        Number(
-                            saved.count
-                        )||0;
+                    hotbar.push({
+                        id:definition.id,
+                        name:definition.name,
+                        icon:definition.icon,
+                        count
+                    });
 
                 }
 
             }
         );
+
+    }else{
+
+        hotbar=[];
 
     }
 
@@ -6514,6 +6815,12 @@ async function loadPlayerWorld(){
     exploredChunks={};
 
     modifiedBlocks={};
+
+    for(const key of Object.keys(waterLevels)){
+        delete waterLevels[key];
+    }
+
+    lastWaterSimulation=performance.now();
 
 
     const {
@@ -7446,10 +7753,18 @@ window.addEventListener(
             key<="9"
         ){
 
-            selectedSlot=
+            const requestedSlot=
                 Number(key)-1;
 
-            updateHotbar();
+            if(
+                hotbar[requestedSlot]
+            ){
+
+                selectedSlot=requestedSlot;
+
+                updateHotbar();
+
+            }
 
         }
 
