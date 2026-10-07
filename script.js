@@ -4,8 +4,8 @@ const games = [
     category: "Aventura",
     icon: "🌎",
     description: "Explore, construa, quebre blocos e descubra um mundo cheio de aventuras.",
-    link: "<iframe src="https://hello-there-friend-576.lovable.app/ludix.html" width="100%" height="600" style="border:none;"></iframe>
-"
+    link: "https://theo1326.github.io/ludixs/jogos/sandbox/"
+
     },
     
     {
