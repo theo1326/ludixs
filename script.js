@@ -5,7 +5,6 @@ const games = [
     icon: "🌎",
     description: "Explore, construa, quebre blocos e descubra um mundo cheio de aventuras.",
     link: "https://theo1326.github.io/ludixs/jogos/sandbox/"
-
     },
     
     {
